@@ -48,3 +48,13 @@ Abstract:
 Evaluate the paper as a daily research briefing candidate for students/researchers.
 Respond with valid JSON only."""
 
+
+def build_scholar_prompt(item) -> tuple[str, str]:
+    """Build an optional LLM analysis prompt for one normalized paper."""
+    from aurora.ai.ranker import item_prompt_payload
+
+    return (
+        RESEARCH_ANALYSIS_SYSTEM,
+        "Analyze this research paper for novelty, learning value, and implementation usefulness:\n"
+        + item_prompt_payload(item),
+    )

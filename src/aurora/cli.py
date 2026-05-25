@@ -116,6 +116,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--hours", type=int, default=None)
     run_parser.add_argument("--repo-interest", action="append", default=None)
     run_parser.add_argument("--research-field", action="append", default=None)
+    run_parser.add_argument("--skip-llm", action="store_true")
     run_parser.add_argument("--dry-run", action="store_true")
 
     return parser
@@ -158,7 +159,7 @@ def _handle_run(args: argparse.Namespace) -> int:
                 file=sys.stderr,
             )
             return 2
-        results = asyncio.run(_run_real_modes(config, modes, run_id))
+        results = asyncio.run(_run_real_modes(config, modes, run_id, skip_llm=args.skip_llm))
 
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
@@ -201,7 +202,7 @@ async def _run_dry_modes(
 
 
 async def _run_real_modes(
-    config: AuroraConfig, modes: Sequence[ModeName], run_id: str
+    config: AuroraConfig, modes: Sequence[ModeName], run_id: str, *, skip_llm: bool = False
 ) -> list[Any]:
     now = datetime.now(timezone.utc)
     runner = PipelineRunner(output_dir=config.run.output_dir)
@@ -213,6 +214,7 @@ async def _run_real_modes(
             config=config,
             since=now - timedelta(hours=config.run.time_window_hours),
             until=now,
+            metadata={"skip_llm": skip_llm},
         )
         if mode == "tech_news":
             pipeline = build_tech_news_pipeline(config)

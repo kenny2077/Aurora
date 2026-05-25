@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from datetime import datetime
 from typing import Any
 
+from aurora.ai.ranker import LLMRanker
 from aurora.config import ScholarModeConfig
 from aurora.modes.scholar.fields import (
     expanded_arxiv_categories,
@@ -16,6 +17,7 @@ from aurora.modes.scholar.fields import (
     field_tags,
 )
 from aurora.models import ScoreResult, SignalItem
+from aurora.modes.scholar.prompts import build_scholar_prompt
 from aurora.pipeline import StageContext
 
 
@@ -75,6 +77,9 @@ class ScholarScorer:
 class ScholarEnricher:
     """Apply scholar score results to SignalItem fields."""
 
+    def __init__(self, llm_ranker: LLMRanker | None = None) -> None:
+        self.llm_ranker = llm_ranker
+
     async def enrich(
         self,
         items: Sequence[SignalItem],
@@ -103,7 +108,10 @@ class ScholarEnricher:
                     }
                 )
             )
-        return enriched
+        if self.llm_ranker is None:
+            return enriched
+        analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
+        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
 
 
 def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:

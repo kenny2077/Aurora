@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import httpx
 
+from aurora.ai import LLMRanker
 from aurora.config import AuroraConfig
 from aurora.modes.scholar.render import ScholarRenderer, ScholarSummarizer
 from aurora.modes.scholar.scoring import ScholarEnricher, ScholarScorer
@@ -19,6 +20,10 @@ def build_scholar_pipeline(
     scholar = config.modes.scholar
     if not scholar.enabled:
         raise ValueError("scholar mode is disabled")
+    llm_ranker = LLMRanker(
+        config.ai,
+        weights=config.pipeline.scoring.default_final_weights,
+    )
 
     return ModePipeline(
         mode="scholar",
@@ -29,9 +34,8 @@ def build_scholar_pipeline(
         normalize_stage=ScholarNormalizeStage(),
         deduplicate_stage=ScholarDeduplicateStage(),
         score_stage=ScholarScorer(scholar),
-        enrich_stage=ScholarEnricher(),
+        enrich_stage=ScholarEnricher(llm_ranker),
         summarize_stage=ScholarSummarizer(scholar),
         render_stage=ScholarRenderer(),
         deliver_stage=NoopDeliveryStage(),
     )
-

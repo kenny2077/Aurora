@@ -7,6 +7,8 @@ from collections.abc import Sequence
 from datetime import datetime, timezone
 
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
+from aurora.ai.ranker import LLMRanker
+from aurora.modes.tech_news.prompts import build_tech_news_prompt
 from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
 
@@ -62,6 +64,9 @@ class TechNewsScorer:
 class TechNewsEnricher:
     """Apply score results to SignalItem fields."""
 
+    def __init__(self, llm_ranker: LLMRanker | None = None) -> None:
+        self.llm_ranker = llm_ranker
+
     async def enrich(
         self,
         items: Sequence[SignalItem],
@@ -89,7 +94,10 @@ class TechNewsEnricher:
                     }
                 )
             )
-        return enriched
+        if self.llm_ranker is None:
+            return enriched
+        analyses = await self.llm_ranker.analyze_items(enriched, build_tech_news_prompt, context)
+        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
 
 
 def _source_authority(item: SignalItem) -> float:
@@ -132,4 +140,3 @@ def _topic_relevance(matches: list[str]) -> float:
 def _matched_keywords(item: SignalItem, keywords: list[str]) -> list[str]:
     text = f"{item.title} {item.raw_content}".lower()
     return [keyword for keyword in keywords if keyword in text]
-

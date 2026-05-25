@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import httpx
 
+from aurora.ai import LLMRanker
 from aurora.config import AuroraConfig
 from aurora.pipeline import ModePipeline
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
@@ -19,6 +20,10 @@ def build_tech_news_pipeline(
     tech_news = config.modes.tech_news
     if not tech_news.enabled:
         raise ValueError("tech_news mode is disabled")
+    llm_ranker = LLMRanker(
+        config.ai,
+        weights=config.pipeline.scoring.default_final_weights,
+    )
 
     return ModePipeline(
         mode="tech_news",
@@ -29,9 +34,8 @@ def build_tech_news_pipeline(
         normalize_stage=TechNewsNormalizeStage(),
         deduplicate_stage=TechNewsDeduplicateStage(),
         score_stage=TechNewsScorer(tech_news.filters, tech_news.scoring),
-        enrich_stage=TechNewsEnricher(),
+        enrich_stage=TechNewsEnricher(llm_ranker),
         summarize_stage=TechNewsSummarizer(),
         render_stage=TechNewsRenderer(),
         deliver_stage=NoopDeliveryStage(),
     )
-

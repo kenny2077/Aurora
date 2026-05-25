@@ -14,8 +14,10 @@ from typing import Any
 
 import httpx
 
+from aurora.ai.ranker import LLMRanker
 from aurora.config import RepoLearningModeConfig
 from aurora.modes.repo_learning.github_client import GitHubRepoClient
+from aurora.modes.repo_learning.prompts import build_repo_learning_prompt
 from aurora.modes.repo_learning.state import RepoLearningStateStore
 from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
@@ -116,9 +118,11 @@ class RepoLearningEnricher:
         config: RepoLearningModeConfig,
         *,
         http_client: httpx.AsyncClient | None = None,
+        llm_ranker: LLMRanker | None = None,
     ) -> None:
         self.config = config
         self.http_client = http_client
+        self.llm_ranker = llm_ranker
 
     async def enrich(
         self,
@@ -181,7 +185,10 @@ class RepoLearningEnricher:
                     }
                 )
             )
-        return enriched
+        if self.llm_ranker is None:
+            return enriched
+        analyses = await self.llm_ranker.analyze_items(enriched, build_repo_learning_prompt, context)
+        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
 
 
 def extract_package_files(paths: Sequence[str], *, limit: int = 30) -> list[str]:
