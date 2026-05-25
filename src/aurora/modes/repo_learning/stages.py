@@ -52,8 +52,9 @@ class RepoLearningDeduplicateStage:
 class RepoLearningDeliveryStage:
     """No-op delivery that records selected repositories as recently recommended."""
 
-    def __init__(self, state_store: RepoLearningStateStore) -> None:
+    def __init__(self, state_store: RepoLearningStateStore, downstream=None) -> None:
         self.state_store = state_store
+        self.downstream = downstream
 
     async def deliver(
         self, rendered: RenderedDigest, context: StageContext
@@ -64,11 +65,15 @@ class RepoLearningDeliveryStage:
             if str(repo_id).strip()
         ]
         self.state_store.mark_recommended(repo_ids, context.until or datetime.now(timezone.utc))
+        state_result = DeliveryResult(
+            channel="repo_learning_state",
+            metadata={"recommended_count": len(repo_ids)},
+        )
+        if self.downstream is None:
+            return [state_result]
         return [
-            DeliveryResult(
-                channel="dry_run",
-                metadata={"recommended_count": len(repo_ids)},
-            )
+            state_result,
+            *(await self.downstream.deliver(rendered, context)),
         ]
 
 

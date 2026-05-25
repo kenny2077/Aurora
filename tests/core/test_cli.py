@@ -11,7 +11,10 @@ def test_config_validate_succeeds_with_defaults(capsys) -> None:
     exit_code = main(["config", "validate"])
 
     assert exit_code == 0
-    assert "config: ok" in capsys.readouterr().out
+    output = capsys.readouterr().out
+    assert "config: ok" in output
+    assert "enabled modes:" in output
+    assert "missing required env vars:" in output
 
 
 def test_config_validate_succeeds_with_temp_config(tmp_path: Path, capsys) -> None:
@@ -22,6 +25,29 @@ def test_config_validate_succeeds_with_temp_config(tmp_path: Path, capsys) -> No
 
     assert exit_code == 0
     assert "config: ok" in capsys.readouterr().out
+
+
+def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        """
+        {
+          "run": {"output_dir": "data/runs", "cache_dir": "data/cache"},
+          "delivery": {
+            "filesystem": {"reports_dir": "reports"},
+            "github_pages": {"publish_dir": "site"}
+          }
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    exit_code = main(["doctor", "--config", str(config_path)])
+    output = capsys.readouterr().out
+
+    assert exit_code == 0
+    assert "doctor: ok" in output
+    assert "missing optional env vars:" in output
 
 
 def test_config_validate_invalid_config_exits_nonzero(tmp_path: Path, capsys) -> None:

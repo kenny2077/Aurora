@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import os
 import sys
 from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
@@ -89,6 +90,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "config":
             return _handle_config(args)
+        if args.command == "doctor":
+            return _handle_doctor(args)
         if args.command == "run":
             return _handle_run(args)
     except Exception as exc:
@@ -108,6 +111,9 @@ def _build_parser() -> argparse.ArgumentParser:
     validate_parser = config_subparsers.add_parser("validate", help="Validate Aurora config")
     validate_parser.add_argument("--config", type=Path, default=None)
 
+    doctor_parser = subparsers.add_parser("doctor", help="Check Aurora runtime environment")
+    doctor_parser.add_argument("--config", type=Path, default=None)
+
     run_parser = subparsers.add_parser("run", help="Run Aurora")
     run_parser.add_argument("--config", type=Path, default=None)
     run_parser.add_argument("--mode", choices=MODE_CHOICES, default=None)
@@ -117,17 +123,39 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--repo-interest", action="append", default=None)
     run_parser.add_argument("--research-field", action="append", default=None)
     run_parser.add_argument("--skip-llm", action="store_true")
+    run_parser.add_argument("--skip-delivery", action="store_true")
+    run_parser.add_argument("--strict-delivery", action="store_true")
     run_parser.add_argument("--dry-run", action="store_true")
 
     return parser
 
 
 def _handle_config(args: argparse.Namespace) -> int:
-    if args.config is None:
-        AuroraConfig()
-    else:
-        load_config(args.config)
+    config = AuroraConfig() if args.config is None else load_config(args.config)
     print("config: ok")
+    print(f"enabled modes: {', '.join(config.run.enabled_modes)}")
+    missing = _missing_required_env_vars(config)
+    print(f"missing required env vars: {', '.join(missing) if missing else 'none'}")
+    return 0
+
+
+def _handle_doctor(args: argparse.Namespace) -> int:
+    config = AuroraConfig() if args.config is None else load_config(args.config)
+    print("doctor: ok")
+    print(f"python: {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}")
+    print(f"enabled modes: {', '.join(config.run.enabled_modes)}")
+    for label, path in {
+        "output_dir": config.run.output_dir,
+        "cache_dir": config.run.cache_dir,
+        "state_path": config.run.state_path,
+        "reports_dir": config.delivery.filesystem.reports_dir,
+        "site_dir": config.delivery.github_pages.publish_dir,
+    }.items():
+        print(f"{label}: {'writable' if _is_writable_target(path) else 'not writable'} ({path})")
+    missing_required = _missing_required_env_vars(config)
+    print(f"missing required env vars: {', '.join(missing_required) if missing_required else 'none'}")
+    optional = _missing_optional_env_vars(config)
+    print(f"missing optional env vars: {', '.join(optional) if optional else 'none'}")
     return 0
 
 
@@ -159,7 +187,16 @@ def _handle_run(args: argparse.Namespace) -> int:
                 file=sys.stderr,
             )
             return 2
-        results = asyncio.run(_run_real_modes(config, modes, run_id, skip_llm=args.skip_llm))
+        results = asyncio.run(
+            _run_real_modes(
+                config,
+                modes,
+                run_id,
+                skip_llm=args.skip_llm,
+                skip_delivery=args.skip_delivery,
+                strict_delivery=args.strict_delivery,
+            )
+        )
 
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
@@ -202,7 +239,13 @@ async def _run_dry_modes(
 
 
 async def _run_real_modes(
-    config: AuroraConfig, modes: Sequence[ModeName], run_id: str, *, skip_llm: bool = False
+    config: AuroraConfig,
+    modes: Sequence[ModeName],
+    run_id: str,
+    *,
+    skip_llm: bool = False,
+    skip_delivery: bool = False,
+    strict_delivery: bool = False,
 ) -> list[Any]:
     now = datetime.now(timezone.utc)
     runner = PipelineRunner(output_dir=config.run.output_dir)
@@ -214,7 +257,11 @@ async def _run_real_modes(
             config=config,
             since=now - timedelta(hours=config.run.time_window_hours),
             until=now,
-            metadata={"skip_llm": skip_llm},
+            metadata={
+                "skip_llm": skip_llm,
+                "skip_delivery": skip_delivery,
+                "strict_delivery": strict_delivery,
+            },
         )
         if mode == "tech_news":
             pipeline = build_tech_news_pipeline(config)
@@ -232,6 +279,46 @@ async def _run_real_modes(
 
 def _default_run_id() -> str:
     return datetime.now(timezone.utc).strftime("run-%Y%m%dT%H%M%SZ")
+
+
+def _missing_required_env_vars(config: AuroraConfig) -> list[str]:
+    names: list[str] = []
+    if config.delivery.email.enabled:
+        names.extend(
+            [
+                config.delivery.email.smtp_username_env,
+                config.delivery.email.password_env,
+                config.delivery.email.recipients_env,
+            ]
+        )
+    return [name for name in _unique(names) if not os.getenv(name)]
+
+
+def _missing_optional_env_vars(config: AuroraConfig) -> list[str]:
+    names = [
+        config.ai.api_key_env,
+        config.modes.repo_learning.sources.github_search.token_env,
+    ]
+    if config.delivery.email.enabled:
+        names.extend(
+            [
+                config.delivery.email.smtp_username_env,
+                config.delivery.email.password_env,
+                config.delivery.email.recipients_env,
+            ]
+        )
+    return [name for name in _unique(names) if not os.getenv(name)]
+
+
+def _unique(values: Sequence[str]) -> list[str]:
+    return list(dict.fromkeys(value for value in values if value))
+
+
+def _is_writable_target(path: Path) -> bool:
+    candidate = path if path.suffix == "" else path.parent
+    while not candidate.exists() and candidate != candidate.parent:
+        candidate = candidate.parent
+    return os.access(candidate, os.W_OK)
 
 
 def _build_dry_run_pipeline(mode: str) -> ModePipeline:

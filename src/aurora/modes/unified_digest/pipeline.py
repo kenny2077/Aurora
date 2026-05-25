@@ -5,13 +5,13 @@ from __future__ import annotations
 from collections.abc import Callable
 
 from aurora.config import AuroraConfig
+from aurora.delivery import ConfiguredDeliveryStage
 from aurora.modes.repo_learning import build_repo_learning_pipeline
 from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
 from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer
 from aurora.modes.unified_digest.stages import (
     UnifiedDeduplicateStage,
-    UnifiedDeliveryStage,
     UnifiedEnrichStage,
     UnifiedFetchStage,
     UnifiedNormalizeStage,
@@ -47,5 +47,5 @@ def build_unified_digest_pipeline(
         enrich_stage=UnifiedEnrichStage(),
         summarize_stage=UnifiedDigestSummarizer(unified),
         render_stage=UnifiedDigestRenderer(unified),
-        deliver_stage=UnifiedDeliveryStage(),
+        deliver_stage=ConfiguredDeliveryStage(config),
     )

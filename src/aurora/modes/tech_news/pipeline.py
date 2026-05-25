@@ -6,11 +6,12 @@ import httpx
 
 from aurora.ai import LLMRanker
 from aurora.config import AuroraConfig
+from aurora.delivery import ConfiguredDeliveryStage
 from aurora.pipeline import ModePipeline
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
 from aurora.modes.tech_news.scoring import TechNewsEnricher, TechNewsScorer
 from aurora.modes.tech_news.sources import HackerNewsFetchStage, RSSFetchStage
-from aurora.modes.tech_news.stages import NoopDeliveryStage, TechNewsDeduplicateStage, TechNewsNormalizeStage
+from aurora.modes.tech_news.stages import TechNewsDeduplicateStage, TechNewsNormalizeStage
 
 
 def build_tech_news_pipeline(
@@ -37,5 +38,5 @@ def build_tech_news_pipeline(
         enrich_stage=TechNewsEnricher(llm_ranker),
         summarize_stage=TechNewsSummarizer(),
         render_stage=TechNewsRenderer(),
-        deliver_stage=NoopDeliveryStage(),
+        deliver_stage=ConfiguredDeliveryStage(config),
     )

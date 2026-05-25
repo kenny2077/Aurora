@@ -6,3 +6,5 @@ __pycache__/
 data/runs/
 data/cache/
 data/aurora_state.json
+reports/
+site/

@@ -6,10 +6,11 @@ import httpx
 
 from aurora.ai import LLMRanker
 from aurora.config import AuroraConfig
+from aurora.delivery import ConfiguredDeliveryStage
 from aurora.modes.scholar.render import ScholarRenderer, ScholarSummarizer
 from aurora.modes.scholar.scoring import ScholarEnricher, ScholarScorer
 from aurora.modes.scholar.sources import ArxivFetchStage, OpenReviewFetchStage
-from aurora.modes.scholar.stages import NoopDeliveryStage, ScholarDeduplicateStage, ScholarNormalizeStage
+from aurora.modes.scholar.stages import ScholarDeduplicateStage, ScholarNormalizeStage
 from aurora.pipeline import ModePipeline
 
 
@@ -37,5 +38,5 @@ def build_scholar_pipeline(
         enrich_stage=ScholarEnricher(llm_ranker),
         summarize_stage=ScholarSummarizer(scholar),
         render_stage=ScholarRenderer(),
-        deliver_stage=NoopDeliveryStage(),
+        deliver_stage=ConfiguredDeliveryStage(config),
     )

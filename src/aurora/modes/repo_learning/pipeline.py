@@ -6,6 +6,7 @@ import httpx
 
 from aurora.ai import LLMRanker
 from aurora.config import AuroraConfig
+from aurora.delivery import ConfiguredDeliveryStage
 from aurora.modes.repo_learning.render import RepoLearningRenderer, RepoLearningSummarizer
 from aurora.modes.repo_learning.scoring import RepoLearningEnricher, RepoLearningScorer
 from aurora.modes.repo_learning.sources import GitHubSearchFetchStage
@@ -44,5 +45,5 @@ def build_repo_learning_pipeline(
         ),
         summarize_stage=RepoLearningSummarizer(repo_learning),
         render_stage=RepoLearningRenderer(repo_learning),
-        deliver_stage=RepoLearningDeliveryStage(state_store),
+        deliver_stage=RepoLearningDeliveryStage(state_store, ConfiguredDeliveryStage(config)),
     )
