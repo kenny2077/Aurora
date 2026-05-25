@@ -6,10 +6,12 @@ import argparse
 import asyncio
 import sys
 from collections.abc import Sequence
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from aurora.config import AuroraConfig, ModeName
+from aurora.modes.tech_news import build_tech_news_pipeline
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 from aurora.storage.config_loader import load_config
@@ -107,6 +109,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--mode", choices=MODE_CHOICES, default=None)
     run_parser.add_argument("--output-dir", type=Path, default=None)
     run_parser.add_argument("--run-id", default=None)
+    run_parser.add_argument("--hours", type=int, default=None)
     run_parser.add_argument("--dry-run", action="store_true")
 
     return parser
@@ -122,19 +125,34 @@ def _handle_config(args: argparse.Namespace) -> int:
 
 
 def _handle_run(args: argparse.Namespace) -> int:
-    if not args.dry_run:
-        print("error: only dry-run is available in PR 2", file=sys.stderr)
-        return 2
-
     config = load_config(args.config) if args.config is not None else AuroraConfig()
     if args.output_dir is not None:
         config = config.model_copy(
             update={"run": config.run.model_copy(update={"output_dir": args.output_dir})}
         )
+    if args.hours is not None:
+        if args.hours < 1:
+            print("error: --hours must be at least 1", file=sys.stderr)
+            return 2
+        config = config.model_copy(
+            update={"run": config.run.model_copy(update={"time_window_hours": args.hours})}
+        )
 
     modes = _select_modes(config, args.mode)
-    run_id = args.run_id or "dry-run"
-    results = asyncio.run(_run_dry_modes(config, modes, run_id))
+    run_id = args.run_id or ("dry-run" if args.dry_run else _default_run_id())
+
+    if args.dry_run:
+        results = asyncio.run(_run_dry_modes(config, modes, run_id))
+    else:
+        unsupported = [mode for mode in modes if mode != "tech_news"]
+        if unsupported:
+            print(
+                f"error: mode not implemented yet: {', '.join(unsupported)}",
+                file=sys.stderr,
+            )
+            return 2
+        results = asyncio.run(_run_tech_news(config, run_id))
+
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
@@ -158,6 +176,23 @@ async def _run_dry_modes(
     return results
 
 
+async def _run_tech_news(config: AuroraConfig, run_id: str) -> list[Any]:
+    now = datetime.now(timezone.utc)
+    context = StageContext(
+        mode="tech_news",
+        run_id=run_id,
+        config=config,
+        since=now - timedelta(hours=config.run.time_window_hours),
+        until=now,
+    )
+    runner = PipelineRunner(output_dir=config.run.output_dir)
+    return [await runner.run(build_tech_news_pipeline(config), context)]
+
+
+def _default_run_id() -> str:
+    return datetime.now(timezone.utc).strftime("run-%Y%m%dT%H%M%SZ")
+
+
 def _build_dry_run_pipeline(mode: str) -> ModePipeline:
     return ModePipeline(
         mode=mode,
@@ -174,4 +209,3 @@ def _build_dry_run_pipeline(mode: str) -> ModePipeline:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

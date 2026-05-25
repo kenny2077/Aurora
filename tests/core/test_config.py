@@ -20,6 +20,10 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.pipeline.scoring.score_threshold == 7.0
     assert config.delivery.filesystem.enabled is True
     assert config.delivery.github_pages.enabled is True
+    assert config.modes.tech_news.enabled is True
+    assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 30
+    assert config.modes.tech_news.sources.hackernews.min_score == 100
+    assert config.modes.tech_news.sources.rss == []
 
 
 @pytest.mark.parametrize(
@@ -31,6 +35,8 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"pipeline": {"scoring": {"score_threshold": 10.1}}},
         {"ai": {"analysis_concurrency": 0}},
         {"delivery": {"email": {"smtp_port": 70000}}},
+        {"modes": {"tech_news": {"item_type": "paper"}}},
+        {"modes": {"tech_news": {"sources": {"hackernews": {"fetch_top_stories": 0}}}}},
     ],
 )
 def test_aurora_config_rejects_invalid_ranges(payload: dict) -> None:
@@ -79,4 +85,3 @@ def test_load_config_reads_json_expands_env_and_validates(
 
     assert config.run.state_path == tmp_path / "state.json"
     assert config.ai.api_key_env == "DEEPSEEK_API_KEY"
-

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
 
 ModeName = Literal["tech_news", "scholar", "repo_learning", "unified_digest"]
@@ -177,8 +177,118 @@ class DeliveryConfig(BaseModel):
     github_pages: GitHubPagesDeliveryConfig = Field(default_factory=GitHubPagesDeliveryConfig)
 
 
+class HackerNewsSourceConfig(BaseModel):
+    """Hacker News source configuration for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    fetch_top_stories: int = Field(default=30, ge=1)
+    min_score: int = Field(default=100, ge=0)
+    top_comments_limit: int = Field(default=5, ge=0)
+
+
+class RSSSourceConfig(BaseModel):
+    """RSS/Atom source configuration for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    url: HttpUrl
+    enabled: bool = True
+    category: str | None = None
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("name must be a non-empty string")
+        return value.strip()
+
+
+class TechNewsSourcesConfig(BaseModel):
+    """Source configuration for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    hackernews: HackerNewsSourceConfig = Field(default_factory=HackerNewsSourceConfig)
+    rss: list[RSSSourceConfig] = Field(default_factory=list)
+
+
+class TechNewsFiltersConfig(BaseModel):
+    """Filtering controls for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    min_source_score: float = Field(default=0.0, ge=0.0)
+    include_keywords: list[str] = Field(
+        default_factory=lambda: [
+            "ai",
+            "ml",
+            "llm",
+            "agent",
+            "open source",
+            "developer",
+            "security",
+            "python",
+        ]
+    )
+    exclude_keywords: list[str] = Field(default_factory=list)
+
+    @field_validator("include_keywords", "exclude_keywords")
+    @classmethod
+    def clean_keywords(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            keyword = str(raw).strip().lower()
+            if not keyword or keyword in seen:
+                continue
+            cleaned.append(keyword)
+            seen.add(keyword)
+        return cleaned
+
+
+class TechNewsScoringConfig(BaseModel):
+    """Deterministic scoring weights for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    source_authority_weight: float = Field(default=0.25, ge=0.0)
+    engagement_weight: float = Field(default=0.25, ge=0.0)
+    recency_weight: float = Field(default=0.20, ge=0.0)
+    topic_relevance_weight: float = Field(default=0.30, ge=0.0)
+
+
+class TechNewsModeConfig(BaseModel):
+    """Configuration for Aurora's tech_news MVP mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    item_type: str = "news"
+    sources: TechNewsSourcesConfig = Field(default_factory=TechNewsSourcesConfig)
+    filters: TechNewsFiltersConfig = Field(default_factory=TechNewsFiltersConfig)
+    scoring: TechNewsScoringConfig = Field(default_factory=TechNewsScoringConfig)
+
+    @field_validator("item_type")
+    @classmethod
+    def validate_item_type(cls, value: str) -> str:
+        if value != "news":
+            raise ValueError("tech_news item_type must be 'news'")
+        return value
+
+
+class ModesConfig(BaseModel):
+    """Mode-specific configuration branches."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    tech_news: TechNewsModeConfig = Field(default_factory=TechNewsModeConfig)
+
+
 class AuroraConfig(BaseModel):
-    """Root Aurora configuration for PR 1."""
+    """Root Aurora configuration."""
 
     model_config = ConfigDict(extra="forbid")
 
@@ -186,4 +296,4 @@ class AuroraConfig(BaseModel):
     pipeline: PipelineConfig = Field(default_factory=PipelineConfig)
     ai: AIConfig = Field(default_factory=AIConfig)
     delivery: DeliveryConfig = Field(default_factory=DeliveryConfig)
-
+    modes: ModesConfig = Field(default_factory=ModesConfig)

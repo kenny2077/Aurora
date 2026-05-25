@@ -1,0 +1,135 @@
+"""Deterministic scoring and enrichment for tech_news mode."""
+
+from __future__ import annotations
+
+import math
+from collections.abc import Sequence
+from datetime import datetime, timezone
+
+from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
+from aurora.models import ScoreResult, SignalItem
+from aurora.pipeline import StageContext
+
+
+class TechNewsScorer:
+    """Score tech news items without LLM calls."""
+
+    def __init__(self, filters: TechNewsFiltersConfig, scoring: TechNewsScoringConfig) -> None:
+        self.filters = filters
+        self.scoring = scoring
+
+    async def score(self, items: Sequence[SignalItem], context: StageContext) -> list[ScoreResult]:
+        return [self._score_item(item, context) for item in items]
+
+    def _score_item(self, item: SignalItem, context: StageContext) -> ScoreResult:
+        matched_keywords = _matched_keywords(item, self.filters.include_keywords)
+        if _matched_keywords(item, self.filters.exclude_keywords):
+            return ScoreResult(
+                item_id=item.id,
+                deterministic_score=0.0,
+                final_score=0.0,
+                score_breakdown={"excluded": 0.0},
+                reason="excluded by keyword",
+            )
+
+        breakdown = {
+            "source_authority": _source_authority(item),
+            "engagement": _engagement(item),
+            "recency": _recency(item, context),
+            "topic_relevance": _topic_relevance(matched_keywords),
+        }
+        weights = {
+            "source_authority": self.scoring.source_authority_weight,
+            "engagement": self.scoring.engagement_weight,
+            "recency": self.scoring.recency_weight,
+            "topic_relevance": self.scoring.topic_relevance_weight,
+        }
+        total_weight = sum(weights.values()) or 1.0
+        final_score = sum(breakdown[key] * weights[key] for key in breakdown) / total_weight
+        final_score = round(max(0.0, min(10.0, final_score)), 2)
+        if final_score < self.filters.min_source_score:
+            final_score = 0.0
+        return ScoreResult(
+            item_id=item.id,
+            deterministic_score=final_score,
+            final_score=final_score,
+            score_breakdown=breakdown,
+            reason="deterministic tech_news score",
+            tags=[item.source, *matched_keywords],
+        )
+
+
+class TechNewsEnricher:
+    """Apply score results to SignalItem fields."""
+
+    async def enrich(
+        self,
+        items: Sequence[SignalItem],
+        score_results: Sequence[ScoreResult],
+        context: StageContext,
+    ) -> list[SignalItem]:
+        scores_by_id = {score.item_id: score for score in score_results}
+        enriched: list[SignalItem] = []
+        for item in items:
+            score = scores_by_id.get(item.id)
+            if score is None:
+                enriched.append(item)
+                continue
+            metadata = dict(item.metadata)
+            metadata["score_breakdown"] = score.score_breakdown
+            metadata["score_reason"] = score.reason
+            enriched.append(
+                item.model_copy(
+                    update={
+                        "deterministic_score": score.deterministic_score,
+                        "final_score": score.final_score,
+                        "tags": score.tags,
+                        "action_items": score.action_items,
+                        "metadata": metadata,
+                    }
+                )
+            )
+        return enriched
+
+
+def _source_authority(item: SignalItem) -> float:
+    if item.source == "hackernews":
+        return 8.0
+    if item.source == "rss":
+        return 6.5
+    return 5.0
+
+
+def _engagement(item: SignalItem) -> float:
+    if item.source == "hackernews":
+        score = float(item.metadata.get("score") or 0)
+        comments = float(item.metadata.get("descendants") or 0)
+        return min(10.0, 2.0 + math.log10(score + 1) * 2.2 + math.log10(comments + 1) * 1.2)
+    return 4.0
+
+
+def _recency(item: SignalItem, context: StageContext) -> float:
+    timestamp = item.published_at or item.updated_at
+    if timestamp is None:
+        return 0.0
+    now = context.until or datetime.now(timezone.utc)
+    age_hours = max(0.0, (now - timestamp).total_seconds() / 3600)
+    if age_hours <= 6:
+        return 10.0
+    if age_hours <= 24:
+        return 8.0
+    if age_hours <= 72:
+        return 5.5
+    return 3.0
+
+
+def _topic_relevance(matches: list[str]) -> float:
+    if not matches:
+        return 4.0
+    return min(10.0, 5.0 + len(matches) * 1.5)
+
+
+def _matched_keywords(item: SignalItem, keywords: list[str]) -> list[str]:
+    text = f"{item.title} {item.raw_content}".lower()
+    return [keyword for keyword in keywords if keyword in text]
+
