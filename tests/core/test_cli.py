@@ -113,6 +113,40 @@ def test_run_mode_all_expands_to_config_enabled_modes(tmp_path: Path) -> None:
     assert (output_dir / "dry-run" / "scholar" / "normalized.jsonl").exists()
 
 
+def test_dry_run_smoke_all_modes_including_unified_digest(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text(
+        """
+        {
+          "run": {
+            "enabled_modes": ["tech_news", "scholar", "repo_learning", "unified_digest"]
+          }
+        }
+        """,
+        encoding="utf-8",
+    )
+
+    exit_code = main(
+        [
+            "run",
+            "--dry-run",
+            "--config",
+            str(config_path),
+            "--mode",
+            "all",
+            "--output-dir",
+            str(output_dir),
+        ]
+    )
+
+    assert exit_code == 0
+    assert (output_dir / "dry-run" / "tech_news" / "normalized.jsonl").exists()
+    assert (output_dir / "dry-run" / "scholar" / "normalized.jsonl").exists()
+    assert (output_dir / "dry-run" / "repo_learning" / "normalized.jsonl").exists()
+    assert (output_dir / "dry-run" / "unified_digest" / "normalized.jsonl").exists()
+
+
 def test_real_tech_news_run_uses_pipeline_and_writes_non_empty_snapshots(
     tmp_path: Path, monkeypatch
 ) -> None:

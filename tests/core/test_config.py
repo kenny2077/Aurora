@@ -128,3 +128,11 @@ def test_load_config_reads_json_expands_env_and_validates(
 
     assert config.run.state_path == tmp_path / "state.json"
     assert config.ai.api_key_env == "DEEPSEEK_API_KEY"
+
+
+def test_example_config_validates() -> None:
+    config = load_config(Path("data/config.example.json"))
+
+    assert config.run.enabled_modes == ["unified_digest"]
+    assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
+    assert config.modes.scholar.fields == ["ml", "agents"]
