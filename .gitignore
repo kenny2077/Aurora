@@ -3,3 +3,6 @@ __pycache__/
 .pytest_cache/
 *.py[cod]
 .DS_Store
+data/runs/
+data/cache/
+data/aurora_state.json

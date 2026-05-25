@@ -1,6 +1,7 @@
 """Pipeline contract exports."""
 
 from aurora.pipeline.context import StageContext
+from aurora.pipeline.runner import ModePipeline, PipelineRunResult, PipelineRunner
 from aurora.pipeline.stages import (
     DeduplicateStage,
     DeliverStage,
@@ -17,10 +18,12 @@ __all__ = [
     "DeliverStage",
     "EnrichStage",
     "FetchStage",
+    "ModePipeline",
     "NormalizeStage",
+    "PipelineRunResult",
+    "PipelineRunner",
     "RenderStage",
     "ScoreStage",
     "StageContext",
     "SummarizeStage",
 ]
-
