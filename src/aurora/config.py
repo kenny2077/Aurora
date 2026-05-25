@@ -279,12 +279,129 @@ class TechNewsModeConfig(BaseModel):
         return value
 
 
+class ArxivSourceConfig(BaseModel):
+    """arXiv source configuration for scholar mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    categories: list[str] = Field(
+        default_factory=lambda: ["cs.LG", "cs.AI", "stat.ML", "cs.CL", "cs.RO", "cs.NE"]
+    )
+    max_results: int | None = Field(default=None, ge=1)
+
+
+class OpenReviewSourceConfig(BaseModel):
+    """OpenReview source configuration for scholar mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    venue_ids: list[str] = Field(
+        default_factory=lambda: [
+            "ICLR.cc/2026/Conference",
+            "ICLR.cc/2025/Conference",
+            "ICML.cc/2026/Conference",
+            "ICML.cc/2025/Conference",
+            "NeurIPS.cc/2025/Conference",
+            "NeurIPS.cc/2026/Conference",
+        ]
+    )
+
+    @field_validator("venue_ids")
+    @classmethod
+    def validate_venue_ids(cls, values: list[str]) -> list[str]:
+        cleaned = [value.strip() for value in values if value.strip()]
+        if not cleaned:
+            raise ValueError("at least one OpenReview venue id is required")
+        return cleaned
+
+
+class ScholarSourcesConfig(BaseModel):
+    """Source configuration for scholar mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    arxiv: ArxivSourceConfig = Field(default_factory=ArxivSourceConfig)
+    openreview: OpenReviewSourceConfig = Field(default_factory=OpenReviewSourceConfig)
+
+
+class ScholarModeConfig(BaseModel):
+    """Configuration for Aurora's scholar MVP mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    item_type: str = "paper"
+    max_candidates: int = Field(default=200, ge=1)
+    final_item_count: int = Field(default=10, ge=1)
+    min_year: int = Field(default=2025, ge=1900, le=2100)
+    max_year: int = Field(default=2026, ge=1900, le=2100)
+    score_threshold: float = Field(default=7.0, ge=0.0, le=10.0)
+    venue_allowlist: list[str] = Field(
+        default_factory=lambda: ["ICML", "NeurIPS", "ICLR", "AISTATS", "COLT", "UAI", "MLSys", "TMLR"]
+    )
+    keyword_allowlist: list[str] = Field(
+        default_factory=lambda: [
+            "representation learning",
+            "self-supervised learning",
+            "generative modeling",
+            "diffusion models",
+            "reinforcement learning",
+            "interpretability",
+            "large language models",
+            "multimodal learning",
+            "llm agents",
+            "reasoning",
+            "alignment",
+            "retrieval augmented generation",
+            "tool use",
+            "efficient training",
+            "inference optimization",
+            "learning theory",
+            "optimization",
+        ]
+    )
+    keyword_blocklist: list[str] = Field(
+        default_factory=lambda: [
+            "medical case report",
+            "pure computer vision application",
+            "remote sensing only",
+            "hardware-only",
+            "non-ml survey",
+        ]
+    )
+    sources: ScholarSourcesConfig = Field(default_factory=ScholarSourcesConfig)
+
+    @field_validator("item_type")
+    @classmethod
+    def validate_item_type(cls, value: str) -> str:
+        if value != "paper":
+            raise ValueError("scholar item_type must be 'paper'")
+        return value
+
+    @field_validator("keyword_allowlist", "keyword_blocklist", "venue_allowlist")
+    @classmethod
+    def clean_text_list(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip()
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            cleaned.append(value)
+            seen.add(key)
+        return cleaned
+
+
 class ModesConfig(BaseModel):
     """Mode-specific configuration branches."""
 
     model_config = ConfigDict(extra="forbid")
 
     tech_news: TechNewsModeConfig = Field(default_factory=TechNewsModeConfig)
+    scholar: ScholarModeConfig = Field(default_factory=ScholarModeConfig)
 
 
 class AuroraConfig(BaseModel):

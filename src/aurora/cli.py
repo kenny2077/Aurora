@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from aurora.config import AuroraConfig, ModeName
+from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
@@ -18,6 +19,7 @@ from aurora.storage.config_loader import load_config
 
 
 MODE_CHOICES = ("tech_news", "scholar", "repo_learning", "unified_digest", "all")
+IMPLEMENTED_MODES = ("tech_news", "scholar")
 
 
 class _DryRunFetch:
@@ -144,14 +146,14 @@ def _handle_run(args: argparse.Namespace) -> int:
     if args.dry_run:
         results = asyncio.run(_run_dry_modes(config, modes, run_id))
     else:
-        unsupported = [mode for mode in modes if mode != "tech_news"]
+        unsupported = [mode for mode in modes if mode not in IMPLEMENTED_MODES]
         if unsupported:
             print(
                 f"error: mode not implemented yet: {', '.join(unsupported)}",
                 file=sys.stderr,
             )
             return 2
-        results = asyncio.run(_run_tech_news(config, run_id))
+        results = asyncio.run(_run_real_modes(config, modes, run_id))
 
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
@@ -176,17 +178,28 @@ async def _run_dry_modes(
     return results
 
 
-async def _run_tech_news(config: AuroraConfig, run_id: str) -> list[Any]:
+async def _run_real_modes(
+    config: AuroraConfig, modes: Sequence[ModeName], run_id: str
+) -> list[Any]:
     now = datetime.now(timezone.utc)
-    context = StageContext(
-        mode="tech_news",
-        run_id=run_id,
-        config=config,
-        since=now - timedelta(hours=config.run.time_window_hours),
-        until=now,
-    )
     runner = PipelineRunner(output_dir=config.run.output_dir)
-    return [await runner.run(build_tech_news_pipeline(config), context)]
+    results = []
+    for mode in modes:
+        context = StageContext(
+            mode=mode,
+            run_id=run_id,
+            config=config,
+            since=now - timedelta(hours=config.run.time_window_hours),
+            until=now,
+        )
+        if mode == "tech_news":
+            pipeline = build_tech_news_pipeline(config)
+        elif mode == "scholar":
+            pipeline = build_scholar_pipeline(config)
+        else:
+            raise ValueError(f"mode not implemented yet: {mode}")
+        results.append(await runner.run(pipeline, context))
+    return results
 
 
 def _default_run_id() -> str:

@@ -24,6 +24,12 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 30
     assert config.modes.tech_news.sources.hackernews.min_score == 100
     assert config.modes.tech_news.sources.rss == []
+    assert config.modes.scholar.enabled is True
+    assert config.modes.scholar.max_candidates == 200
+    assert config.modes.scholar.final_item_count == 10
+    assert config.modes.scholar.score_threshold == 7.0
+    assert config.modes.scholar.sources.arxiv.enabled is True
+    assert config.modes.scholar.sources.openreview.enabled is True
 
 
 @pytest.mark.parametrize(
@@ -37,6 +43,9 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"delivery": {"email": {"smtp_port": 70000}}},
         {"modes": {"tech_news": {"item_type": "paper"}}},
         {"modes": {"tech_news": {"sources": {"hackernews": {"fetch_top_stories": 0}}}}},
+        {"modes": {"scholar": {"item_type": "news"}}},
+        {"modes": {"scholar": {"max_candidates": 0}}},
+        {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
     ],
 )
 def test_aurora_config_rejects_invalid_ranges(payload: dict) -> None:
