@@ -30,6 +30,22 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.scholar.score_threshold == 7.0
     assert config.modes.scholar.sources.arxiv.enabled is True
     assert config.modes.scholar.sources.openreview.enabled is True
+    assert config.modes.repo_learning.enabled is True
+    assert config.modes.repo_learning.item_type == "repo"
+    assert config.modes.repo_learning.sources.github_search.enabled is True
+    assert config.modes.repo_learning.sources.github_search.token_env == "GH_SEARCH_TOKEN"
+    assert config.modes.repo_learning.sources.github_search.domains == [
+        "ai-agents",
+        "mcp-ecosystem",
+        "workflow-automation",
+    ]
+    assert config.modes.repo_learning.sources.github_search.min_stars == 500
+    assert config.modes.repo_learning.sources.github_search.recent_years == 2
+    assert config.modes.repo_learning.sources.github_search.active_within_days == 180
+    assert config.modes.repo_learning.sources.github_search.per_page == 20
+    assert config.modes.repo_learning.ranking.final_item_count == 6
+    assert config.modes.repo_learning.ranking.enrich_top_n == 12
+    assert config.modes.repo_learning.ranking.history_lookback_days == 14
 
 
 @pytest.mark.parametrize(
@@ -46,6 +62,10 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"scholar": {"item_type": "news"}}},
         {"modes": {"scholar": {"max_candidates": 0}}},
         {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
+        {"modes": {"repo_learning": {"item_type": "paper"}}},
+        {"modes": {"repo_learning": {"sources": {"github_search": {"domains": []}}}}},
+        {"modes": {"repo_learning": {"sources": {"github_search": {"per_page": 0}}}}},
+        {"modes": {"repo_learning": {"ranking": {"final_item_count": 0}}}},
     ],
 )
 def test_aurora_config_rejects_invalid_ranges(payload: dict) -> None:

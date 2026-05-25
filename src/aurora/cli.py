@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from aurora.config import AuroraConfig, ModeName
+from aurora.modes.repo_learning import build_repo_learning_pipeline
 from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
@@ -19,7 +20,7 @@ from aurora.storage.config_loader import load_config
 
 
 MODE_CHOICES = ("tech_news", "scholar", "repo_learning", "unified_digest", "all")
-IMPLEMENTED_MODES = ("tech_news", "scholar")
+IMPLEMENTED_MODES = ("tech_news", "scholar", "repo_learning")
 
 
 class _DryRunFetch:
@@ -196,6 +197,8 @@ async def _run_real_modes(
             pipeline = build_tech_news_pipeline(config)
         elif mode == "scholar":
             pipeline = build_scholar_pipeline(config)
+        elif mode == "repo_learning":
+            pipeline = build_repo_learning_pipeline(config)
         else:
             raise ValueError(f"mode not implemented yet: {mode}")
         results.append(await runner.run(pipeline, context))

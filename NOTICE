@@ -1,0 +1,19 @@
+Aurora includes code and behavior adapted from the following MIT-licensed
+Horizon-family projects:
+
+- Horizon / Horizon-TechNews: MIT, copyright (c) 2026 Thysrael.
+  Aurora modules adapted from this project include the tech_news RSS/Hacker
+  News source behavior and deterministic news scoring under
+  src/aurora/modes/tech_news/.
+- Horizon-Scholar: MIT, forked from Horizon and carrying the same MIT notice.
+  Aurora modules adapted from this project include arXiv/OpenReview paper
+  ingestion and deterministic scholar scoring under src/aurora/modes/scholar/.
+- Horizon-Github / RepoRadar: MIT as declared in pyproject.toml and README.
+  Aurora modules adapted from this project include GitHub search, README/tree
+  fetch behavior, query preset validation, deterministic repository scoring,
+  package-file extraction, and recently recommended suppression under
+  src/aurora/modes/repo_learning/.
+
+Aurora keeps these adaptations scoped to Aurora's SignalItem and shared pipeline
+contracts. Generated outputs, historical reports, screenshots, and
+secrets-bearing configs from the upstream projects are not copied into Aurora.

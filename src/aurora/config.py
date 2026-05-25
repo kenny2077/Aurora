@@ -395,6 +395,93 @@ class ScholarModeConfig(BaseModel):
         return cleaned
 
 
+class RepoLearningGitHubSearchConfig(BaseModel):
+    """GitHub search source configuration for repo_learning mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    token_env: str = "GH_SEARCH_TOKEN"
+    domains: list[str] = Field(
+        default_factory=lambda: ["ai-agents", "mcp-ecosystem", "workflow-automation"]
+    )
+    min_stars: int = Field(default=500, ge=0)
+    recent_years: int = Field(default=2, ge=0)
+    active_within_days: int = Field(default=180, ge=1)
+    per_page: int = Field(default=20, ge=1, le=100)
+
+    @field_validator("token_env")
+    @classmethod
+    def validate_token_env(cls, value: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("token_env must be a non-empty string")
+        return value.strip()
+
+    @field_validator("domains")
+    @classmethod
+    def clean_domains(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip()
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            cleaned.append(value)
+            seen.add(key)
+        if not cleaned:
+            raise ValueError("at least one repo learning domain is required")
+        return cleaned
+
+
+class RepoLearningFirecrawlConfig(BaseModel):
+    """Placeholder Firecrawl config; no client implementation is part of PR 5."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    api_key_env: str = "FIRECRAWL_API_KEY"
+
+
+class RepoLearningSourcesConfig(BaseModel):
+    """Source configuration for repo_learning mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    github_search: RepoLearningGitHubSearchConfig = Field(
+        default_factory=RepoLearningGitHubSearchConfig
+    )
+    firecrawl: RepoLearningFirecrawlConfig = Field(default_factory=RepoLearningFirecrawlConfig)
+
+
+class RepoLearningRankingConfig(BaseModel):
+    """Ranking and state controls for repo_learning mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    final_item_count: int = Field(default=6, ge=1)
+    enrich_top_n: int = Field(default=12, ge=0)
+    history_lookback_days: int = Field(default=14, ge=1)
+
+
+class RepoLearningModeConfig(BaseModel):
+    """Configuration for Aurora's repo_learning MVP mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    item_type: str = "repo"
+    sources: RepoLearningSourcesConfig = Field(default_factory=RepoLearningSourcesConfig)
+    ranking: RepoLearningRankingConfig = Field(default_factory=RepoLearningRankingConfig)
+
+    @field_validator("item_type")
+    @classmethod
+    def validate_item_type(cls, value: str) -> str:
+        if value != "repo":
+            raise ValueError("repo_learning item_type must be 'repo'")
+        return value
+
+
 class ModesConfig(BaseModel):
     """Mode-specific configuration branches."""
 
@@ -402,6 +489,7 @@ class ModesConfig(BaseModel):
 
     tech_news: TechNewsModeConfig = Field(default_factory=TechNewsModeConfig)
     scholar: ScholarModeConfig = Field(default_factory=ScholarModeConfig)
+    repo_learning: RepoLearningModeConfig = Field(default_factory=RepoLearningModeConfig)
 
 
 class AuroraConfig(BaseModel):
