@@ -55,26 +55,6 @@ def test_run_dry_run_creates_expected_snapshot_files(tmp_path: Path, capsys) -> 
     assert (run_dir / "enriched.jsonl").read_text(encoding="utf-8") == ""
 
 
-def test_run_unimplemented_mode_without_dry_run_exits_nonzero(capsys) -> None:
-    exit_code = main(["run", "--mode", "unified_digest"])
-
-    assert exit_code == 2
-    assert "mode not implemented yet: unified_digest" in capsys.readouterr().err
-
-
-def test_run_mode_all_reports_unimplemented_modes_from_config(tmp_path: Path, capsys) -> None:
-    config_path = tmp_path / "config.json"
-    config_path.write_text(
-        '{"run": {"enabled_modes": ["repo_learning", "unified_digest"]}}',
-        encoding="utf-8",
-    )
-
-    exit_code = main(["run", "--mode", "all", "--config", str(config_path)])
-
-    assert exit_code == 2
-    assert "mode not implemented yet: unified_digest" in capsys.readouterr().err
-
-
 def test_run_mode_all_expands_to_config_enabled_modes(tmp_path: Path) -> None:
     config_path = tmp_path / "config.json"
     output_dir = tmp_path / "runs"
@@ -267,6 +247,34 @@ def test_real_repo_learning_run_applies_repo_interest_override(
     assert observed_interests == ["agents", "cv"]
 
 
+def test_real_unified_digest_run_uses_pipeline_and_writes_snapshots(
+    tmp_path: Path, monkeypatch
+) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["unified_digest"]}}', encoding="utf-8")
+    monkeypatch.setattr("aurora.cli.build_unified_digest_pipeline", _fake_unified_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "unified_digest",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--run-id",
+            "test-run",
+        ]
+    )
+
+    run_dir = output_dir / "test-run" / "unified_digest"
+    assert exit_code == 0
+    assert (run_dir / "normalized.jsonl").read_text(encoding="utf-8") != ""
+    assert (run_dir / "enriched.jsonl").read_text(encoding="utf-8") != ""
+
+
 class _Fetch:
     name = "fake"
 
@@ -328,6 +336,10 @@ def _fake_scholar_pipeline(config) -> ModePipeline:
 
 def _fake_repo_learning_pipeline(config) -> ModePipeline:
     return _mode_pipeline("repo_learning", "repo")
+
+
+def _fake_unified_pipeline(config) -> ModePipeline:
+    return _mode_pipeline("unified_digest", "news")
 
 
 def _mode_pipeline(mode: str, item_type: str) -> ModePipeline:

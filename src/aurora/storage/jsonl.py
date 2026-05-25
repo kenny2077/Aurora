@@ -21,8 +21,21 @@ def write_jsonl(path: str | Path, rows: Iterable[Any]) -> Path:
     return output_path
 
 
+def read_jsonl(path: str | Path) -> list[Any]:
+    """Read JSONL rows from a snapshot path."""
+    input_path = Path(path)
+    if not input_path.exists():
+        return []
+    rows: list[Any] = []
+    with input_path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.strip()
+            if stripped:
+                rows.append(json.loads(stripped))
+    return rows
+
+
 def _to_jsonable(row: Any) -> Any:
     if isinstance(row, BaseModel):
         return row.model_dump(mode="json")
     return row
-

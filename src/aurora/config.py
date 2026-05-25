@@ -11,6 +11,7 @@ from aurora.interests import REPO_INTEREST_PRESETS, SCHOLAR_FIELD_PRESETS, clean
 
 
 ModeName = Literal["tech_news", "scholar", "repo_learning", "unified_digest"]
+SignalSection = Literal["news", "paper", "repo"]
 
 
 class RunConfig(BaseModel):
@@ -512,6 +513,39 @@ class RepoLearningModeConfig(BaseModel):
         return clean_preset_names(values, REPO_INTEREST_PRESETS, label="repo interest")
 
 
+class UnifiedDigestModeConfig(BaseModel):
+    """Configuration for Aurora's unified_digest mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = True
+    include_modes: list[Literal["tech_news", "scholar", "repo_learning"]] = Field(
+        default_factory=lambda: ["tech_news", "scholar", "repo_learning"]
+    )
+    max_items_per_type: int = Field(default=8, ge=1)
+    max_total_items: int = Field(default=20, ge=1)
+    cross_mode_clusters: bool = True
+    section_order: list[SignalSection] = Field(default_factory=lambda: ["paper", "repo", "news"])
+
+    @field_validator("include_modes")
+    @classmethod
+    def validate_include_modes(
+        cls, values: list[Literal["tech_news", "scholar", "repo_learning"]]
+    ) -> list[Literal["tech_news", "scholar", "repo_learning"]]:
+        if not values:
+            raise ValueError("at least one included mode is required")
+        if len(values) != len(set(values)):
+            raise ValueError("include_modes must not contain duplicates")
+        return values
+
+    @field_validator("section_order")
+    @classmethod
+    def validate_section_order(cls, values: list[SignalSection]) -> list[SignalSection]:
+        if sorted(values) != ["news", "paper", "repo"]:
+            raise ValueError("section_order must contain news, paper, and repo exactly once")
+        return values
+
+
 class ModesConfig(BaseModel):
     """Mode-specific configuration branches."""
 
@@ -520,6 +554,7 @@ class ModesConfig(BaseModel):
     tech_news: TechNewsModeConfig = Field(default_factory=TechNewsModeConfig)
     scholar: ScholarModeConfig = Field(default_factory=ScholarModeConfig)
     repo_learning: RepoLearningModeConfig = Field(default_factory=RepoLearningModeConfig)
+    unified_digest: UnifiedDigestModeConfig = Field(default_factory=UnifiedDigestModeConfig)
 
 
 class AuroraConfig(BaseModel):
