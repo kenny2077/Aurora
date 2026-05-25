@@ -40,7 +40,9 @@ class GitHubSearchFetchStage:
         records: list[dict[str, Any]] = []
         seen: set[str] = set()
         for search_query in build_search_queries(
-            self.config.sources.github_search, now=context.until
+            self.config.sources.github_search,
+            interests=self.config.interests,
+            now=context.until,
         ):
             for item in await github.search_repositories(search_query.query):
                 key = _repo_key(item)

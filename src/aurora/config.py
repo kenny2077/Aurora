@@ -7,6 +7,8 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
 
+from aurora.interests import REPO_INTEREST_PRESETS, SCHOLAR_FIELD_PRESETS, clean_preset_names
+
 
 ModeName = Literal["tech_news", "scholar", "repo_learning", "unified_digest"]
 
@@ -183,7 +185,7 @@ class HackerNewsSourceConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     enabled: bool = True
-    fetch_top_stories: int = Field(default=30, ge=1)
+    fetch_top_stories: int = Field(default=60, ge=1)
     min_score: int = Field(default=100, ge=0)
     top_comments_limit: int = Field(default=5, ge=0)
 
@@ -254,10 +256,10 @@ class TechNewsScoringConfig(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    source_authority_weight: float = Field(default=0.25, ge=0.0)
-    engagement_weight: float = Field(default=0.25, ge=0.0)
-    recency_weight: float = Field(default=0.20, ge=0.0)
-    topic_relevance_weight: float = Field(default=0.30, ge=0.0)
+    source_authority_weight: float = Field(default=0.15, ge=0.0)
+    engagement_weight: float = Field(default=0.40, ge=0.0)
+    recency_weight: float = Field(default=0.35, ge=0.0)
+    topic_relevance_weight: float = Field(default=0.10, ge=0.0)
 
 
 class TechNewsModeConfig(BaseModel):
@@ -338,6 +340,7 @@ class ScholarModeConfig(BaseModel):
     min_year: int = Field(default=2025, ge=1900, le=2100)
     max_year: int = Field(default=2026, ge=1900, le=2100)
     score_threshold: float = Field(default=7.0, ge=0.0, le=10.0)
+    fields: list[str] = Field(default_factory=lambda: ["ml"])
     venue_allowlist: list[str] = Field(
         default_factory=lambda: ["ICML", "NeurIPS", "ICLR", "AISTATS", "COLT", "UAI", "MLSys", "TMLR"]
     )
@@ -380,6 +383,11 @@ class ScholarModeConfig(BaseModel):
             raise ValueError("scholar item_type must be 'paper'")
         return value
 
+    @field_validator("fields")
+    @classmethod
+    def validate_fields(cls, values: list[str]) -> list[str]:
+        return clean_preset_names(values, SCHOLAR_FIELD_PRESETS, label="research field")
+
     @field_validator("keyword_allowlist", "keyword_blocklist", "venue_allowlist")
     @classmethod
     def clean_text_list(cls, values: list[str]) -> list[str]:
@@ -409,6 +417,8 @@ class RepoLearningGitHubSearchConfig(BaseModel):
     recent_years: int = Field(default=2, ge=0)
     active_within_days: int = Field(default=180, ge=1)
     per_page: int = Field(default=20, ge=1, le=100)
+    custom_keywords: list[str] = Field(default_factory=list)
+    languages: list[str] = Field(default_factory=list)
 
     @field_validator("token_env")
     @classmethod
@@ -431,6 +441,20 @@ class RepoLearningGitHubSearchConfig(BaseModel):
             seen.add(key)
         if not cleaned:
             raise ValueError("at least one repo learning domain is required")
+        return cleaned
+
+    @field_validator("custom_keywords", "languages")
+    @classmethod
+    def clean_text_values(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip()
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            cleaned.append(value)
+            seen.add(key)
         return cleaned
 
 
@@ -471,6 +495,7 @@ class RepoLearningModeConfig(BaseModel):
 
     enabled: bool = True
     item_type: str = "repo"
+    interests: list[str] = Field(default_factory=lambda: ["agents", "mcp", "workflow-automation"])
     sources: RepoLearningSourcesConfig = Field(default_factory=RepoLearningSourcesConfig)
     ranking: RepoLearningRankingConfig = Field(default_factory=RepoLearningRankingConfig)
 
@@ -480,6 +505,11 @@ class RepoLearningModeConfig(BaseModel):
         if value != "repo":
             raise ValueError("repo_learning item_type must be 'repo'")
         return value
+
+    @field_validator("interests")
+    @classmethod
+    def validate_interests(cls, values: list[str]) -> list[str]:
+        return clean_preset_names(values, REPO_INTEREST_PRESETS, label="repo interest")
 
 
 class ModesConfig(BaseModel):

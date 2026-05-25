@@ -10,6 +10,7 @@ from typing import Any
 import httpx
 
 from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.fields import expanded_arxiv_categories
 from aurora.pipeline import StageContext
 
 
@@ -54,7 +55,7 @@ class ArxivFetchStage:
             ARXIV_API_URL,
             params={
                 "search_query": " OR ".join(
-                    f"cat:{category}" for category in self.config.sources.arxiv.categories
+                    f"cat:{category}" for category in expanded_arxiv_categories(self.config)
                 ),
                 "start": "0",
                 "max_results": str(self.config.sources.arxiv.max_results or self.config.max_candidates),

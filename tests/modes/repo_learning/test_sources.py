@@ -27,15 +27,36 @@ def test_build_search_queries_include_presets_and_filters() -> None:
 
     queries = build_search_queries(
         config,
+        interests=["cv"],
         now=datetime(2026, 5, 25, tzinfo=timezone.utc),
     )
 
-    assert len(queries) == 1
-    assert queries[0].domain == "ai-agents"
-    assert "agent" in queries[0].query
+    assert [query.domain for query in queries] == ["cv", "agents"]
+    assert "computer vision" in queries[0].query
+    assert "language:Python" in queries[0].query
+    assert "agent" in queries[1].query
+    assert "language:TypeScript" in queries[1].query
     assert "stars:>=750" in queries[0].query
     assert "pushed:>=2026-05-15" in queries[0].query
     assert "created:>=" in queries[0].query
+
+
+def test_build_search_queries_merges_custom_keywords_and_language_overrides() -> None:
+    config = RepoLearningGitHubSearchConfig(
+        domains=["workflow-automation"],
+        custom_keywords=["graph rag"],
+        languages=["Rust"],
+    )
+
+    queries = build_search_queries(
+        config,
+        interests=["ml"],
+        now=datetime(2026, 5, 25, tzinfo=timezone.utc),
+    )
+
+    assert '"graph rag"' in queries[0].query
+    assert "language:Rust" in queries[0].query
+    assert "language:Python" not in queries[0].query
 
 
 def test_slug_and_ref_validation() -> None:
@@ -127,7 +148,7 @@ def test_github_search_fetch_stage_deduplicates_and_attaches_query_metadata() ->
     records = asyncio.run(exercise())
 
     assert len(records) == 1
-    assert records[0]["aurora_source_domain"] == "ai-agents"
+    assert records[0]["aurora_source_domain"] == "agents"
     assert "stars:>=500" in records[0]["aurora_search_query"]
 
 

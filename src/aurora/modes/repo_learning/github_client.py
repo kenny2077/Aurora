@@ -14,6 +14,7 @@ from typing import Any
 import httpx
 
 from aurora.config import RepoLearningGitHubSearchConfig
+from aurora.interests import REPO_INTEREST_PRESETS, unique_text
 
 
 GITHUB_API_BASE_URL = "https://api.github.com"
@@ -21,10 +22,9 @@ RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com"
 SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
 REF_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._/@+-]*$")
 
-PRESET_QUERY_TERMS = {
-    "ai-agents": ["agent", "llm", "tool use", "coding agent"],
-    "mcp-ecosystem": ["mcp", "model context protocol", "mcp server"],
-    "workflow-automation": ["workflow", "automation", "orchestration"],
+LEGACY_DOMAIN_ALIASES = {
+    "ai-agents": "agents",
+    "mcp-ecosystem": "mcp",
 }
 
 
@@ -111,6 +111,7 @@ class GitHubRepoClient:
 def build_search_queries(
     config: RepoLearningGitHubSearchConfig,
     *,
+    interests: list[str] | None = None,
     now: datetime | None = None,
 ) -> list[RepoSearchQuery]:
     """Build deterministic GitHub search queries from repo learning presets."""
@@ -119,8 +120,8 @@ def build_search_queries(
     created_after = (current - timedelta(days=config.recent_years * 365)).date().isoformat()
 
     queries: list[RepoSearchQuery] = []
-    for domain in config.domains:
-        terms = _terms_for_domain(domain)
+    for domain in _query_domains(interests or [], config.domains):
+        terms = unique_text([*_terms_for_domain(domain), *config.custom_keywords])
         term_query = " OR ".join(_quote_search_term(term) for term in terms)
         pieces = [
             f"({term_query})",
@@ -129,6 +130,12 @@ def build_search_queries(
         ]
         if config.recent_years:
             pieces.append(f"created:>={created_after}")
+        if config.languages:
+            pieces.append(_language_query(config.languages))
+        elif domain in REPO_INTEREST_PRESETS:
+            preset_languages = REPO_INTEREST_PRESETS[domain].get("languages") or []
+            if preset_languages:
+                pieces.append(_language_query([str(language) for language in preset_languages]))
         queries.append(RepoSearchQuery(domain=domain, query=" ".join(pieces)))
     return queries
 
@@ -158,12 +165,25 @@ def _github_token(token_env: str) -> str | None:
 
 def _terms_for_domain(domain: str) -> list[str]:
     key = domain.strip().lower()
-    if key in PRESET_QUERY_TERMS:
-        return PRESET_QUERY_TERMS[key]
+    key = LEGACY_DOMAIN_ALIASES.get(key, key)
+    if key in REPO_INTEREST_PRESETS:
+        return [str(term) for term in REPO_INTEREST_PRESETS[key]["terms"]]
     return [part for part in key.replace("_", "-").split("-") if part] or [key]
+
+
+def _query_domains(interests: list[str], domains: list[str]) -> list[str]:
+    normalized_domains = [LEGACY_DOMAIN_ALIASES.get(domain.lower(), domain.lower()) for domain in domains]
+    return unique_text([*interests, *normalized_domains])
 
 
 def _quote_search_term(term: str) -> str:
     if " " in term:
         return f'"{term}"'
     return term
+
+
+def _language_query(languages: list[str]) -> str:
+    language_parts = [f"language:{language}" for language in unique_text(languages)]
+    if len(language_parts) == 1:
+        return language_parts[0]
+    return "(" + " OR ".join(language_parts) + ")"

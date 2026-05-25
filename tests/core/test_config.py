@@ -21,10 +21,13 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.delivery.filesystem.enabled is True
     assert config.delivery.github_pages.enabled is True
     assert config.modes.tech_news.enabled is True
-    assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 30
+    assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 60
     assert config.modes.tech_news.sources.hackernews.min_score == 100
     assert config.modes.tech_news.sources.rss == []
+    assert config.modes.tech_news.scoring.engagement_weight == 0.40
+    assert config.modes.tech_news.scoring.recency_weight == 0.35
     assert config.modes.scholar.enabled is True
+    assert config.modes.scholar.fields == ["ml"]
     assert config.modes.scholar.max_candidates == 200
     assert config.modes.scholar.final_item_count == 10
     assert config.modes.scholar.score_threshold == 7.0
@@ -32,6 +35,7 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.scholar.sources.openreview.enabled is True
     assert config.modes.repo_learning.enabled is True
     assert config.modes.repo_learning.item_type == "repo"
+    assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.repo_learning.sources.github_search.enabled is True
     assert config.modes.repo_learning.sources.github_search.token_env == "GH_SEARCH_TOKEN"
     assert config.modes.repo_learning.sources.github_search.domains == [
@@ -60,9 +64,11 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"tech_news": {"item_type": "paper"}}},
         {"modes": {"tech_news": {"sources": {"hackernews": {"fetch_top_stories": 0}}}}},
         {"modes": {"scholar": {"item_type": "news"}}},
+        {"modes": {"scholar": {"fields": ["unknown-field"]}}},
         {"modes": {"scholar": {"max_candidates": 0}}},
         {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
         {"modes": {"repo_learning": {"item_type": "paper"}}},
+        {"modes": {"repo_learning": {"interests": ["unknown-interest"]}}},
         {"modes": {"repo_learning": {"sources": {"github_search": {"domains": []}}}}},
         {"modes": {"repo_learning": {"sources": {"github_search": {"per_page": 0}}}}},
         {"modes": {"repo_learning": {"ranking": {"final_item_count": 0}}}},

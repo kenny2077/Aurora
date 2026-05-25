@@ -113,6 +113,8 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--output-dir", type=Path, default=None)
     run_parser.add_argument("--run-id", default=None)
     run_parser.add_argument("--hours", type=int, default=None)
+    run_parser.add_argument("--repo-interest", action="append", default=None)
+    run_parser.add_argument("--research-field", action="append", default=None)
     run_parser.add_argument("--dry-run", action="store_true")
 
     return parser
@@ -140,6 +142,7 @@ def _handle_run(args: argparse.Namespace) -> int:
         config = config.model_copy(
             update={"run": config.run.model_copy(update={"time_window_hours": args.hours})}
         )
+    config = _apply_run_overrides(config, args)
 
     modes = _select_modes(config, args.mode)
     run_id = args.run_id or ("dry-run" if args.dry_run else _default_run_id())
@@ -166,6 +169,23 @@ def _select_modes(config: AuroraConfig, mode: str | None) -> list[ModeName]:
     if mode is None or mode == "all":
         return list(config.run.enabled_modes)
     return [mode]  # type: ignore[list-item]
+
+
+def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> AuroraConfig:
+    modes = config.modes
+    if args.repo_interest:
+        repo_learning = type(modes.repo_learning).model_validate(
+            {**modes.repo_learning.model_dump(mode="python"), "interests": args.repo_interest}
+        )
+        modes = modes.model_copy(update={"repo_learning": repo_learning})
+    if args.research_field:
+        scholar = type(modes.scholar).model_validate(
+            {**modes.scholar.model_dump(mode="python"), "fields": args.research_field}
+        )
+        modes = modes.model_copy(update={"scholar": scholar})
+    if modes is not config.modes:
+        return config.model_copy(update={"modes": modes})
+    return config
 
 
 async def _run_dry_modes(

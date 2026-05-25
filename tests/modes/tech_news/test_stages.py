@@ -89,6 +89,31 @@ def test_scoring_increases_with_engagement_recency_and_keywords() -> None:
     assert strong_score.tags == ["hackernews", "ai", "agent"]
 
 
+def test_default_scoring_prioritizes_timely_high_engagement_news() -> None:
+    scorer = TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig())
+    popular_timely = _item(
+        "news:popular",
+        "Database Outage Postmortem",
+        "https://example.com/popular",
+        source="hackernews",
+        published_at=datetime(2026, 5, 26, tzinfo=timezone.utc),
+        metadata={"score": 1200, "descendants": 300},
+    )
+    niche_keyword = _item(
+        "news:niche",
+        "AI Agent Library",
+        "https://example.com/niche",
+        source="rss",
+        published_at=datetime(2026, 5, 20, tzinfo=timezone.utc),
+    )
+
+    popular_score, niche_score = asyncio.run(scorer.score([popular_timely, niche_keyword], _context()))
+
+    assert popular_score.final_score > niche_score.final_score
+    assert TechNewsScoringConfig().engagement_weight > TechNewsScoringConfig().topic_relevance_weight
+    assert TechNewsScoringConfig().recency_weight > TechNewsScoringConfig().topic_relevance_weight
+
+
 def test_enricher_applies_score_results_to_items() -> None:
     item = _item("news:1", "AI", "https://example.com/ai")
     scorer = TechNewsScorer(TechNewsFiltersConfig(include_keywords=["ai"]), TechNewsScoringConfig())
@@ -136,4 +161,3 @@ def _item(
         published_at=published_at or datetime(2026, 5, 26, tzinfo=timezone.utc),
         metadata=metadata or {},
     )
-

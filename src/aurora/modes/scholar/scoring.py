@@ -9,6 +9,12 @@ from datetime import datetime
 from typing import Any
 
 from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.fields import (
+    expanded_arxiv_categories,
+    expanded_keyword_allowlist,
+    expanded_venue_allowlist,
+    field_tags,
+)
 from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
 
@@ -62,7 +68,7 @@ class ScholarScorer:
             final_score=score,
             score_breakdown={key: round(value, 3) for key, value in breakdown.items()},
             reason="deterministic scholar score",
-            tags=_score_tags(item),
+            tags=_score_tags(item, self.config),
         )
 
 
@@ -104,7 +110,7 @@ def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:
     venue = _norm(item.metadata.get("venue") or "")
     if not venue:
         return 0.0
-    allowlisted = any(_norm(allowed) in venue for allowed in config.venue_allowlist)
+    allowlisted = any(_norm(allowed) in venue for allowed in expanded_venue_allowlist(config))
     if not allowlisted:
         return 0.25 if item.source == "openreview" else 0.0
     status = _norm(item.metadata.get("status") or "")
@@ -169,10 +175,11 @@ def _citation_signal(item: SignalItem) -> float:
 
 def _topic_relevance_signal(item: SignalItem, config: ScholarModeConfig) -> float:
     text = _scoring_text(item)
-    keyword_matches = sum(1 for keyword in config.keyword_allowlist if _norm(keyword) in text)
-    keyword_signal = min(1.0, keyword_matches / 2) if config.keyword_allowlist else 0.5
+    keyword_allowlist = expanded_keyword_allowlist(config)
+    keyword_matches = sum(1 for keyword in keyword_allowlist if _norm(keyword) in text)
+    keyword_signal = min(1.0, keyword_matches / 2) if keyword_allowlist else 0.5
     category_signal = 0.35 if set(_norm(c) for c in item.metadata.get("categories") or []).intersection(
-        _norm(c) for c in config.sources.arxiv.categories
+        _norm(c) for c in expanded_arxiv_categories(config)
     ) else 0.0
     venue_signal = 0.25 if _venue_signal(item, config) >= 0.75 else 0.0
     return _clamp(keyword_signal + category_signal + venue_signal)
@@ -227,9 +234,11 @@ def _is_top_venue_accepted(item: SignalItem) -> bool:
     )
 
 
-def _score_tags(item: SignalItem) -> list[str]:
+def _score_tags(item: SignalItem, config: ScholarModeConfig | None = None) -> list[str]:
     tags = [item.source]
     tags.extend(str(category) for category in item.metadata.get("categories") or [])
+    if config is not None:
+        tags.extend(field_tags(config))
     venue = item.metadata.get("venue")
     if venue:
         tags.append(str(venue))
@@ -266,4 +275,3 @@ def _norm(value: Any) -> str:
 
 def _clamp(value: float) -> float:
     return max(0.0, min(1.0, value))
-

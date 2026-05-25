@@ -4,6 +4,11 @@ import asyncio
 from datetime import datetime, timezone
 
 from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.fields import (
+    expanded_arxiv_categories,
+    expanded_keyword_allowlist,
+    expanded_venue_allowlist,
+)
 from aurora.modes.scholar.prompts import RESEARCH_ANALYSIS_SYSTEM, RESEARCH_ANALYSIS_USER
 from aurora.modes.scholar.render import ScholarRenderer, ScholarSummarizer
 from aurora.modes.scholar.scoring import ScholarEnricher, ScholarScorer
@@ -115,6 +120,24 @@ def test_scoring_blocklists_and_rewards_top_venue_code_keyword_papers() -> None:
     }
 
 
+def test_research_field_presets_expand_categories_keywords_venues_and_tags() -> None:
+    config = ScholarModeConfig(fields=["cv"], keyword_allowlist=["diffusion"], venue_allowlist=["ICML"])
+    paper = _paper(
+        "cv",
+        "Vision-Language Segmentation",
+        {"categories": ["cs.CV"], "venue": "CVPR", "venue_year": 2026, "source_ids": {}},
+        abstract="A computer vision method for segmentation and vision-language evaluation.",
+    )
+
+    score = asyncio.run(ScholarScorer(config).score([paper], _context()))[0]
+
+    assert "cs.CV" in expanded_arxiv_categories(config)
+    assert "computer vision" in expanded_keyword_allowlist(config)
+    assert "CVPR" in expanded_venue_allowlist(config)
+    assert "cv" in score.tags
+    assert score.score_breakdown["topic_relevance_signal"] > 0.5
+
+
 def test_enricher_applies_score_and_fallback_learning_text() -> None:
     item = _paper("paper", "Reasoning", {"venue": "ICLR", "source_ids": {"arxiv": "1"}})
     score = asyncio.run(ScholarScorer(ScholarModeConfig()).score([item], _context()))[0]
@@ -169,4 +192,3 @@ def _paper(
         raw_content=abstract,
         metadata=metadata,
     )
-

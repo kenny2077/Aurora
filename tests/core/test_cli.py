@@ -169,6 +169,40 @@ def test_real_scholar_run_uses_pipeline_and_writes_non_empty_snapshots(
     assert (run_dir / "enriched.jsonl").read_text(encoding="utf-8") != ""
 
 
+def test_real_scholar_run_applies_research_field_override(
+    tmp_path: Path, monkeypatch
+) -> None:
+    observed_fields: list[str] = []
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["scholar"]}}', encoding="utf-8")
+
+    def fake_pipeline(config) -> ModePipeline:
+        observed_fields.extend(config.modes.scholar.fields)
+        return _fake_scholar_pipeline(config)
+
+    monkeypatch.setattr("aurora.cli.build_scholar_pipeline", fake_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "scholar",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--research-field",
+            "ml",
+            "--research-field",
+            "agents",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed_fields == ["ml", "agents"]
+
+
 def test_real_repo_learning_run_uses_pipeline_and_writes_non_empty_snapshots(
     tmp_path: Path, monkeypatch
 ) -> None:
@@ -197,6 +231,40 @@ def test_real_repo_learning_run_uses_pipeline_and_writes_non_empty_snapshots(
     assert (run_dir / "deduplicated.jsonl").read_text(encoding="utf-8") != ""
     assert (run_dir / "score_results.jsonl").read_text(encoding="utf-8") != ""
     assert (run_dir / "enriched.jsonl").read_text(encoding="utf-8") != ""
+
+
+def test_real_repo_learning_run_applies_repo_interest_override(
+    tmp_path: Path, monkeypatch
+) -> None:
+    observed_interests: list[str] = []
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["repo_learning"]}}', encoding="utf-8")
+
+    def fake_pipeline(config) -> ModePipeline:
+        observed_interests.extend(config.modes.repo_learning.interests)
+        return _fake_repo_learning_pipeline(config)
+
+    monkeypatch.setattr("aurora.cli.build_repo_learning_pipeline", fake_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "repo_learning",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--repo-interest",
+            "agents",
+            "--repo-interest",
+            "cv",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed_interests == ["agents", "cv"]
 
 
 class _Fetch:
