@@ -1,0 +1,95 @@
+{
+  "run": {
+    "enabled_modes": ["unified_digest"],
+    "timezone": "Asia/Shanghai",
+    "time_window_hours": 168,
+    "max_items": 50,
+    "dry_run": false,
+    "state_path": "data/aurora_state.json",
+    "cache_dir": "data/cache",
+    "output_dir": "data/runs"
+  },
+  "delivery": {
+    "email": {
+      "enabled": true,
+      "smtp_host": "smtp.gmail.com",
+      "smtp_port": 465,
+      "smtp_username_env": "SMTP_USERNAME",
+      "password_env": "EMAIL_PASSWORD",
+      "sender_name": "Aurora",
+      "recipients_env": "AURORA_EMAIL_RECIPIENTS"
+    },
+    "github_pages": {
+      "enabled": true,
+      "publish_dir": "site"
+    },
+    "filesystem": {
+      "enabled": true,
+      "reports_dir": "reports",
+      "site_dir": "site"
+    }
+  },
+  "modes": {
+    "tech_news": {
+      "sources": {
+        "hackernews": {
+          "enabled": true,
+          "fetch_top_stories": 100,
+          "min_score": 30,
+          "top_comments_limit": 3
+        },
+        "rss": []
+      }
+    },
+    "scholar": {
+      "fields": ["ml", "agents"],
+      "max_candidates": 200,
+      "final_item_count": 10,
+      "score_threshold": 5.5,
+      "sources": {
+        "arxiv": {
+          "enabled": true,
+          "max_results": 200
+        },
+        "openreview": {
+          "enabled": true
+        },
+        "semantic_scholar": {
+          "enabled": true,
+          "api_key_env": "SEMANTIC_SCHOLAR_API_KEY",
+          "cache_ttl_hours": 168,
+          "max_requests_per_run": 40
+        }
+      }
+    },
+    "repo_learning": {
+      "interests": ["agents", "mcp", "workflow-automation"],
+      "sources": {
+        "github_search": {
+          "enabled": true,
+          "token_env": "GH_SEARCH_TOKEN",
+          "domains": ["ai-agents", "mcp-ecosystem", "workflow-automation"],
+          "custom_keywords": [],
+          "languages": [],
+          "min_stars": 100,
+          "recent_years": 5,
+          "active_within_days": 365,
+          "per_page": 30
+        }
+      },
+      "ranking": {
+        "final_item_count": 6,
+        "enrich_top_n": 12,
+        "history_lookback_days": 14
+      }
+    },
+    "unified_digest": {
+      "enabled": true,
+      "include_modes": ["tech_news", "scholar", "repo_learning"],
+      "max_items_per_type": 8,
+      "max_total_items": 20,
+      "cross_mode_clusters": true,
+      "section_order": ["paper", "repo", "news"]
+    }
+  }
+}

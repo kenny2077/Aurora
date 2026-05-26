@@ -101,6 +101,7 @@ def test_unified_pipeline_reports_included_mode_failures(tmp_path: Path) -> None
         run=RunConfig(output_dir=tmp_path),
         modes={"unified_digest": {"include_modes": ["scholar"]}},
     )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
     pipeline = ModePipeline(
         mode="unified_digest",
         fetch_stages=[UnifiedFetchStage(config, {"scholar": _failing_builder})],
@@ -116,13 +117,36 @@ def test_unified_pipeline_reports_included_mode_failures(tmp_path: Path) -> None
     result = asyncio.run(
         PipelineRunner(output_dir=tmp_path).run(
             pipeline,
-            StageContext(mode="unified_digest", run_id="test", config=config),
+            context,
         )
     )
 
     assert result.raw_count == 0
-    assert result.source_statuses[0].ok is False
-    assert "disabled" in (result.source_statuses[0].error or "")
+    assert result.source_statuses[0].ok is True
+    assert context.metadata["unified_mode_failures"] == [
+        {"mode": "scholar", "error": "scholar mode is disabled"}
+    ]
+
+
+def test_unified_fetch_keeps_successful_modes_when_one_mode_fails(tmp_path: Path) -> None:
+    config = AuroraConfig(
+        run=RunConfig(output_dir=tmp_path),
+        modes={"unified_digest": {"include_modes": ["tech_news", "scholar"]}},
+    )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
+    builders = {
+        "tech_news": lambda config: _static_pipeline(
+            "tech_news", [_item("news:1", "news", "News", 8.0)], []
+        ),
+        "scholar": _failing_builder,
+    }
+
+    collected = asyncio.run(UnifiedFetchStage(config, builders).fetch(context))
+
+    assert [item.id for item in collected] == ["news:1"]
+    assert context.metadata["unified_mode_failures"] == [
+        {"mode": "scholar", "error": "scholar mode is disabled"}
+    ]
 
 
 def _item(

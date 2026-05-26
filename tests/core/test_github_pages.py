@@ -44,6 +44,11 @@ def test_github_pages_delivery_writes_jekyll_site(tmp_path: Path) -> None:
     assert (site_dir / "feed.xml").exists()
     assert (site_dir / "assets" / "css" / "aurora.css").exists()
     assert latest_path.exists()
+    index = (site_dir / "index.md").read_text(encoding="utf-8")
+    css = (site_dir / "assets" / "css" / "aurora.css").read_text(encoding="utf-8")
+    assert "## Latest Published Digest" in index
+    assert "{{ latest.content }}" in index
+    assert ".aurora-latest-digest" in css
 
     post = post_path.read_text(encoding="utf-8")
     assert "title: \"Aurora Unified Digest\"" in post

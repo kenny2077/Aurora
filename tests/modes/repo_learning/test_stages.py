@@ -201,6 +201,45 @@ def test_enricher_fetches_readme_tree_and_fills_learning_fields() -> None:
     assert len(enriched.action_items) == 3
 
 
+def test_enricher_passes_stage_context_to_llm_ranker() -> None:
+    context = _context()
+    item = _repo(
+        "repo:org/example",
+        "org/example",
+        {
+            "owner": "org",
+            "name": "example",
+            "full_name": "org/example",
+            "default_branch": "main",
+        },
+    )
+    score = ScoreResult(
+        item_id=item.id,
+        deterministic_score=8.0,
+        final_score=8.0,
+        score_breakdown={"relevance": 8.0},
+    )
+    ranker = _RecordingRanker()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "raw.githubusercontent.com":
+            return httpx.Response(200, text="# Example")
+        return httpx.Response(200, json={"tree": []})
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await RepoLearningEnricher(
+                RepoLearningModeConfig(ranking=RepoLearningRankingConfig(enrich_top_n=1)),
+                http_client=client,
+                llm_ranker=ranker,
+            ).enrich([item], [score], context)
+
+    enriched = asyncio.run(exercise())
+
+    assert enriched[0].id == item.id
+    assert ranker.context is context
+
+
 def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: Path) -> None:
     config = RepoLearningModeConfig(ranking=RepoLearningRankingConfig(final_item_count=1))
     state_store = RepoLearningStateStore(tmp_path / "state.json")
@@ -296,3 +335,15 @@ def _repo(
         raw_content=description,
         metadata=base_metadata,
     )
+
+
+class _RecordingRanker:
+    def __init__(self) -> None:
+        self.context: StageContext | None = None
+
+    async def analyze_items(self, items, prompt_builder, context: StageContext) -> dict:
+        self.context = context
+        return {}
+
+    def apply_analysis(self, item: SignalItem, analysis) -> SignalItem:
+        return item

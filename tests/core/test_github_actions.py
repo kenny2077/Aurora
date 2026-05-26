@@ -19,12 +19,17 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "persist-credentials: false" in workflow
     assert "actions/checkout@v5" in workflow
     assert "python -m pip install --user \"uv==0.11.15\"" in workflow
-    assert "uv run aurora config validate" in workflow
-    assert "ARGS=(--mode \"$MODE\")" in workflow
+    assert "uv run aurora config validate --config data/actions.config.json" in workflow
+    assert "Missing required email secret" in workflow
+    assert "CONFIG_PATH=\"data/actions.config.json\"" in workflow
+    assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
+    assert "ARGS=(--config \"$CONFIG_PATH\" --mode \"$MODE\")" in workflow
     assert "ARGS+=(--skip-llm)" in workflow
     assert "uv run aurora run \"${ARGS[@]}\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow
     assert "test -s site/index.md" in workflow
+    assert "Selected 0 item(s)" in workflow
+    assert "refusing to publish an empty Pages update" in workflow
     assert "git -C \"$PUBLISH_DIR\" fetch --depth=1 origin gh-pages" in workflow
     assert "cp -R site/. \"$PUBLISH_DIR\"/" in workflow
     assert "rm \"$PUBLISH_DIR/.nojekyll\"" in workflow

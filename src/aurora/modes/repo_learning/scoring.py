@@ -131,15 +131,16 @@ class RepoLearningEnricher:
         context: StageContext,
     ) -> list[SignalItem]:
         if self.http_client is not None:
-            return await self._enrich_with_client(items, score_results, self.http_client)
+            return await self._enrich_with_client(items, score_results, self.http_client, context)
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            return await self._enrich_with_client(items, score_results, client)
+            return await self._enrich_with_client(items, score_results, client, context)
 
     async def _enrich_with_client(
         self,
         items: Sequence[SignalItem],
         score_results: Sequence[ScoreResult],
         client: httpx.AsyncClient,
+        context: StageContext,
     ) -> list[SignalItem]:
         scores_by_id = {score.item_id: score for score in score_results}
         top_ids = {

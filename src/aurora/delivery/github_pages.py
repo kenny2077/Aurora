@@ -171,6 +171,18 @@ Aurora publishes a personal intelligence digest across research papers, GitHub r
 - [Repo Learning]({{ '/repo_learning/' | relative_url }})
 - [Tech News]({{ '/tech_news/' | relative_url }})
 
+## Latest Published Digest
+
+{% assign latest = site.posts.first %}
+{% if latest %}
+<article class="aurora-latest-digest">
+  <p class="aurora-meta">{{ latest.date | date: "%Y-%m-%d %H:%M" }} <span class="aurora-pill">{{ latest.mode }}</span></p>
+  {{ latest.content }}
+</article>
+{% else %}
+No digest posts have been published yet.
+{% endif %}
+
 ## Archive
 
 {% if site.posts.size > 0 %}
@@ -261,6 +273,17 @@ def _aurora_css() -> str:
 
 .aurora-back {
   margin: 1rem 0 1.5rem;
+}
+
+.aurora-latest-digest {
+  border-top: 1px solid #d6e1e7;
+  margin: 1.25rem 0 2rem;
+  padding-top: 0.5rem;
+}
+
+.aurora-meta {
+  color: #637083;
+  font-size: 0.9rem;
 }
 
 .main-content li {

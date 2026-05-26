@@ -29,15 +29,22 @@ class UnifiedFetchStage:
     async def fetch(self, context: StageContext) -> list[SignalItem]:
         runner = PipelineRunner(output_dir=self.config.run.output_dir)
         collected: list[SignalItem] = []
+        failures: list[dict[str, str]] = []
         for mode in self.config.modes.unified_digest.include_modes:
             builder = self.builders.get(mode)
-            if builder is None:
-                raise ValueError(f"unified_digest included unsupported mode: {mode}")
-            pipeline = _without_delivery(builder(self.config))
-            sub_context = context.model_copy(update={"mode": mode, "config": self.config})
-            result = await runner.run(pipeline, sub_context)
+            try:
+                if builder is None:
+                    raise ValueError(f"unified_digest included unsupported mode: {mode}")
+                pipeline = _without_delivery(builder(self.config))
+                sub_context = context.model_copy(update={"mode": mode, "config": self.config})
+                result = await runner.run(pipeline, sub_context)
+            except Exception as exc:
+                failures.append({"mode": mode, "error": str(exc)})
+                continue
             for row in read_jsonl(result.output_paths["enriched"]):
                 collected.append(SignalItem.model_validate(row))
+        if failures:
+            context.metadata.setdefault("unified_mode_failures", []).extend(failures)
         return collected
 
 

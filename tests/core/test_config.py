@@ -143,3 +143,18 @@ def test_example_config_validates() -> None:
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.scholar.fields == ["ml", "agents"]
     assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
+
+
+def test_actions_config_enables_email_and_content_window() -> None:
+    config = load_config(Path("data/actions.config.json"))
+
+    assert config.run.enabled_modes == ["unified_digest"]
+    assert config.run.time_window_hours == 168
+    assert config.delivery.email.enabled is True
+    assert config.delivery.email.smtp_username_env == "SMTP_USERNAME"
+    assert config.delivery.email.password_env == "EMAIL_PASSWORD"
+    assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
+    assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
+    assert config.modes.tech_news.sources.hackernews.min_score == 30
+    assert config.modes.scholar.score_threshold == 5.5
+    assert config.modes.repo_learning.sources.github_search.min_stars == 100

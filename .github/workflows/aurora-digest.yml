@@ -50,21 +50,40 @@ jobs:
       - name: Install
         run: uv sync --dev
       - name: Validate config
-        run: uv run aurora config validate
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          AURORA_EMAIL_RECIPIENTS: ${{ secrets.AURORA_EMAIL_RECIPIENTS }}
+        run: uv run aurora config validate --config data/actions.config.json
+      - name: Check email secrets
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          AURORA_EMAIL_RECIPIENTS: ${{ secrets.AURORA_EMAIL_RECIPIENTS }}
+        run: |
+          for name in SMTP_USERNAME EMAIL_PASSWORD AURORA_EMAIL_RECIPIENTS; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing required email secret: ${name}"
+              exit 1
+            fi
+          done
       - name: Run Aurora
         timeout-minutes: 25
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
           GH_SEARCH_TOKEN: ${{ secrets.GH_SEARCH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
           AURORA_EMAIL_RECIPIENTS: ${{ secrets.AURORA_EMAIL_RECIPIENTS }}
         run: |
+          CONFIG_PATH="data/actions.config.json"
           MODE="${{ github.event.inputs.mode || 'unified_digest' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
           SKIP_LLM="${{ github.event.inputs.skip_llm || 'true' }}"
-          ARGS=(--mode "$MODE")
+          ARGS=(--config "$CONFIG_PATH" --mode "$MODE")
           if [ "$SKIP_LLM" = "true" ]; then
             ARGS+=(--skip-llm)
           fi
@@ -83,6 +102,10 @@ jobs:
           POST_COUNT="$(find site/_posts -type f -name '*.md' | wc -l)"
           if [ "$POST_COUNT" -lt 1 ]; then
             echo "No digest posts were generated under site/_posts."
+            exit 1
+          fi
+          if grep -R "Selected 0 item(s)" site/_posts/*.md; then
+            echo "Generated digest is empty; refusing to publish an empty Pages update."
             exit 1
           fi
       - name: Publish gh-pages branch

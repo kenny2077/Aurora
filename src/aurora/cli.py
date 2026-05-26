@@ -201,6 +201,10 @@ def _handle_run(args: argparse.Namespace) -> int:
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
+        for delivery_result in result.delivery_results:
+            status = "ok" if delivery_result.ok else "failed"
+            suffix = f" - {delivery_result.error}" if delivery_result.error else ""
+            print(f"{result.mode}: delivery {delivery_result.channel}: {status}{suffix}")
     return 0
 
 
