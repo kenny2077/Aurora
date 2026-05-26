@@ -3,16 +3,21 @@ from __future__ import annotations
 from pathlib import Path
 
 
-def test_github_actions_workflow_contains_schedule_manual_dispatch_and_pages_upload() -> None:
+def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     workflow = Path(".github/workflows/aurora-digest.yml").read_text(encoding="utf-8")
 
     assert "schedule:" in workflow
     assert "workflow_dispatch:" in workflow
     assert "working-directory: target" not in workflow
+    assert "contents: write" in workflow
     assert "uv run aurora config validate" in workflow
-    assert "uv run aurora run --mode" in workflow
+    assert "uv run aurora run --mode \"$MODE\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow
-    assert "mkdir -p site" in workflow
-    assert "path: site" in workflow
+    assert "test -s site/index.md" in workflow
+    assert "peaceiris/actions-gh-pages@v4" in workflow
+    assert "publish_branch: gh-pages" in workflow
+    assert "publish_dir: ./site" in workflow
+    assert "keep_files: true" in workflow
+    assert "actions/upload-pages-artifact" not in workflow
+    assert "Aurora run did not publish a site artifact" not in workflow
     assert "target/site" not in workflow
-    assert "actions/upload-pages-artifact" in workflow

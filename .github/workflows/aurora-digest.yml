@@ -27,9 +27,7 @@ jobs:
   aurora:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      pages: write
-      id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
@@ -52,17 +50,32 @@ jobs:
           if [ "$DRY_RUN" = "true" ]; then
             uv run aurora run --dry-run --mode "$MODE"
           else
-            uv run aurora run --mode "$MODE"
+            uv run aurora run --mode "$MODE" --strict-delivery
           fi
-      - name: Ensure Pages artifact exists
-        if: always()
+      - name: Verify generated Pages site
+        if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          mkdir -p site
-          if [ ! -f site/index.html ]; then
-            printf '<!doctype html><meta charset="utf-8"><title>Aurora</title><h1>Aurora run did not publish a site artifact.</h1>\n' > site/index.html
+          test -s site/index.md
+          test -s site/_config.yml
+          test -s site/feed.xml
+          test -d site/_posts
+          POST_COUNT="$(find site/_posts -type f -name '*.md' | wc -l)"
+          if [ "$POST_COUNT" -lt 1 ]; then
+            echo "No digest posts were generated under site/_posts."
+            exit 1
           fi
-      - name: Upload Pages artifact
-        if: always()
-        uses: actions/upload-pages-artifact@v3
+      - name: Publish gh-pages branch
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: site
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
+          keep_files: true
+      - name: Upload dry-run outputs
+        if: ${{ github.event.inputs.dry_run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: aurora-dry-run
+          path: data/runs
+          if-no-files-found: error

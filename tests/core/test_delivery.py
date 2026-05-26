@@ -36,7 +36,9 @@ def test_configured_delivery_writes_filesystem_and_pages_artifacts(tmp_path: Pat
     assert [result.channel for result in results] == ["filesystem", "github_pages"]
     assert (tmp_path / "reports" / "run-1" / "tech_news.md").read_text(encoding="utf-8") == "# Tech\n\nBody"
     assert (tmp_path / "reports" / "run-1" / "tech_news.html").exists()
-    assert (tmp_path / "site" / "tech_news" / "index.html").exists()
+    assert (tmp_path / "site" / "_config.yml").exists()
+    assert (tmp_path / "site" / "index.md").exists()
+    assert (tmp_path / "site" / "_posts" / "2026-05-25-tech-news.md").exists()
     assert (tmp_path / "site" / "tech_news" / "index.md").exists()
 
 
