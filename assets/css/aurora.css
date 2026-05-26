@@ -49,6 +49,17 @@ body {
   margin: 1rem 0 1.5rem;
 }
 
+.aurora-latest-digest {
+  border-top: 1px solid #d6e1e7;
+  margin: 1.25rem 0 2rem;
+  padding-top: 0.5rem;
+}
+
+.aurora-meta {
+  color: #637083;
+  font-size: 0.9rem;
+}
+
 .main-content li {
   margin: 0.35rem 0;
 }
