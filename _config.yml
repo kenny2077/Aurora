@@ -1,0 +1,12 @@
+title: "Aurora"
+description: "Personal intelligence digest for research, repositories, and technology news."
+url: "https://kenny2077.github.io"
+baseurl: "/Aurora"
+theme: jekyll-theme-cayman
+markdown: kramdown
+permalink: /archive/:year/:month/:day/:title/
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default

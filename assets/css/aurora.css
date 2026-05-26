@@ -1,0 +1,54 @@
+body {
+  color: #1c2430;
+}
+
+.page-header {
+  background-color: #12355b;
+  background-image: linear-gradient(120deg, #12355b, #3d7a89);
+}
+
+.main-content {
+  max-width: 980px;
+}
+
+.main-content h1,
+.main-content h2,
+.main-content h3 {
+  color: #12355b;
+}
+
+.aurora-mode-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.aurora-mode-nav a,
+.aurora-pill {
+  border: 1px solid #c7d5df;
+  border-radius: 6px;
+  color: #12355b;
+  display: inline-block;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  padding: 0.35rem 0.55rem;
+  text-decoration: none;
+}
+
+.aurora-mode-nav a:hover {
+  background: #eef6f8;
+}
+
+.aurora-pill {
+  background: #eef6f8;
+  margin-left: 0.35rem;
+}
+
+.aurora-back {
+  margin: 1rem 0 1.5rem;
+}
+
+.main-content li {
+  margin: 0.35rem 0;
+}
