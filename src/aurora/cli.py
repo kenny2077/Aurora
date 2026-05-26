@@ -299,6 +299,8 @@ def _missing_optional_env_vars(config: AuroraConfig) -> list[str]:
         config.ai.api_key_env,
         config.modes.repo_learning.sources.github_search.token_env,
     ]
+    if config.modes.scholar.sources.semantic_scholar.enabled:
+        names.append(config.modes.scholar.sources.semantic_scholar.api_key_env)
     if config.delivery.email.enabled:
         names.extend(
             [

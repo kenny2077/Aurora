@@ -33,6 +33,10 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.scholar.score_threshold == 7.0
     assert config.modes.scholar.sources.arxiv.enabled is True
     assert config.modes.scholar.sources.openreview.enabled is True
+    assert config.modes.scholar.sources.semantic_scholar.enabled is True
+    assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
+    assert config.modes.scholar.sources.semantic_scholar.cache_ttl_hours == 168
+    assert config.modes.scholar.sources.semantic_scholar.max_requests_per_run == 40
     assert config.modes.repo_learning.enabled is True
     assert config.modes.repo_learning.item_type == "repo"
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
@@ -72,6 +76,8 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"scholar": {"fields": ["unknown-field"]}}},
         {"modes": {"scholar": {"max_candidates": 0}}},
         {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
+        {"modes": {"scholar": {"sources": {"semantic_scholar": {"api_key_env": ""}}}}},
+        {"modes": {"scholar": {"sources": {"semantic_scholar": {"cache_ttl_hours": 0}}}}},
         {"modes": {"repo_learning": {"item_type": "paper"}}},
         {"modes": {"repo_learning": {"interests": ["unknown-interest"]}}},
         {"modes": {"repo_learning": {"sources": {"github_search": {"domains": []}}}}},
@@ -136,3 +142,4 @@ def test_example_config_validates() -> None:
     assert config.run.enabled_modes == ["unified_digest"]
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.scholar.fields == ["ml", "agents"]
+    assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"

@@ -46,6 +46,9 @@ rtk uv run aurora run --mode repo_learning --repo-interest cv
 Aurora uses `GH_SEARCH_TOKEN` first, then `GITHUB_TOKEN`, and can run
 unauthenticated with lower GitHub rate limits.
 
+`SEMANTIC_SCHOLAR_API_KEY` is optional for scholar enrichment configuration.
+Aurora validates and schedules cleanly without it.
+
 ## Scholar Radar
 
 Machine-learning research:

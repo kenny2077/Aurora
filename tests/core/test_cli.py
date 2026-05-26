@@ -27,7 +27,8 @@ def test_config_validate_succeeds_with_temp_config(tmp_path: Path, capsys) -> No
     assert "config: ok" in capsys.readouterr().out
 
 
-def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys) -> None:
+def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys, monkeypatch) -> None:
+    monkeypatch.delenv("SEMANTIC_SCHOLAR_API_KEY", raising=False)
     config_path = tmp_path / "config.json"
     config_path.write_text(
         """
@@ -48,6 +49,7 @@ def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys) -> 
     assert exit_code == 0
     assert "doctor: ok" in output
     assert "missing optional env vars:" in output
+    assert "SEMANTIC_SCHOLAR_API_KEY" in output
 
 
 def test_config_validate_invalid_config_exits_nonzero(tmp_path: Path, capsys) -> None:

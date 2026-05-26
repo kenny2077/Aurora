@@ -25,7 +25,15 @@
       "fields": ["ml", "agents"],
       "max_candidates": 200,
       "final_item_count": 10,
-      "score_threshold": 7.0
+      "score_threshold": 7.0,
+      "sources": {
+        "semantic_scholar": {
+          "enabled": true,
+          "api_key_env": "SEMANTIC_SCHOLAR_API_KEY",
+          "cache_ttl_hours": 168,
+          "max_requests_per_run": 40
+        }
+      }
     },
     "repo_learning": {
       "interests": ["agents", "mcp", "workflow-automation"],
