@@ -27,6 +27,7 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "test -s site/index.md" in workflow
     assert "git -C \"$PUBLISH_DIR\" fetch --depth=1 origin gh-pages" in workflow
     assert "cp -R site/. \"$PUBLISH_DIR\"/" in workflow
+    assert "rm \"$PUBLISH_DIR/.nojekyll\"" in workflow
     assert "git -C \"$PUBLISH_DIR\" push origin gh-pages" in workflow
     assert "astral-sh/setup-uv" not in workflow
     assert "actions/upload-artifact" not in workflow

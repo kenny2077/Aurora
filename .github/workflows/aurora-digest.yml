@@ -101,6 +101,9 @@ jobs:
             git -C "$PUBLISH_DIR" checkout --orphan gh-pages
           fi
           cp -R site/. "$PUBLISH_DIR"/
+          if [ -f "$PUBLISH_DIR/.nojekyll" ]; then
+            rm "$PUBLISH_DIR/.nojekyll"
+          fi
           git -C "$PUBLISH_DIR" add .
           if git -C "$PUBLISH_DIR" diff --cached --quiet; then
             echo "No Pages changes to publish."
