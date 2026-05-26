@@ -22,22 +22,31 @@ on:
         options:
           - "false"
           - "true"
+      skip_llm:
+        description: Skip optional LLM enrichment for faster Pages publishing
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
 
 jobs:
   build-site:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v6
       - name: Install
         run: uv sync --dev
       - name: Validate config
         run: uv run aurora config validate
       - name: Run Aurora
+        timeout-minutes: 25
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
@@ -49,10 +58,15 @@ jobs:
         run: |
           MODE="${{ github.event.inputs.mode || 'unified_digest' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+          SKIP_LLM="${{ github.event.inputs.skip_llm || 'true' }}"
+          ARGS=(--mode "$MODE")
+          if [ "$SKIP_LLM" = "true" ]; then
+            ARGS+=(--skip-llm)
+          fi
           if [ "$DRY_RUN" = "true" ]; then
-            uv run aurora run --dry-run --mode "$MODE"
+            uv run aurora run --dry-run "${ARGS[@]}"
           else
-            uv run aurora run --mode "$MODE" --strict-delivery
+            uv run aurora run "${ARGS[@]}" --strict-delivery
           fi
       - name: Verify generated Pages site
         if: ${{ github.event.inputs.dry_run != 'true' }}
@@ -68,14 +82,14 @@ jobs:
           fi
       - name: Upload generated site
         if: ${{ github.event.inputs.dry_run != 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: aurora-site
           path: site
           if-no-files-found: error
       - name: Upload dry-run outputs
         if: ${{ github.event.inputs.dry_run == 'true' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: aurora-dry-run
           path: data/runs
@@ -88,10 +102,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           persist-credentials: false
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: aurora-site
           path: site
