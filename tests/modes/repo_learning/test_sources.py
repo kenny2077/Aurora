@@ -31,11 +31,14 @@ def test_build_search_queries_include_presets_and_filters() -> None:
         now=datetime(2026, 5, 25, tzinfo=timezone.utc),
     )
 
-    assert [query.domain for query in queries] == ["cv", "agents"]
+    assert [query.domain for query in queries[:5]] == ["cv", "cv", "cv", "agents", "agents"]
     assert "computer vision" in queries[0].query
     assert "language:Python" in queries[0].query
-    assert "agent" in queries[1].query
-    assert "language:TypeScript" in queries[1].query
+    assert "agent" in queries[3].query
+    assert "language:Python" in queries[3].query
+    assert "agent" in queries[4].query
+    assert "language:TypeScript" in queries[4].query
+    assert " OR " not in queries[3].query
     assert "stars:>=750" in queries[0].query
     assert "pushed:>=2026-05-15" in queries[0].query
     assert "created:>=" in queries[0].query
@@ -54,9 +57,9 @@ def test_build_search_queries_merges_custom_keywords_and_language_overrides() ->
         now=datetime(2026, 5, 25, tzinfo=timezone.utc),
     )
 
-    assert '"graph rag"' in queries[0].query
-    assert "language:Rust" in queries[0].query
-    assert "language:Python" not in queries[0].query
+    assert any('"graph rag"' in query.query for query in queries)
+    assert all("language:Rust" in query.query for query in queries)
+    assert all("language:Python" not in query.query for query in queries)
 
 
 def test_slug_and_ref_validation() -> None:
@@ -150,6 +153,45 @@ def test_github_search_fetch_stage_deduplicates_and_attaches_query_metadata() ->
     assert len(records) == 1
     assert records[0]["aurora_source_domain"] == "agents"
     assert "stars:>=500" in records[0]["aurora_search_query"]
+
+
+def test_github_search_fetch_stage_keeps_successes_when_one_query_fails() -> None:
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if len(requests) == 1:
+            return httpx.Response(403, json={"message": "rate limited"})
+        return httpx.Response(200, json={"items": [_repo_payload()]})
+
+    context = StageContext(
+        mode="repo_learning",
+        run_id="test",
+        until=datetime(2026, 5, 25, tzinfo=timezone.utc),
+    )
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await GitHubSearchFetchStage(
+                RepoLearningModeConfig(
+                    sources=RepoLearningSourcesConfig(
+                        github_search=RepoLearningGitHubSearchConfig(
+                            domains=["ai-agents"],
+                            min_stars=100,
+                            recent_years=0,
+                            custom_keywords=["agent", "mcp"],
+                            languages=[],
+                        )
+                    ),
+                    interests=["agents"],
+                ),
+                http_client=client,
+            ).fetch(context)
+
+    records = asyncio.run(exercise())
+
+    assert len(records) == 1
+    assert context.metadata["repo_learning_search_failures"][0]["status_code"] == "403"
 
 
 def _repo_payload() -> dict:

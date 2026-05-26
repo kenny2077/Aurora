@@ -63,6 +63,8 @@ def _write_site_scaffold(site_dir: Path) -> None:
         _head_custom_html(), encoding="utf-8"
     )
     (site_dir / "assets" / "css" / "aurora.css").write_text(_aurora_css(), encoding="utf-8")
+    for mode in MODE_LABELS:
+        _write_mode_index_placeholder(site_dir, mode)
 
 
 def _write_digest_post(
@@ -121,6 +123,40 @@ def _write_latest_mode_page(
         f'<p class="aurora-back"><a href="{{{{ {json.dumps(archive_link)} | relative_url }}}}">'
         "Archive permalink</a></p>\n\n"
         f"{rendered.markdown.rstrip()}\n",
+        encoding="utf-8",
+    )
+    return markdown_path
+
+
+def _write_mode_index_placeholder(site_dir: Path, mode: str) -> Path:
+    mode_dir = site_dir / mode
+    mode_dir.mkdir(parents=True, exist_ok=True)
+    markdown_path = mode_dir / "index.md"
+    label = MODE_LABELS.get(mode, mode)
+    front_matter = _front_matter(
+        {
+            "layout": "default",
+            "title": f"Latest {label}",
+            "permalink": f"/{mode}/",
+            "mode": mode,
+        }
+    )
+    markdown_path.write_text(
+        f"{front_matter}\n\n"
+        f"# Latest {label}\n\n"
+        f"{{% assign mode_posts = site.posts | where: \"mode\", \"{mode}\" %}}\n"
+        "{% assign latest_mode = mode_posts.first %}\n"
+        "{% if latest_mode %}\n"
+        '<p class="aurora-back"><a href="{{ latest_mode.url | relative_url }}">'
+        "Archive permalink</a></p>\n\n"
+        "{{ latest_mode.content }}\n"
+        "{% else %}\n"
+        f"No dedicated {label} digest has been published yet.\n\n"
+        "{% assign latest = site.posts.first %}\n"
+        "{% if latest %}\n"
+        "See the [latest published digest]({{ latest.url | relative_url }}) for current Aurora output.\n"
+        "{% endif %}\n"
+        "{% endif %}\n",
         encoding="utf-8",
     )
     return markdown_path

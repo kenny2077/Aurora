@@ -44,7 +44,19 @@ class GitHubSearchFetchStage:
             interests=self.config.interests,
             now=context.until,
         ):
-            for item in await github.search_repositories(search_query.query):
+            try:
+                candidates = await github.search_repositories(search_query.query)
+            except httpx.HTTPStatusError as exc:
+                context.metadata.setdefault("repo_learning_search_failures", []).append(
+                    {
+                        "domain": search_query.domain,
+                        "query": search_query.query,
+                        "status_code": str(exc.response.status_code),
+                        "error": str(exc),
+                    }
+                )
+                continue
+            for item in candidates:
                 key = _repo_key(item)
                 if not key or key in seen:
                     continue

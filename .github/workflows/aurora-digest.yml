@@ -98,6 +98,10 @@ jobs:
           test -s site/index.md
           test -s site/_config.yml
           test -s site/feed.xml
+          test -s site/unified_digest/index.md
+          test -s site/scholar/index.md
+          test -s site/repo_learning/index.md
+          test -s site/tech_news/index.md
           test -d site/_posts
           POST_COUNT="$(find site/_posts -type f -name '*.md' | wc -l)"
           if [ "$POST_COUNT" -lt 1 ]; then

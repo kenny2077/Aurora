@@ -28,6 +28,7 @@ LEGACY_DOMAIN_ALIASES = {
     "ai-agents": "agents",
     "mcp-ecosystem": "mcp",
 }
+MAX_SEARCH_TERMS_PER_DOMAIN = 3
 
 
 @dataclass(frozen=True)
@@ -123,22 +124,37 @@ def build_search_queries(
 
     queries: list[RepoSearchQuery] = []
     for domain in _query_domains(interests or [], config.domains):
-        terms = unique_text([*_terms_for_domain(domain), *config.custom_keywords])
-        term_query = " OR ".join(_quote_search_term(term) for term in terms)
-        pieces = [
-            f"({term_query})",
-            f"stars:>={config.min_stars}",
-            f"pushed:>={active_after}",
-        ]
-        if config.recent_years:
-            pieces.append(f"created:>={created_after}")
-        if config.languages:
-            pieces.append(_language_query(config.languages))
-        elif domain in REPO_INTEREST_PRESETS:
-            preset_languages = REPO_INTEREST_PRESETS[domain].get("languages") or []
-            if preset_languages:
-                pieces.append(_language_query([str(language) for language in preset_languages]))
-        queries.append(RepoSearchQuery(domain=domain, query=" ".join(pieces)))
+        preset_terms = _terms_for_domain(domain)[:MAX_SEARCH_TERMS_PER_DOMAIN]
+        terms = unique_text([*preset_terms, *config.custom_keywords])
+        languages = _languages_for_domain(config, domain)
+        for term in terms:
+            if languages:
+                for language in languages:
+                    queries.append(
+                        RepoSearchQuery(
+                            domain=domain,
+                            query=_search_query(
+                                term,
+                                min_stars=config.min_stars,
+                                active_after=active_after,
+                                created_after=created_after if config.recent_years else None,
+                                language=language,
+                            ),
+                        )
+                    )
+                continue
+            queries.append(
+                RepoSearchQuery(
+                    domain=domain,
+                    query=_search_query(
+                        term,
+                        min_stars=config.min_stars,
+                        active_after=active_after,
+                        created_after=created_after if config.recent_years else None,
+                        language=None,
+                    ),
+                )
+            )
     return queries
 
 
@@ -184,8 +200,31 @@ def _quote_search_term(term: str) -> str:
     return term
 
 
-def _language_query(languages: list[str]) -> str:
-    language_parts = [f"language:{language}" for language in unique_text(languages)]
-    if len(language_parts) == 1:
-        return language_parts[0]
-    return "(" + " OR ".join(language_parts) + ")"
+def _languages_for_domain(
+    config: RepoLearningGitHubSearchConfig, domain: str
+) -> list[str]:
+    if config.languages:
+        return unique_text(config.languages)
+    if domain in REPO_INTEREST_PRESETS:
+        return unique_text([str(language) for language in REPO_INTEREST_PRESETS[domain].get("languages") or []])
+    return []
+
+
+def _search_query(
+    term: str,
+    *,
+    min_stars: int,
+    active_after: str,
+    created_after: str | None,
+    language: str | None,
+) -> str:
+    pieces = [
+        _quote_search_term(term),
+        f"stars:>={min_stars}",
+        f"pushed:>={active_after}",
+    ]
+    if created_after:
+        pieces.append(f"created:>={created_after}")
+    if language:
+        pieces.append(f"language:{language}")
+    return " ".join(pieces)

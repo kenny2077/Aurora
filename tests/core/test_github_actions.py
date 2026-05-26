@@ -28,6 +28,9 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "uv run aurora run \"${ARGS[@]}\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow
     assert "test -s site/index.md" in workflow
+    assert "test -s site/repo_learning/index.md" in workflow
+    assert "test -s site/scholar/index.md" in workflow
+    assert "test -s site/tech_news/index.md" in workflow
     assert "Selected 0 item(s)" in workflow
     assert "refusing to publish an empty Pages update" in workflow
     assert "git -C \"$PUBLISH_DIR\" fetch --depth=1 origin gh-pages" in workflow
