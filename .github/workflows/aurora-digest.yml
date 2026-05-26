@@ -34,13 +34,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - name: Install
-        working-directory: target
         run: uv sync --dev
       - name: Validate config
-        working-directory: target
         run: uv run aurora config validate
       - name: Run Aurora
-        working-directory: target
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
@@ -57,8 +54,15 @@ jobs:
           else
             uv run aurora run --mode "$MODE"
           fi
+      - name: Ensure Pages artifact exists
+        if: always()
+        run: |
+          mkdir -p site
+          if [ ! -f site/index.html ]; then
+            printf '<!doctype html><meta charset="utf-8"><title>Aurora</title><h1>Aurora run did not publish a site artifact.</h1>\n' > site/index.html
+          fi
       - name: Upload Pages artifact
         if: always()
         uses: actions/upload-pages-artifact@v3
         with:
-          path: target/site
+          path: site
