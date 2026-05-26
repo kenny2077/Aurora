@@ -19,6 +19,8 @@ from aurora.interests import REPO_INTEREST_PRESETS, unique_text
 
 GITHUB_API_BASE_URL = "https://api.github.com"
 RAW_GITHUB_BASE_URL = "https://raw.githubusercontent.com"
+# This is the environment variable name for GitHub's token, not a token value.
+GITHUB_TOKEN_ENV = "GITHUB_TOKEN"  # nosec B105
 SLUG_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._-]*$")
 REF_RE = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._/@+-]*$")
 
@@ -158,8 +160,8 @@ def _github_token(token_env: str) -> str | None:
     token = os.getenv(token_env)
     if token:
         return token
-    if token_env != "GITHUB_TOKEN":
-        return os.getenv("GITHUB_TOKEN")
+    if token_env != GITHUB_TOKEN_ENV:
+        return os.getenv(GITHUB_TOKEN_ENV)
     return None
 
 

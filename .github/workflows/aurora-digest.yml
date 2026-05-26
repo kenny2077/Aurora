@@ -24,12 +24,14 @@ on:
           - "true"
 
 jobs:
-  aurora:
+  build-site:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: astral-sh/setup-uv@v5
       - name: Install
         run: uv sync --dev
@@ -64,14 +66,13 @@ jobs:
             echo "No digest posts were generated under site/_posts."
             exit 1
           fi
-      - name: Publish gh-pages branch
+      - name: Upload generated site
         if: ${{ github.event.inputs.dry_run != 'true' }}
-        uses: peaceiris/actions-gh-pages@v4
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./site
-          keep_files: true
+          name: aurora-site
+          path: site
+          if-no-files-found: error
       - name: Upload dry-run outputs
         if: ${{ github.event.inputs.dry_run == 'true' }}
         uses: actions/upload-artifact@v4
@@ -79,3 +80,25 @@ jobs:
           name: aurora-dry-run
           path: data/runs
           if-no-files-found: error
+
+  publish-pages:
+    needs: build-site
+    if: ${{ github.event.inputs.dry_run != 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: aurora-site
+          path: site
+      - name: Publish gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./site
+          keep_files: true

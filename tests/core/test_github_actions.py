@@ -8,12 +8,20 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
 
     assert "schedule:" in workflow
     assert "workflow_dispatch:" in workflow
+    assert "build-site:" in workflow
+    assert "publish-pages:" in workflow
+    assert "needs: build-site" in workflow
     assert "working-directory: target" not in workflow
+    assert "contents: read" in workflow
     assert "contents: write" in workflow
+    assert "persist-credentials: false" in workflow
     assert "uv run aurora config validate" in workflow
     assert "uv run aurora run --mode \"$MODE\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow
     assert "test -s site/index.md" in workflow
+    assert "actions/upload-artifact@v4" in workflow
+    assert "actions/download-artifact@v4" in workflow
+    assert "name: aurora-site" in workflow
     assert "peaceiris/actions-gh-pages@v4" in workflow
     assert "publish_branch: gh-pages" in workflow
     assert "publish_dir: ./site" in workflow

@@ -129,6 +129,8 @@ class RSSFetchStage:
                 response.raise_for_status()
                 feed = feedparser.parse(response.text)
             except Exception:
+                feed = None
+            if feed is None:
                 continue
             for entry in feed.entries:
                 published_at = _parse_feed_date(entry)
@@ -232,4 +234,3 @@ def _is_before_since(value: datetime, context: StageContext) -> bool:
 
 def _strip_html(value: str) -> str:
     return re.sub(r"<[^>]+>", " ", value).strip()
-
