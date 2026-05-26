@@ -10,6 +10,7 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "workflow_dispatch:" in workflow
     assert "skip_llm:" in workflow
     assert "default: \"true\"" in workflow
+    assert "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: \"true\"" in workflow
     assert "build-site:" in workflow
     assert "publish-pages:" in workflow
     assert "needs: build-site" in workflow
