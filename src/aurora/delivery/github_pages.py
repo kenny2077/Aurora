@@ -144,19 +144,9 @@ def _write_mode_index_placeholder(site_dir: Path, mode: str) -> Path:
     markdown_path.write_text(
         f"{front_matter}\n\n"
         f"# Latest {label}\n\n"
-        f"{{% assign mode_posts = site.posts | where: \"mode\", \"{mode}\" %}}\n"
-        "{% assign latest_mode = mode_posts.first %}\n"
-        "{% if latest_mode %}\n"
-        '<p class="aurora-back"><a href="{{ latest_mode.url | relative_url }}">'
-        "Archive permalink</a></p>\n\n"
-        "{{ latest_mode.content }}\n"
-        "{% else %}\n"
         f"No dedicated {label} digest has been published yet.\n\n"
-        "{% assign latest = site.posts.first %}\n"
-        "{% if latest %}\n"
-        "See the [latest published digest]({{ latest.url | relative_url }}) for current Aurora output.\n"
-        "{% endif %}\n"
-        "{% endif %}\n",
+        "Open the [latest unified digest]({{ '/unified_digest/' | relative_url }}) "
+        "for current Aurora output.\n",
         encoding="utf-8",
     )
     return markdown_path

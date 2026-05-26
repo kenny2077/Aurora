@@ -54,7 +54,7 @@ def test_github_pages_delivery_writes_jekyll_site(tmp_path: Path) -> None:
     assert ".aurora-latest-digest" in css
     repo_page = (site_dir / "repo_learning" / "index.md").read_text(encoding="utf-8")
     assert "No dedicated Repo Learning digest has been published yet." in repo_page
-    assert "latest published digest" in repo_page
+    assert "latest unified digest" in repo_page
 
     post = post_path.read_text(encoding="utf-8")
     assert "title: \"Aurora Unified Digest\"" in post
