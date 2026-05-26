@@ -1,14 +1,14 @@
 ---
 layout: "default"
 title: "Aurora Unified Digest"
-date: "2026-05-26 17:25:41 +0800"
+date: "2026-05-26 18:42:41 +0800"
 mode: "unified_digest"
-run_id: "run-20260526T092541Z"
+run_id: "site-pages-check"
 item_count: 16
 item_counts:
   news: 8
-  paper: 8
-  repo: 0
+  paper: 0
+  repo: 8
 permalink: "/archive/2026-05-26-unified-digest/"
 ---
 
@@ -16,60 +16,60 @@ permalink: "/archive/2026-05-26-unified-digest/"
 
 Selected 16 item(s).
 
-## Research Papers
+## Repositories
 
-1. [A Multimodal 3D Foundation Model for Light Sheet Fluorescence Microscopy Enables Few-Shot Segmentation, Classification, and Deblurring](https://arxiv.org/abs/2605.26026v1) - 6.82/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-2. [LECTOR: Joint Optimization of Scientific Reasoning Graphs and Introduction Generation](https://arxiv.org/abs/2605.25964v1) - 6.82/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-3. [Can LLMs Time Travel? Enhancing Temporal Consistency in Legal Agentic Search through Reinforcement Learning](https://arxiv.org/abs/2605.25920v1) - 6.82/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-4. [Selective Latent Thinking: Adaptive Compression of LLM Reasoning Chains](https://arxiv.org/abs/2605.25745v1) - 6.82/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-5. [Latent Representation Alignment for Offline Goal-Conditioned Reinforcement Learning](https://arxiv.org/abs/2605.25740v1) - 6.82/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-6. [From Model Scaling to System Scaling: Scaling the Harness in Agentic AI](https://arxiv.org/abs/2605.26112v1) - 6.75/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-7. [Step-TP: A Grounded, Step-Level Dataset with Chain-of-Thought Reasoning for LLM-Guided Tensor Program Optimization](https://arxiv.org/abs/2605.25954v1) - 6.75/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
-8. [From Facts to Insights: A Persona-Driven Dual Memory Framework and Dataset for Role-Playing Agents](https://arxiv.org/abs/2605.25693v1) - 6.75/10
-   - Source: arxiv
-   - Why: Relevant ML research candidate for today's scholar radar.
+1. [stablyai/orca](https://github.com/stablyai/orca) - 9.39/10
+   - Source: github_search
+   - Why: stablyai/orca combines TypeScript implementation details with strong signals around ade, claude-code, cli.
+2. [dtyq/magic](https://github.com/dtyq/magic) - 9.38/10
+   - Source: github_search
+   - Why: dtyq/magic combines TypeScript implementation details with strong signals around agent, agi, ai.
+3. [AI-QL/tuui](https://github.com/AI-QL/tuui) - 9.37/10
+   - Source: github_search
+   - Why: AI-QL/tuui combines TypeScript implementation details with strong signals around agent, agentic-ai, ai.
+4. [ComposioHQ/agent-orchestrator](https://github.com/ComposioHQ/agent-orchestrator) - 9.37/10
+   - Source: github_search
+   - Why: ComposioHQ/agent-orchestrator combines TypeScript implementation details with strong signals around agent-fleet, agent-swarm, claude-code.
+5. [builderz-labs/mission-control](https://github.com/builderz-labs/mission-control) - 9.36/10
+   - Source: github_search
+   - Why: builderz-labs/mission-control combines TypeScript implementation details with strong signals around agent-orchestration, ai-agents, ai-automation.
+6. [superset-sh/superset](https://github.com/superset-sh/superset) - 9.34/10
+   - Source: github_search
+   - Why: superset-sh/superset combines TypeScript implementation details with strong signals around agentic-ai, ai-agents, claude-code.
+7. [MemTensor/MemOS](https://github.com/MemTensor/MemOS) - 9.34/10
+   - Source: github_search
+   - Why: MemTensor/MemOS combines TypeScript implementation details with strong signals around agent, agentic-ai, ai.
+8. [open-multi-agent/open-multi-agent](https://github.com/open-multi-agent/open-multi-agent) - 9.34/10
+   - Source: github_search
+   - Why: open-multi-agent/open-multi-agent combines TypeScript implementation details with strong signals around agent-framework, ai-agents, anthropic.
 
 ## Tech News
 
-1. [The User Is Visibly Frustrated](https://pscanf.com/s/354/) - 9.18/10
+1. [Ask HN: Is anyone working at least 4 hours daily on an Apple Vision Pro?](https://news.ycombinator.com/item?id=48275508) - 9.01/10
    - Source: hackernews
-   - Why: [zeumo]: My take on the issue is that for most use cases where AI is pushed to the general public, a conversational chatbot is not the right tool, and the ex...
+   - Why: I asked this in 2024 and would love to see the change: https:&#x2F;&#x2F;news.ycombinator.com&#x2F;item?id=41748125 [Oreb]: Yes. I spend maybe half of the ye...
 2. [Using AI to write better code more slowly](https://nolanlawson.com/2026/05/25/using-ai-to-write-better-code-more-slowly/) - 8.95/10
    - Source: hackernews
    - Why: [bottlepalm]: I&#x27;ve hit this point with AI where it&#x27;s not a simple process, but a long drawn out back and forth. I&#x27;ll use AI to design the impl...
 3. [Norway's 2 petabytes of Huawei flash storage and LLM training](https://www.blocksandfiles.com/flash/2026/05/22/norways-2-petabytes-of-huawei-flash-storage-and-llm-training/5244910) - 8.95/10
    - Source: hackernews
    - Why: [TrackerFF]: I&#x27;m a Norwegian, and I use the national library almost every day for searching through texts. They have truly one of the best working user...
-4. [Ask HN: Is anyone working at least 4 hours daily on an Apple Vision Pro?](https://news.ycombinator.com/item?id=48275508) - 8.94/10
+4. [DynIP – Dynamic DNS with RFC 2136, IPv6, DNSSEC, and BYOD](https://dynip.dev/) - 8.79/10
    - Source: hackernews
-   - Why: I asked this in 2024 and would love to see the change: https:&#x2F;&#x2F;news.ycombinator.com&#x2F;item?id=41748125 [Oreb]: Yes. I spend maybe half of the ye...
-5. [Motorola phones have started hijacking the Amazon app to insert affiliate codes](https://9to5google.com/2026/05/25/motorola-amazon-app-hijacking-behavior/) - 8.93/10
+   - Why: [dynip]: I&#x27;m Daniel, network engineer in Sweden. Built DynIP because every DDNS service I tried was designed around 2010-era networks: proprietary HTTP-...
+5. [The User Is Visibly Frustrated](https://pscanf.com/s/354/) - 8.73/10
    - Source: hackernews
-   - Why: [codedokode]: Think how bad the market got. Today we have preinstalled garbage apps like LinkedIn, garbage apps mandated to be preinstalled by the government...
+   - Why: [andOlga]: Every time someone claims LLMs &quot;talk like real people&quot;, I have to wonder what kind of people they talk to, what kind of conversations th...
 6. [Netherlands Seizes 800 Servers, Arrests 2 for Aiding Cyberattacks](https://krebsonsecurity.com/2026/05/netherlands-seizes-800-servers-arrests-2-for-aiding-cyberattacks/) - 8.66/10
    - Source: hackernews
    - Why: [pocksuppet]: We should note these are not even slightly legitimate hosting companies, lest anyone worry too much about their non-KYC offshore servers. These...
 7. [Ferrari Luce](https://www.ferrari.com/en-EN/auto/ferrari-luce) - 8.65/10
    - Source: hackernews
    - Why: https:&#x2F;&#x2F;www.topgear.com&#x2F;car-news&#x2F;electric&#x2F;its-finally-here-m... [rickdeckard]: Makes sense from corporate perspective to hire the &q...
-8. [Microsoft Copilot Cowork Exfiltrates Files](https://www.promptarmor.com/resources/microsoft-copilot-cowork-exfiltrates-files) - 8.64/10
+8. [What we lost when we stopped letting kids leave the front yard](https://stevemagness.substack.com/p/the-cost-of-safetyism) - 8.65/10
    - Source: hackernews
-   - Why: [arjie]: A skill is just a program for an LLM agent. This just seems like works-as-expected. Are the five lines in the skill notably innocuous or something?...
+   - Why: [hibikir]: What I see in my deep suburbia is just far less interest in wandering past the front yard, because there&#x27;s nothing to do: House after house w...
 
 ---
 
-Generated by Aurora from run `run-20260526T092541Z`.
+Generated by Aurora from run `site-pages-check`.
