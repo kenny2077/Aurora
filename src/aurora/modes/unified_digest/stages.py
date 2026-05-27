@@ -4,10 +4,12 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
+from datetime import datetime, timezone
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
 from aurora.config import AuroraConfig, UnifiedDigestModeConfig
+from aurora.modes.repo_learning.state import RepoLearningStateStore
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 from aurora.storage.jsonl import read_jsonl
@@ -116,12 +118,31 @@ class UnifiedEnrichStage:
 
 
 class UnifiedDeliveryStage:
-    """No-op unified digest delivery until real delivery exists."""
+    """Record selected repo recommendations, then delegate configured delivery."""
+
+    def __init__(self, state_store: RepoLearningStateStore, downstream=None) -> None:
+        self.state_store = state_store
+        self.downstream = downstream
 
     async def deliver(
         self, rendered: RenderedDigest, context: StageContext
     ) -> list[DeliveryResult]:
-        return [DeliveryResult(channel="dry_run")]
+        repo_ids = [
+            str(repo_id)
+            for repo_id in rendered.metadata.get("recommended_repo_ids", [])
+            if str(repo_id).strip()
+        ]
+        self.state_store.mark_recommended(
+            repo_ids,
+            context.until or datetime.now(timezone.utc),
+        )
+        state_result = DeliveryResult(
+            channel="repo_learning_state",
+            metadata={"recommended_count": len(repo_ids), "source_mode": "unified_digest"},
+        )
+        if self.downstream is None:
+            return [state_result]
+        return [state_result, *(await self.downstream.deliver(rendered, context))]
 
 
 class _NoDeliveryStage:

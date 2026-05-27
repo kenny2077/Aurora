@@ -49,6 +49,19 @@ jobs:
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       - name: Install
         run: uv sync --dev
+      - name: Restore Aurora state
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          STATE_DIR="$(mktemp -d)"
+          git -C "$STATE_DIR" init
+          git -C "$STATE_DIR" remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          if git -C "$STATE_DIR" fetch --depth=1 origin gh-pages; then
+            git -C "$STATE_DIR" checkout -B gh-pages FETCH_HEAD
+            if [ -f "$STATE_DIR/.aurora/aurora_state.json" ]; then
+              mkdir -p data
+              cp "$STATE_DIR/.aurora/aurora_state.json" data/aurora_state.json
+            fi
+          fi
       - name: Validate config
         env:
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
@@ -111,6 +124,10 @@ jobs:
           if grep -R "Selected 0 item(s)" site/_posts/*.md; then
             echo "Generated digest is empty; refusing to publish an empty Pages update."
             exit 1
+          fi
+          if [ -f data/aurora_state.json ]; then
+            mkdir -p site/.aurora
+            cp data/aurora_state.json site/.aurora/aurora_state.json
           fi
       - name: Publish gh-pages branch
         if: ${{ github.event.inputs.dry_run != 'true' }}

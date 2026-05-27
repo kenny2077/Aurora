@@ -126,6 +126,24 @@ def test_scoring_rewards_relevant_active_repos_and_suppresses_recent_state(tmp_p
     }
 
 
+def test_scoring_state_changes_next_run_order(tmp_path: Path) -> None:
+    state_store = RepoLearningStateStore(tmp_path / "state.json")
+    first = _repo("repo:org/first", "org/first", {"stars": 5000})
+    second = _repo("repo:org/second", "org/second", {"stars": 4500})
+    config = RepoLearningModeConfig()
+
+    before = asyncio.run(
+        RepoLearningScorer(config, state_store=state_store).score([first, second], _context())
+    )
+    state_store.mark_recommended(["repo:org/first"], datetime(2026, 5, 24, tzinfo=timezone.utc))
+    after = asyncio.run(
+        RepoLearningScorer(config, state_store=state_store).score([first, second], _context())
+    )
+
+    assert before[0].final_score >= before[1].final_score
+    assert after[0].final_score < after[1].final_score
+
+
 def test_extract_package_files_selects_manifests_docs_examples_and_workflows() -> None:
     files = extract_package_files(
         [

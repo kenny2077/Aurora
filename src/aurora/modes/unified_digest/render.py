@@ -69,6 +69,7 @@ class UnifiedDigestRenderer:
             markdown=summary,
             metadata={
                 "selected_item_ids": [item.id for item in selected],
+                "recommended_repo_ids": [item.id for item in selected if item.type == "repo"],
                 "item_counts": {
                     item_type: sum(1 for item in selected if item.type == item_type)
                     for item_type in self.config.section_order

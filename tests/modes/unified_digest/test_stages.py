@@ -5,10 +5,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from aurora.config import AuroraConfig, RunConfig, UnifiedDigestModeConfig
+from aurora.modes.repo_learning.state import RepoLearningStateStore
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer
 from aurora.modes.unified_digest.stages import (
     UnifiedDeduplicateStage,
+    UnifiedDeliveryStage,
     UnifiedFetchStage,
 )
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
@@ -93,6 +95,7 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     assert "[Repo](" not in summary
     assert "News" not in summary
     assert rendered.metadata["selected_item_ids"] == ["repo:2", "paper:1"]
+    assert rendered.metadata["recommended_repo_ids"] == ["repo:2"]
     assert rendered.metadata["item_counts"] == {"repo": 1, "paper": 1, "news": 0}
 
 
@@ -122,6 +125,28 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Repositories" in summary
     assert "Tech News" in summary
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
+
+
+def test_unified_delivery_updates_repo_recommendation_state(tmp_path: Path) -> None:
+    state_store = RepoLearningStateStore(tmp_path / "state.json")
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Digest",
+        markdown="body",
+        metadata={"recommended_repo_ids": ["repo:org/one", "repo:org/two"]},
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        until=datetime(2026, 5, 25, tzinfo=timezone.utc),
+    )
+
+    results = asyncio.run(UnifiedDeliveryStage(state_store, _Deliver([])).deliver(rendered, context))
+    recent = state_store.recent_ids(datetime(2026, 5, 24, tzinfo=timezone.utc))
+
+    assert [result.channel for result in results] == ["repo_learning_state", "test"]
+    assert results[0].metadata["recommended_count"] == 2
+    assert recent == {"repo:org/one", "repo:org/two"}
 
 
 def test_unified_pipeline_reports_included_mode_failures(tmp_path: Path) -> None:
