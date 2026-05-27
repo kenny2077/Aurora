@@ -3,82 +3,10 @@ layout: "default"
 title: "Latest Scholar"
 permalink: "/scholar/"
 mode: "scholar"
-run_id: "run-20260527T042008Z"
-date: "2026-05-27 12:20:08 +0800"
 ---
 
-<p class="aurora-back"><a href="{{ "/archive/2026-05-27-scholar/" | relative_url }}">Archive permalink</a></p>
+# Latest Scholar
 
-# Aurora Scholar
+No dedicated Scholar digest has been published yet.
 
-Selected 10 research paper(s).
-
-## 1. [Online Learning on Hidden-Convex Losses via Algorithmic Equivalence: Optimal Regret, Geometric Barrier, and Bandit Feedback](https://arxiv.org/abs/2605.26373v1) - 7.03/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Anas Barakat, Andreas Kontogiannis, Vasilis Pollatos, Ioannis Panageas, Antonios Varvitsiotis
-- Abstract: We study adversarial online learning with hidden-convex losses, i.e., nonconvex losses that become convex after a nonlinear reparameterization. Ghai, Lu and Hazan (2022) proved that, under geometric and smoothness assumptions, online gra...
-
-## 2. [Vector Policy Optimization: Training for Diversity Improves Test-Time Search](https://arxiv.org/abs/2605.22817v1) - 6.85/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Ryan Bahlous-Boldi, Isha Puri, Idan Shenfeld, Akarsh Kumar, Mehul Damani, Sebastian Risi, Omar Khattab, Zhang-Wei Hong, Pulkit Agrawal
-- Abstract: Language models must now generalize out of the box to novel environments and work inside inference-scaling search procedures, such as AlphaEvolve, that select rollouts with a variety of task-specific reward functions. Unfortunately, the...
-
-## 3. [Bilevel Optimization over Saddle Points of Zero-Sum Markov Games](https://arxiv.org/abs/2605.26654v1) - 6.71/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Zihao Zheng, Irwin King, Songtao Lu
-- Abstract: Reinforcement learning (RL) often has a hierarchical structure, where an upper-level (UL) learner selects model parameters and a lower-level (LL) decision-making process responds, naturally leading to a bilevel optimization problem. Most...
-
-## 4. [From Scores to Gibbs Correctors: Accelerating Uniform-Rate Discrete Diffusion Models](https://arxiv.org/abs/2605.27352v1) - 6.59/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Yuchen Liang, Ness Shroff, Yingbin Liang
-- Abstract: Discrete diffusion models have achieved strong empirical performance in text and other symbolic domains, but, especially for uniform-rate models, they often require many steps to generate a single sample. Existing acceleration methods ei...
-
-## 5. [Causal Representation Learning for Generalisable Recommendation](https://arxiv.org/abs/2605.27043v1) - 6.59/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Yorgos Felekis, Michael O'Riordan, Oriol Corcoll, Ciarán M. Gilligan-Lee
-- Abstract: Predictive models trained on observational data often fail to generalise to the distributions they encounter when deployed, especially when the training data is a product of the system being optimised. Recommender systems are a canonical...
-
-## 6. [A PAC-Bayesian View of Generalisation for Physics-Informed Machine Learning](https://arxiv.org/abs/2605.26341v1) - 6.59/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Thien V. Nguyen, Amaury Habrard, Benjamin Guedj
-- Abstract: Physics-informed machine learning (PIML) integrates mechanistic knowledge, typically in the form of partial differential equations (PDE), into data-driven models. Despite strong empirical performance, its statistical generalisation prope...
-
-## 7. [MATCHA: Matching Text via Contrastive Semantic Alignment](https://arxiv.org/abs/2605.27345v1) - 6.58/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Siran Li, Ece Sena Etoglu, Carsten Eickhoff, Seyed Ali Bahrainian
-- Abstract: Reliable evaluation is essential for understanding large language model (LLM) performance, yet today's go-to metrics, namely token-overlap scores (e.g., ROUGE) and embedding-based measures (e.g., BERTScore), often misjudge semantic simil...
-
-## 8. [OSMa-Bench++: Toward Open-Ended Benchmarking of Semantic Mapping for Manipulation with Prompt-Generated Synthetic Scenes](https://arxiv.org/abs/2605.26831v1) - 6.58/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Regina Kurkova, Maxim Popov, Sergey Kolyubin
-- Abstract: Semantic mapping methods are increasingly used as intermediate scene representations for downstream robotic reasoning and manipulation, yet their evaluation is still largely tied to fixed benchmark datasets with limited coverage of manip...
-
-## 9. [Credit-assigned Policy Gradient for Early Stage Retrieval in Two-stage Ranking](https://arxiv.org/abs/2605.26385v1) - 6.56/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Haruka Kiyohara, Mihaela Curmei, Ariel Evnine, Shankar Kalyanaraman, Israel Nir, Ana-Roxana Pop, Nitzan Razin, Sarah Dean, Thorsten Joachims, Udi Weinsberg
-- Abstract: Large-scale search, recommendation, and retrieval-augmented generation (RAG) systems typically employ a two-stage architecture: an early-stage ranker (ESR) generates a candidate set, which is subsequently re-ranked by a late-stage ranker...
-
-## 10. [Chartographer: Counterfactual Chart Generation for Evaluating Vision-Language Models](https://arxiv.org/abs/2605.27311v1) - 6.56/10
-
-- Source: arxiv
-- Venue/status: arxiv / preprint
-- Authors: Yifan Jiang, Dae Yon Hwang, Jesse C. Cresswell, Freda Shi
-- Abstract: Chart question-answering (QA) benchmarks aim to pose questions that require visual reasoning to correctly answer, but models can often reach solutions through shortcuts or prior familiarity with a chart based on their own background know...
+Open the [latest unified digest]({{ '/unified_digest/' | relative_url }}) for current Aurora output.

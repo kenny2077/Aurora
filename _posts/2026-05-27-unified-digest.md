@@ -1,75 +1,90 @@
 ---
 layout: "default"
 title: "Aurora Unified Digest"
-date: "2026-05-27 11:53:56 +0800"
+date: "2026-05-27 12:56:51 +0800"
 mode: "unified_digest"
-run_id: "run-20260527T035356Z"
-item_count: 16
+run_id: "run-20260527T045651Z"
+item_count: 20
 item_counts:
-  news: 8
-  paper: 0
+  news: 4
+  paper: 8
   repo: 8
 permalink: "/archive/2026-05-27-unified-digest/"
 ---
 
 # Aurora Unified Digest
 
-Selected 16 item(s).
+Selected 20 item(s).
+
+## Research Papers
+
+1. [MATCHA: Matching Text via Contrastive Semantic Alignment](https://arxiv.org/abs/2605.27345v1) - 6.55/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+2. [OSMa-Bench++: Toward Open-Ended Benchmarking of Semantic Mapping for Manipulation with Prompt-Generated Synthetic Scenes](https://arxiv.org/abs/2605.26831v1) - 6.55/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+3. [Robust Koopman Control Barrier Filters for Safe Actor-Critic Reinforcement Learning](https://arxiv.org/abs/2605.26452v1) - 6.55/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+4. [Alignment Tampering: How Reinforcement Learning from Human Feedback Is Exploited to Optimize Misaligned Biases](https://arxiv.org/abs/2605.27355v1) - 6.52/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+5. [FineVLA: Fine-Grained Instruction Alignment for Steerable Vision-Language-Action Policies](https://arxiv.org/abs/2605.27284v1) - 6.25/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+6. [Learning to Act under Noise: Enhancing Agent Robustness via Noisy Environments](https://arxiv.org/abs/2605.27209v1) - 6.12/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+7. [Bilevel Optimization over Saddle Points of Zero-Sum Markov Games](https://arxiv.org/abs/2605.26654v1) - 6.12/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
+8. [When Does LeJEPA Learn a World Model?](https://arxiv.org/abs/2605.26379v1) - 6.12/10
+   - Source: arxiv
+   - Why: Relevant ML research candidate for today's scholar radar.
 
 ## Repositories
 
 1. [bytedance/deer-flow](https://github.com/bytedance/deer-flow) - 9.43/10
    - Source: github_search
-   - Why: DeerFlow represents a state-of-the-art multi-agent framework with 70k+ stars, demonstrating massive community adoption. Its architecture integrates sandboxes, memory, sub-agents, and a message gateway, making it a comprehensive reference for building production-grade agent systems. The project is highly active and includes detailed documentation, making it ideal for learning advanced agent orchestration patterns.
+   - Why: bytedance/deer-flow combines Python implementation details with strong signals around agent, agentic, agentic-framework.
 2. [sickn33/antigravity-awesome-skills](https://github.com/sickn33/antigravity-awesome-skills) - 9.43/10
    - Source: github_search
-   - Why: This repo is a one-stop shop for learning how to build, use, and share reusable agentic skills. It demonstrates real-world patterns for structuring AI agent instructions, integrating with multiple tools, and maintaining a large community-driven skill ecosystem.
+   - Why: sickn33/antigravity-awesome-skills combines Python implementation details with strong signals around agent-skills, agentic-skills, ai-agent-skills.
 3. [mukul975/Anthropic-Cybersecurity-Skills](https://github.com/mukul975/Anthropic-Cybersecurity-Skills) - 9.43/10
    - Source: github_search
-   - Why: This repository bridges the gap between cybersecurity expertise and AI agent capabilities, providing a standardized, framework-aligned skill library that can be directly used to enhance AI-driven security tools. It's the largest such collection, with strong community adoption (10k+ stars, 1.2k forks) and active maintenance.
+   - Why: mukul975/Anthropic-Cybersecurity-Skills combines Python implementation details with strong signals around ai-agents, claude-code, cloud-security.
 4. [FlorianBruniaux/claude-code-ultimate-guide](https://github.com/FlorianBruniaux/claude-code-ultimate-guide) - 9.43/10
    - Source: github_search
-   - Why: This is the definitive resource for mastering Claude Code, offering structured learning paths, real-world templates, and security best practices. It bridges the gap between basic usage and expert-level agentic workflows, making it essential for any developer adopting AI-assisted coding.
+   - Why: FlorianBruniaux/claude-code-ultimate-guide combines TypeScript implementation details with strong signals around agentic-coding, ai-assistant, ai-coding.
 5. [ModelEngine-Group/nexent](https://github.com/ModelEngine-Group/nexent) - 9.43/10
    - Source: github_search
-   - Why: Nexent represents a paradigm shift in AI agent development by eliminating the need for coding or complex drag-and-drop interfaces, enabling pure language-driven agent creation. Its Harness Engineering approach ensures production readiness with built-in governance, making it highly relevant for learners interested in practical, scalable AI agent deployment.
+   - Why: ModelEngine-Group/nexent combines Python implementation details with strong signals around agent, agentic-ai, agentic-framework.
 6. [tirth8205/code-review-graph](https://github.com/tirth8205/code-review-graph) - 9.4/10
    - Source: github_search
-   - Why: This project directly addresses the critical problem of token waste and context overload in AI-assisted code review. By providing a precise, incremental, and persistent code graph, it dramatically improves efficiency and accuracy of AI tools like Claude, making it a must-have for developers using AI in large codebases.
+   - Why: tirth8205/code-review-graph combines Python implementation details with strong signals around ai-coding, claude, claude-code.
 7. [stablyai/orca](https://github.com/stablyai/orca) - 9.4/10
    - Source: github_search
-   - Why: It represents a paradigm shift in how developers interact with AI agents, moving from single-agent to multi-agent orchestration with real-time collaboration and mobile access.
+   - Why: stablyai/orca combines TypeScript implementation details with strong signals around ade, claude-code, cli.
 8. [dtyq/magic](https://github.com/dtyq/magic) - 9.38/10
    - Source: github_search
-   - Why: This is a rare all-in-one platform that bridges personal AI assistants and enterprise needs, offering security, budget control, approval workflows, and direct business outcomes. Its high stars, recent activity, and comprehensive feature set make it a standout for learning modern AI agent architectures.
+   - Why: dtyq/magic combines TypeScript implementation details with strong signals around agent, agi, ai.
 
 ## Tech News
 
-1. [Erin Brockovich made a map to track data centers around the country](https://www.niemanlab.org/2026/05/erin-brockovich-made-a-map-to-track-data-centers-around-the-country/) - 9.11/10
+1. [Stripe is friendly to “friendly fraud”](https://www.gingerlime.com/2026/stripe-seem-friendly-to-friendly-fraud/) - 9.3/10
    - Source: hackernews
-   - Why: Combines celebrity activism with tech infrastructure scrutiny, sparking debate on data centers' environmental impact.
-2. [Cloudflare Flagship](https://developers.cloudflare.com/flagship/) - 9.06/10
+   - Why: [zuzululu]: My suggestion is to just ban specific regions or countries and you can cut 80% of this fraud. I&#x27;m not going to name those countries outright...
+2. [Erin Brockovich made a map to track data centers around the country](https://www.niemanlab.org/2026/05/erin-brockovich-made-a-map-to-track-data-centers-around-the-country/) - 9.19/10
    - Source: hackernews
-   - Why: Feature flags are critical for modern DevOps and canary releases; Cloudflare's entry with a potential security flaw could impact many developers and applications.
-3. [Stripe is friendly to “friendly fraud”](https://www.gingerlime.com/2026/stripe-seem-friendly-to-friendly-fraud/) - 9.02/10
+   - Why: [tiffanyh]: Why go through the effort when such work has already been done? https:&#x2F;&#x2F;www.datacentermap.com&#x2F;datacenters&#x2F; Not being negative...
+3. [Cloudflare Flagship](https://developers.cloudflare.com/flagship/) - 9.05/10
    - Source: hackernews
-   - Why: Friendly fraud is a growing issue for online businesses, costing billions annually. Stripe's handling of chargebacks affects millions of merchants, and this debate underscores the tension between customer protection and merchant rights.
+   - Why: [crabmusket]: Looking at the docs for their JS SDK, they have this warning: &gt; The client provider requires an API token to fetch flag values. This token i...
 4. [Big tech's anti-labor playbook has come for Wikipedia](https://medium.com/@jakeorlowitz/wikipedia-is-doing-the-capitalist-thing-56a393232943) - 9.0/10
    - Source: hackernews
-   - Why: Wikipedia is a cornerstone of open knowledge; layoffs of core technical contributors could erode trust, slow innovation, and set a precedent for other open-source projects.
-5. [Outsourcing plus local AI will soon become more economical vs. frontier labs](https://www.signalbloom.ai/posts/outsourcing-plus-localai-will-soon-become-more-economical-vs-frontier-labs/) - 8.95/10
-   - Source: hackernews
-   - Why: This challenges the current narrative that frontier AI labs dominate, suggesting that local AI + outsourcing could be more economical, impacting how companies allocate AI budgets and developer resources.
-6. [The user is visibly frustrated](https://pscanf.com/s/354/) - 8.8/10
-   - Source: hackernews
-   - Why: As AI chatbots become ubiquitous, understanding user frustration is critical for improving UX and adoption. The discussion highlights fundamental design flaws in conversational interfaces and suggests that non-conversational models (like Copilot's original autocomplete) may be more effective for many tasks.
-7. [Uber president says AI spending is getting 'harder to justify'](https://www.theverge.com/transportation/937116/uber-ai-investment-hard-to-justify) - 8.76/10
-   - Source: hackernews
-   - Why: This reflects growing skepticism among tech leaders about AI's immediate value, potentially influencing investment and strategy across the industry.
-8. [Spain blocks prediction markets Polymarket, Kalshi over lack of gambling licence](https://www.reuters.com/business/spain-blocks-prediction-markets-polymarket-kalshi-over-lack-gambling-licences-2026-05-26/) - 8.65/10
-   - Source: hackernews
-   - Why: This regulatory action could set a precedent for how prediction markets are treated globally, impacting their legality and the broader conversation about gambling vs. information markets.
+   - Why: [OsrsNeedsf2P]: I spent ~2 years actively editing Wikipedia for multiple hours every day. I remember taking my laptop out at airports for 20 minutes between...
 
 ---
 
-Generated by Aurora from run `run-20260527T035356Z`.
+Generated by Aurora from run `run-20260527T045651Z`.
