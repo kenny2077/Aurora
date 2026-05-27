@@ -10,6 +10,7 @@ from typing import Any
 
 from aurora.ai.ranker import LLMRanker
 from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.cache import load_scholar_cache, write_scholar_cache
 from aurora.modes.scholar.fields import (
     expanded_arxiv_categories,
     expanded_keyword_allowlist,
@@ -77,7 +78,12 @@ class ScholarScorer:
 class ScholarEnricher:
     """Apply scholar score results to SignalItem fields."""
 
-    def __init__(self, llm_ranker: LLMRanker | None = None) -> None:
+    def __init__(
+        self,
+        config: ScholarModeConfig | None = None,
+        llm_ranker: LLMRanker | None = None,
+    ) -> None:
+        self.config = config
         self.llm_ranker = llm_ranker
 
     async def enrich(
@@ -86,6 +92,12 @@ class ScholarEnricher:
         score_results: Sequence[ScoreResult],
         context: StageContext,
     ) -> list[SignalItem]:
+        if not items and self.config is not None and self.config.fallback_cache_enabled:
+            cached = load_scholar_cache(self.config, context)
+            if cached:
+                context.metadata["scholar_cached_fallback_used"] = True
+            return cached
+
         scores_by_id = {score.item_id: score for score in score_results}
         enriched: list[SignalItem] = []
         for item in items:
@@ -108,10 +120,12 @@ class ScholarEnricher:
                     }
                 )
             )
-        if self.llm_ranker is None:
-            return enriched
-        analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
-        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        if self.llm_ranker is not None:
+            analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
+            enriched = [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        if self.config is not None and self.config.fallback_cache_enabled:
+            write_scholar_cache(enriched, context)
+        return enriched
 
 
 def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:

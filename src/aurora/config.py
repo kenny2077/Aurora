@@ -360,6 +360,8 @@ class ScholarModeConfig(BaseModel):
     min_year: int = Field(default=2025, ge=1900, le=2100)
     max_year: int = Field(default=2026, ge=1900, le=2100)
     score_threshold: float = Field(default=7.0, ge=0.0, le=10.0)
+    fallback_cache_enabled: bool = True
+    fallback_cache_ttl_hours: int = Field(default=168, ge=1)
     fields: list[str] = Field(default_factory=lambda: ["ml"])
     venue_allowlist: list[str] = Field(
         default_factory=lambda: ["ICML", "NeurIPS", "ICLR", "AISTATS", "COLT", "UAI", "MLSys", "TMLR"]

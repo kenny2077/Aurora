@@ -58,6 +58,53 @@ def test_arxiv_fetch_parses_atom_and_skips_old_papers() -> None:
     assert records[0]["metadata"]["code_urls"] == ["https://github.com/org/repo"]
 
 
+def test_arxiv_fetch_splits_categories_records_failures_and_deduplicates() -> None:
+    requests: list[httpx.Request] = []
+    feed = """
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <id>https://arxiv.org/abs/2605.12345v1</id>
+        <published>2026-05-26T00:00:00Z</published>
+        <title>Split Category Paper</title>
+        <summary>We introduce a method with evaluation and benchmark results.</summary>
+        <category term="cs.AI" />
+      </entry>
+    </feed>
+    """
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if "cat%3Acs.AI" in str(request.url):
+            return httpx.Response(429, json={"message": "rate limited"})
+        return httpx.Response(200, text=feed)
+
+    context = StageContext(
+        mode="scholar",
+        run_id="test",
+        since=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    )
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ArxivFetchStage(
+                ScholarModeConfig(
+                    fields=["ml"],
+                    sources=ScholarSourcesConfig(
+                        arxiv=ArxivSourceConfig(categories=["cs.AI", "cs.CL"], max_results=10)
+                    ),
+                ),
+                http_client=client,
+            ).fetch(context)
+
+    records = asyncio.run(exercise())
+
+    assert len(requests) > 1
+    assert [record["id"] for record in records] == ["arxiv:2605.12345"]
+    assert context.metadata["scholar_source_failures"][0]["source"] == "arxiv"
+    assert context.metadata["scholar_source_failures"][0]["category"] == "cs.AI"
+    assert context.metadata["scholar_source_failures"][0]["status_code"] == "429"
+
+
 def test_openreview_fetch_parses_notes_and_skips_invalid() -> None:
     cdate = int(datetime(2026, 5, 26, tzinfo=timezone.utc).timestamp() * 1000)
     payload = {
@@ -107,4 +154,3 @@ def test_openreview_fetch_parses_notes_and_skips_invalid() -> None:
     assert records[0]["metadata"]["status"] == "accepted"
     assert records[0]["metadata"]["source_ids"]["doi"] == "10.1234/example"
     assert records[0]["metadata"]["pdf_url"] == "https://openreview.net/pdf?id=abc123"
-

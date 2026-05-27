@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timezone
+import os
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from aurora.config import ScholarModeConfig
+from aurora.config import AuroraConfig, RunConfig, ScholarModeConfig
+from aurora.modes.scholar.cache import CACHE_RELATIVE_PATH
 from aurora.modes.scholar.fields import (
     expanded_arxiv_categories,
     expanded_keyword_allowlist,
@@ -23,6 +26,15 @@ def _context() -> StageContext:
         run_id="test",
         since=datetime(2026, 5, 25, tzinfo=timezone.utc),
         until=datetime(2026, 5, 26, tzinfo=timezone.utc),
+    )
+
+
+def _cached_context(tmp_path: Path, *, until: datetime | None = None) -> StageContext:
+    return StageContext(
+        mode="scholar",
+        run_id="test",
+        until=until or datetime(2026, 5, 26, tzinfo=timezone.utc),
+        config=AuroraConfig(run=RunConfig(cache_dir=tmp_path / "cache")),
     )
 
 
@@ -149,6 +161,56 @@ def test_enricher_applies_score_and_fallback_learning_text() -> None:
     assert enriched[0].why_it_matters
     assert enriched[0].learning_value
     assert "score_breakdown" in enriched[0].metadata
+
+
+def test_enricher_writes_successful_scholar_cache(tmp_path: Path) -> None:
+    item = _paper("paper", "Reasoning", {"venue": "ICLR", "source_ids": {"arxiv": "1"}})
+    config = ScholarModeConfig()
+    score = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+    context = _cached_context(tmp_path)
+
+    enriched = asyncio.run(ScholarEnricher(config).enrich([item], [score], context))
+
+    cache_path = tmp_path / "cache" / CACHE_RELATIVE_PATH
+    assert cache_path.exists()
+    assert enriched[0].id in cache_path.read_text(encoding="utf-8")
+
+
+def test_enricher_loads_recent_cached_papers_when_live_results_empty(tmp_path: Path) -> None:
+    item = _paper("paper", "Cached Paper", {"venue": "ICLR", "source_ids": {"arxiv": "1"}}).model_copy(
+        update={"final_score": 8.0, "why_it_matters": "Cached reason."}
+    )
+    config = ScholarModeConfig()
+    context = _cached_context(tmp_path)
+    asyncio.run(ScholarEnricher(config).enrich([item], [], context))
+
+    fallback = asyncio.run(ScholarEnricher(config).enrich([], [], context))
+
+    assert [item.id for item in fallback] == ["paper"]
+    assert fallback[0].metadata["cached_fallback"] is True
+    assert fallback[0].why_it_matters == "Cached reason."
+    assert context.metadata["scholar_cached_fallback_used"] is True
+
+
+def test_enricher_ignores_expired_or_corrupt_scholar_cache(tmp_path: Path) -> None:
+    config = ScholarModeConfig(fallback_cache_ttl_hours=1)
+    context = _cached_context(tmp_path, until=datetime(2026, 5, 26, tzinfo=timezone.utc))
+    cache_path = tmp_path / "cache" / CACHE_RELATIVE_PATH
+    cache_path.parent.mkdir(parents=True)
+    cache_path.write_text("not-json\n", encoding="utf-8")
+
+    corrupt = asyncio.run(ScholarEnricher(config).enrich([], [], context))
+    assert corrupt == []
+
+    item = _paper("paper", "Expired Paper", {"source_ids": {"arxiv": "1"}}).model_copy(
+        update={"final_score": 8.0}
+    )
+    asyncio.run(ScholarEnricher(config).enrich([item], [], context))
+    old_timestamp = (context.until - timedelta(hours=2)).timestamp()
+    os.utime(cache_path, (old_timestamp, old_timestamp))
+
+    expired = asyncio.run(ScholarEnricher(config).enrich([], [], context))
+    assert expired == []
 
 
 def test_markdown_rendering_is_stable_score_ordered_and_capped() -> None:

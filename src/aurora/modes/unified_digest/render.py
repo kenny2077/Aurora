@@ -33,6 +33,13 @@ class UnifiedDigestSummarizer:
             if not section_items:
                 continue
             lines.extend([f"## {SECTION_TITLES[item_type]}", ""])
+            if item_type == "paper" and any(item.metadata.get("cached_fallback") for item in section_items):
+                lines.extend(
+                    [
+                        "Using cached scholar results because live sources returned no papers.",
+                        "",
+                    ]
+                )
             for index, item in enumerate(section_items, start=1):
                 why = item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
                 lines.extend(

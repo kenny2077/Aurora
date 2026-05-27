@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from datetime import datetime, timezone
+import math
 from typing import Any
 
 from defusedxml import ElementTree as ET
@@ -51,21 +52,46 @@ class ArxivFetchStage:
     async def _fetch_with_client(
         self, client: httpx.AsyncClient, context: StageContext
     ) -> list[dict[str, Any]]:
-        response = await client.get(
-            ARXIV_API_URL,
-            params={
-                "search_query": " OR ".join(
-                    f"cat:{category}" for category in expanded_arxiv_categories(self.config)
-                ),
-                "start": "0",
-                "max_results": str(self.config.sources.arxiv.max_results or self.config.max_candidates),
-                "sortBy": "submittedDate",
-                "sortOrder": "descending",
-            },
-            headers={"User-Agent": "Aurora-Scholar/0.1"},
-        )
-        response.raise_for_status()
-        return _parse_arxiv_feed(response.text, context)
+        categories = expanded_arxiv_categories(self.config)
+        max_results = self.config.sources.arxiv.max_results or self.config.max_candidates
+        per_category_limit = max(1, math.ceil(max_results / max(1, len(categories))))
+        records: list[dict[str, Any]] = []
+        seen_ids: set[str] = set()
+        for category in categories:
+            try:
+                response = await client.get(
+                    ARXIV_API_URL,
+                    params={
+                        "search_query": f"cat:{category}",
+                        "start": "0",
+                        "max_results": str(per_category_limit),
+                        "sortBy": "submittedDate",
+                        "sortOrder": "descending",
+                    },
+                    headers={"User-Agent": "Aurora-Scholar/0.1"},
+                )
+                response.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                context.metadata.setdefault("scholar_source_failures", []).append(
+                    {
+                        "source": "arxiv",
+                        "category": category,
+                        "status_code": str(exc.response.status_code),
+                        "error": str(exc),
+                    }
+                )
+                continue
+            for record in _parse_arxiv_feed(response.text, context):
+                metadata = record.get("metadata", {}) if isinstance(record.get("metadata"), dict) else {}
+                source_ids = metadata.get("source_ids", {}) if isinstance(metadata.get("source_ids"), dict) else {}
+                canonical_id = str(source_ids.get("arxiv") or record.get("id") or "")
+                if not canonical_id or canonical_id in seen_ids:
+                    continue
+                seen_ids.add(canonical_id)
+                records.append(record)
+                if len(records) >= max_results:
+                    return records
+        return records
 
 
 class OpenReviewFetchStage:

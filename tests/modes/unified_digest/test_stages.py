@@ -96,6 +96,34 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     assert rendered.metadata["item_counts"] == {"repo": 1, "paper": 1, "news": 0}
 
 
+def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other_sections() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["paper", "repo", "news"],
+    )
+    items = [
+        _item(
+            "paper:cached",
+            "paper",
+            "Cached Paper",
+            8.0,
+            metadata={"cached_fallback": True},
+        ),
+        _item("repo:1", "repo", "Repo", 7.0),
+        _item("news:1", "news", "News", 6.0),
+    ]
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
+    rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, items, context))
+
+    assert "Using cached scholar results because live sources returned no papers." in summary
+    assert "Repositories" in summary
+    assert "Tech News" in summary
+    assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
+
+
 def test_unified_pipeline_reports_included_mode_failures(tmp_path: Path) -> None:
     config = AuroraConfig(
         run=RunConfig(output_dir=tmp_path),
@@ -149,6 +177,31 @@ def test_unified_fetch_keeps_successful_modes_when_one_mode_fails(tmp_path: Path
     ]
 
 
+def test_unified_fetch_collects_cached_scholar_papers(tmp_path: Path) -> None:
+    cached_paper = _item(
+        "paper:cached",
+        "paper",
+        "Cached Paper",
+        8.0,
+        metadata={"cached_fallback": True},
+    )
+    config = AuroraConfig(
+        run=RunConfig(output_dir=tmp_path),
+        modes={"unified_digest": {"include_modes": ["scholar"]}},
+    )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
+
+    collected = asyncio.run(
+        UnifiedFetchStage(
+            config,
+            {"scholar": lambda config: _cached_pipeline("scholar", cached_paper)},
+        ).fetch(context)
+    )
+
+    assert [item.id for item in collected] == ["paper:cached"]
+    assert collected[0].metadata["cached_fallback"] is True
+
+
 def _item(
     item_id: str,
     item_type: str,
@@ -193,6 +246,20 @@ def _failing_builder(config: AuroraConfig) -> ModePipeline:
     raise ValueError("scholar mode is disabled")
 
 
+def _cached_pipeline(mode: str, item: SignalItem) -> ModePipeline:
+    return ModePipeline(
+        mode=mode,
+        fetch_stages=[_Fetch([])],
+        normalize_stage=_Normalize(),
+        deduplicate_stage=_Dedup(),
+        score_stage=_Score(),
+        enrich_stage=_CachedEnrich(item),
+        summarize_stage=_Summarize(),
+        render_stage=_Render(),
+        deliver_stage=_Deliver([]),
+    )
+
+
 class _Fetch:
     name = "static"
 
@@ -224,6 +291,14 @@ class _Score:
 class _Enrich:
     async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
         return list(items)
+
+
+class _CachedEnrich:
+    def __init__(self, item: SignalItem) -> None:
+        self.item = item
+
+    async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
+        return [self.item]
 
 
 class _Summarize:

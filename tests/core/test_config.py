@@ -31,6 +31,8 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.scholar.max_candidates == 200
     assert config.modes.scholar.final_item_count == 10
     assert config.modes.scholar.score_threshold == 7.0
+    assert config.modes.scholar.fallback_cache_enabled is True
+    assert config.modes.scholar.fallback_cache_ttl_hours == 168
     assert config.modes.scholar.sources.arxiv.enabled is True
     assert config.modes.scholar.sources.openreview.enabled is True
     assert config.modes.scholar.sources.semantic_scholar.enabled is True
@@ -78,6 +80,7 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
         {"modes": {"scholar": {"sources": {"semantic_scholar": {"api_key_env": ""}}}}},
         {"modes": {"scholar": {"sources": {"semantic_scholar": {"cache_ttl_hours": 0}}}}},
+        {"modes": {"scholar": {"fallback_cache_ttl_hours": 0}}},
         {"modes": {"repo_learning": {"item_type": "paper"}}},
         {"modes": {"repo_learning": {"interests": ["unknown-interest"]}}},
         {"modes": {"repo_learning": {"sources": {"github_search": {"domains": []}}}}},
