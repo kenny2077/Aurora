@@ -162,7 +162,13 @@ def test_pipeline_runner_executes_fixed_stage_order(tmp_path) -> None:
     assert result.score_result_count == 1
     assert result.enriched_count == 1
     assert result.delivery_results == [DeliveryResult(channel="dry_run")]
-    assert set(result.output_paths) == {"normalized", "deduplicated", "score_results", "enriched"}
+    assert set(result.output_paths) == {
+        "normalized",
+        "deduplicated",
+        "score_results",
+        "enriched",
+        "run_summary",
+    }
 
 
 def test_pipeline_runner_aggregates_multiple_fetch_stages(tmp_path) -> None:
@@ -252,6 +258,76 @@ def test_pipeline_runner_attaches_run_summary_to_context_and_rendered_digest(tmp
     assert run_summary["sources"][0]["error"] == "fetch failed"
     assert run_summary["sources"][1]["source"] == "good_fetch"
     assert run_summary["sources"][1]["fetched_count"] == 1
+
+
+def test_pipeline_runner_writes_final_run_summary_json_with_delivery_results(tmp_path) -> None:
+    calls: list[str] = []
+    result = asyncio.run(
+        PipelineRunner(tmp_path).run(
+            _pipeline(
+                calls,
+                fetch_stages=[
+                    RecordingFetch("good_fetch", [{"id": "ok"}], calls),
+                ],
+            ),
+            StageContext(mode="tech_news", run_id="json-summary"),
+        )
+    )
+
+    summary_path = tmp_path / "json-summary" / "tech_news" / "run_summary.json"
+    assert result.output_paths["run_summary"] == summary_path
+    payload = __import__("json").loads(summary_path.read_text(encoding="utf-8"))
+
+    assert payload["run_id"] == "json-summary"
+    assert payload["mode"] == "tech_news"
+    assert payload["counts"]["enriched"] == 1
+    assert payload["source_health"] == {"total": 1, "ok": 1, "failed": 0, "rate_limited": 0}
+    assert payload["delivery_results"] == [
+        {
+            "channel": "dry_run",
+            "destination": None,
+            "error": None,
+            "message_id": None,
+            "metadata": {},
+            "ok": True,
+        }
+    ]
+    assert set(payload["output_paths"]) == {
+        "normalized",
+        "deduplicated",
+        "score_results",
+        "enriched",
+        "run_summary",
+    }
+
+
+def test_pipeline_runner_redacts_secret_like_error_values_in_run_summary(tmp_path) -> None:
+    calls: list[str] = []
+
+    class SecretFailingFetch:
+        name = "secret_fetch"
+
+        async def fetch(self, context: StageContext) -> Sequence[Any]:
+            raise RuntimeError("token=abc123 DEEPSEEK_API_KEY=secret Authorization: Bearer hidden")
+
+    result = asyncio.run(
+        PipelineRunner(tmp_path).run(
+            _pipeline(
+                calls,
+                fetch_stages=[SecretFailingFetch(), RecordingFetch("good", [{"id": "ok"}], calls)],
+            ),
+            StageContext(mode="tech_news", run_id="redacted"),
+        )
+    )
+
+    payload = __import__("json").loads(
+        result.output_paths["run_summary"].read_text(encoding="utf-8")
+    )
+    error = payload["sources"][0]["error"]
+    assert "abc123" not in error
+    assert "secret" not in error
+    assert "hidden" not in error
+    assert "[REDACTED]" in error
 
 
 def test_pipeline_runner_propagates_non_fetch_failures(tmp_path) -> None:

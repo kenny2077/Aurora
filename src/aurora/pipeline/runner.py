@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -151,6 +153,21 @@ class PipelineRunner:
             update={"metadata": {**rendered_digest.metadata, "run_summary": run_summary}}
         )
         delivery_results = await pipeline.deliver_stage.deliver(rendered_digest, context)
+        run_summary_path = run_dir / "run_summary.json"
+        output_paths["run_summary"] = run_summary_path
+        final_run_summary = _run_summary(
+            run_id=context.run_id,
+            mode=pipeline.mode,
+            raw_count=len(raw_items),
+            normalized_count=len(normalized_items),
+            deduplicated_count=len(deduplicated_items),
+            score_result_count=len(score_results),
+            enriched_count=len(enriched_items),
+            source_statuses=source_statuses,
+            delivery_results=delivery_results,
+            output_paths=output_paths,
+        )
+        _write_json(run_summary_path, final_run_summary)
 
         return PipelineRunResult(
             run_id=context.run_id,
@@ -192,8 +209,10 @@ def _run_summary(
     score_result_count: int,
     enriched_count: int,
     source_statuses: list[SourceStatus],
+    delivery_results: list[DeliveryResult] | None = None,
+    output_paths: dict[str, Path] | None = None,
 ) -> dict[str, Any]:
-    return {
+    summary: dict[str, Any] = {
         "run_id": run_id,
         "mode": mode,
         "counts": {
@@ -211,11 +230,40 @@ def _run_summary(
         },
         "sources": [_source_status_summary(status) for status in source_statuses],
     }
+    if delivery_results is not None:
+        summary["delivery_results"] = [
+            result.model_dump(mode="json") for result in delivery_results
+        ]
+    if output_paths is not None:
+        summary["output_paths"] = {
+            key: str(value) for key, value in output_paths.items()
+        }
+    return summary
 
 
 def _source_status_summary(status: SourceStatus) -> dict[str, Any]:
-    return {
+    summary = {
         key: value
         for key, value in status.model_dump(mode="json").items()
         if value is not None
     }
+    if "error" in summary:
+        summary["error"] = _redact_secret_like_text(str(summary["error"]))
+    return summary
+
+
+def _redact_secret_like_text(value: str) -> str:
+    patterns = [
+        r"(?i)(authorization:\s*bearer\s+)[^\s]+",
+        r"(?i)([a-z0-9_]*(?:token|key|secret|password)[a-z0-9_]*=)[^\s]+",
+    ]
+    redacted = value
+    for pattern in patterns:
+        redacted = re.sub(pattern, r"\1[REDACTED]", redacted)
+    return redacted
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+    return path

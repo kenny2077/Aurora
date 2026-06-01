@@ -42,6 +42,44 @@ def test_configured_delivery_writes_filesystem_and_pages_artifacts(tmp_path: Pat
     assert (tmp_path / "site" / "tech_news" / "index.md").exists()
 
 
+def test_filesystem_delivery_appends_source_health_when_run_summary_exists(tmp_path: Path) -> None:
+    config = AuroraConfig(
+        delivery=DeliveryConfig(
+            filesystem=FilesystemDeliveryConfig(reports_dir=tmp_path / "reports"),
+            github_pages=GitHubPagesDeliveryConfig(enabled=False),
+        )
+    )
+    context = StageContext(
+        mode="tech_news",
+        run_id="run-1",
+        metadata={
+            "run_summary": {
+                "counts": {"raw": 2, "normalized": 2, "deduplicated": 1, "enriched": 1},
+                "source_health": {"ok": 1, "failed": 1, "rate_limited": 0},
+                "sources": [
+                    {"source": "hackernews", "ok": True, "fetched_count": 2},
+                    {"source": "rss", "ok": False, "error": "timeout"},
+                ],
+            }
+        },
+        config=config,
+    )
+
+    results = asyncio.run(
+        ConfiguredDeliveryStage(config).deliver(
+            RenderedDigest(mode="tech_news", title="Tech", markdown="# Tech\n\nBody"),
+            context,
+        )
+    )
+
+    markdown = (tmp_path / "reports" / "run-1" / "tech_news.md").read_text(encoding="utf-8")
+    assert results[0].ok is True
+    assert "## Source Health" in markdown
+    assert "Items: 2 raw -> 2 normalized -> 1 deduplicated -> 1 enriched." in markdown
+    assert "Sources: 1 ok, 1 failed, 0 rate limited." in markdown
+    assert "rss failed: timeout" in markdown
+
+
 def test_configured_delivery_can_skip_delivery(tmp_path: Path) -> None:
     config = AuroraConfig(
         delivery=DeliveryConfig(
