@@ -93,7 +93,7 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     assert summary.index("Repositories") < summary.index("Research Papers")
     assert "Better Repo" in summary
     assert "[Repo](" not in summary
-    assert "News" not in summary
+    assert "[News](" not in summary
     assert rendered.metadata["selected_item_ids"] == ["repo:2", "paper:1"]
     assert rendered.metadata["recommended_repo_ids"] == ["repo:2"]
     assert rendered.metadata["item_counts"] == {"repo": 1, "paper": 1, "news": 0}
@@ -125,6 +125,86 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Repositories" in summary
     assert "Tech News" in summary
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
+
+
+def test_unified_summary_starts_with_learning_path() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=8,
+        section_order=["paper", "repo", "news"],
+    )
+    items = [
+        _item(
+            "paper:1",
+            "paper",
+            "Strong Paper",
+            9.0,
+            why_it_matters="It explains a useful agent planning pattern.",
+            learning_value="Study the evaluation setup.",
+            action_items=["Read the method section.", "Compare the benchmark."],
+        ),
+        _item(
+            "repo:1",
+            "repo",
+            "Useful Repo",
+            8.5,
+            why_it_matters="It shows the pattern in working code.",
+            learning_value="Trace the package layout.",
+            action_items=["Clone the repo.", "Run the examples."],
+        ),
+        _item("news:1", "news", "Top News", 8.0),
+        _item("news:2", "news", "Second News", 7.0),
+        _item("news:3", "news", "Third News", 6.0),
+        _item("news:4", "news", "Fourth News", 5.0),
+    ]
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            items,
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert summary.index("## Today's Learning Path") < summary.index("## Research Papers")
+    assert "### Paper to Understand" in summary
+    assert "### Repo to Study" in summary
+    assert "### News to Watch" in summary
+    assert "It explains a useful agent planning pattern." in summary
+    assert "Study the evaluation setup." in summary
+    assert "Read the method section." in summary
+    assert "Clone the repo." in summary
+    assert "Top News" in summary
+    assert "Third News" in summary
+    assert "Fourth News" not in summary.split("## Research Papers", maxsplit=1)[0]
+
+
+def test_unified_learning_path_notes_missing_types_and_fallback_actions() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=8,
+        section_order=["paper", "repo", "news"],
+    )
+    items = [
+        _item(
+            "paper:1",
+            "paper",
+            "Paper Without Actions",
+            9.0,
+            action_items=[],
+        )
+    ]
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            items,
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert "## Today's Learning Path" in summary
+    assert "Read the abstract and identify the core claim." in summary
+    assert "No repository candidate is available for today's learning path." in summary
+    assert "No news item is available for today's learning path." in summary
 
 
 def test_unified_delivery_updates_repo_recommendation_state(tmp_path: Path) -> None:
@@ -235,6 +315,9 @@ def _item(
     *,
     url: str | None = None,
     metadata: dict | None = None,
+    why_it_matters: str | None = None,
+    learning_value: str | None = None,
+    action_items: list[str] | None = None,
 ) -> SignalItem:
     return SignalItem(
         id=item_id,
@@ -247,7 +330,9 @@ def _item(
         metadata=metadata or {},
         deterministic_score=score,
         final_score=score,
-        why_it_matters=f"{title} matters",
+        why_it_matters=why_it_matters if why_it_matters is not None else f"{title} matters",
+        learning_value=learning_value or "",
+        action_items=action_items or [],
     )
 
 
