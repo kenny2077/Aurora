@@ -121,6 +121,36 @@ rtk uv run aurora run --mode unified_digest --skip-delivery
 See [docs/interests.md](docs/interests.md) for the full interest and research
 field preset list.
 
+## GitHub Pages Setup
+
+Aurora publishes a static site to the `gh-pages` branch. In GitHub repository
+settings, configure Pages to deploy from `gh-pages` at the branch root. The
+workflow writes real Jekyll content under `site/`, verifies that digest posts
+exist, then pushes that generated site to `gh-pages`.
+
+Useful local checks:
+
+```bash
+rtk uv run aurora doctor --config data/actions.config.json
+rtk uv run aurora run --dry-run --mode all --output-dir /tmp/aurora-actions-smoke
+```
+
+Every run writes JSONL snapshots and a `run_summary.json` file under
+`data/runs/<run_id>/<mode>/`. Use that file first when debugging missing
+content, source failures, rate limits, or delivery issues.
+
+## Troubleshooting Empty Sections
+
+- Empty research papers usually means arXiv/OpenReview returned no qualifying
+  papers or rate-limited; check `scholar_source_failures` and the scholar cache
+  note in the unified digest.
+- Empty repo learning usually means GitHub Search rate limits, strict star/date
+  filters, or repeated recommendations suppressed by state.
+- Empty tech news usually means Hacker News/RSS candidates did not meet score,
+  recency, or keyword filters.
+- Empty Pages output should fail the workflow instead of publishing a placeholder.
+  Inspect `run_summary.json`, workflow logs, and `site/_posts/`.
+
 ## What Aurora Is Not
 
 Aurora is not a realtime alerting system, an exhaustive literature review, a

@@ -152,6 +152,9 @@ def _handle_doctor(args: argparse.Namespace) -> int:
         "site_dir": config.delivery.github_pages.publish_dir,
     }.items():
         print(f"{label}: {'writable' if _is_writable_target(path) else 'not writable'} ({path})")
+    print("pages branch: gh-pages")
+    print("run summaries: enabled")
+    print(f"email delivery: {'enabled' if config.delivery.email.enabled else 'disabled'}")
     missing_required = _missing_required_env_vars(config)
     print(f"missing required env vars: {', '.join(missing_required) if missing_required else 'none'}")
     optional = _missing_optional_env_vars(config)

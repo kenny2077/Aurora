@@ -50,6 +50,9 @@ def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys, mon
     assert "doctor: ok" in output
     assert "missing optional env vars:" in output
     assert "SEMANTIC_SCHOLAR_API_KEY" in output
+    assert "pages branch: gh-pages" in output
+    assert "run summaries: enabled" in output
+    assert "email delivery: disabled" in output
 
 
 def test_config_validate_invalid_config_exits_nonzero(tmp_path: Path, capsys) -> None:

@@ -12,6 +12,10 @@ def test_readme_quickstart_commands_cover_core_modes() -> None:
     assert "one repo to study" in readme
     assert "10-Minute Setup" in readme
     assert "What Aurora Is Not" in readme
+    assert "GitHub Pages Setup" in readme
+    assert "Troubleshooting Empty Sections" in readme
+    assert "gh-pages" in readme
+    assert "run_summary.json" in readme
     assert "SMTP_USERNAME, EMAIL_PASSWORD, AURORA_EMAIL_RECIPIENTS" in readme
     assert "DEEPSEEK_API_KEY" in readme
     assert "GH_SEARCH_TOKEN" in readme
