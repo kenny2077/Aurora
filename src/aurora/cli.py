@@ -201,6 +201,7 @@ def _handle_run(args: argparse.Namespace) -> int:
     for result in results:
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
+        _print_source_health(result)
         for delivery_result in result.delivery_results:
             status = "ok" if delivery_result.ok else "failed"
             suffix = f" - {delivery_result.error}" if delivery_result.error else ""
@@ -325,6 +326,23 @@ def _is_writable_target(path: Path) -> bool:
     while not candidate.exists() and candidate != candidate.parent:
         candidate = candidate.parent
     return os.access(candidate, os.W_OK)
+
+
+def _print_source_health(result: Any) -> None:
+    statuses = list(result.source_statuses)
+    if not statuses:
+        return
+    ok_count = sum(1 for status in statuses if status.ok)
+    failed_count = sum(1 for status in statuses if not status.ok)
+    rate_limited_count = sum(1 for status in statuses if status.rate_limited)
+    print(
+        f"{result.mode}: sources {ok_count} ok, "
+        f"{failed_count} failed, {rate_limited_count} rate limited"
+    )
+    for status in statuses:
+        if not status.ok:
+            suffix = f" - {status.error}" if status.error else ""
+            print(f"{result.mode}: source {status.source} failed{suffix}")
 
 
 def _build_dry_run_pipeline(mode: str) -> ModePipeline:

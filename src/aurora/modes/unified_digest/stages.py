@@ -32,6 +32,7 @@ class UnifiedFetchStage:
         runner = PipelineRunner(output_dir=self.config.run.output_dir)
         collected: list[SignalItem] = []
         failures: list[dict[str, str]] = []
+        child_run_summaries: list[dict[str, Any]] = []
         for mode in self.config.modes.unified_digest.include_modes:
             builder = self.builders.get(mode)
             try:
@@ -43,10 +44,17 @@ class UnifiedFetchStage:
             except Exception as exc:
                 failures.append({"mode": mode, "error": str(exc)})
                 continue
+            run_summary = result.rendered_digest.metadata.get("run_summary")
+            if isinstance(run_summary, dict):
+                child_run_summaries.append(run_summary)
             for row in read_jsonl(result.output_paths["enriched"]):
                 collected.append(SignalItem.model_validate(row))
         if failures:
             context.metadata.setdefault("unified_mode_failures", []).extend(failures)
+        if child_run_summaries:
+            context.metadata.setdefault("unified_child_run_summaries", []).extend(
+                child_run_summaries
+            )
         return collected
 
 

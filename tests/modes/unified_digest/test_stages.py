@@ -35,22 +35,23 @@ def test_unified_fetch_collects_enriched_items_without_sub_delivery(tmp_path: Pa
             "scholar", [_item("paper:1", "paper", "Paper", 9.0)], deliveries
         ),
     }
-
-    collected = asyncio.run(
-        UnifiedFetchStage(config, builders).fetch(
-            StageContext(
-                mode="unified_digest",
-                run_id="test-run",
-                config=config,
-                until=datetime(2026, 5, 25, tzinfo=timezone.utc),
-            )
-        )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test-run",
+        config=config,
+        until=datetime(2026, 5, 25, tzinfo=timezone.utc),
     )
+
+    collected = asyncio.run(UnifiedFetchStage(config, builders).fetch(context))
 
     assert [item.id for item in collected] == ["news:1", "paper:1"]
     assert deliveries == []
     assert (tmp_path / "test-run" / "tech_news" / "enriched.jsonl").exists()
     assert (tmp_path / "test-run" / "scholar" / "enriched.jsonl").exists()
+    assert [summary["mode"] for summary in context.metadata["unified_child_run_summaries"]] == [
+        "tech_news",
+        "scholar",
+    ]
 
 
 def test_cross_mode_dedup_collapses_url_title_paper_and_repo_duplicates() -> None:
@@ -125,6 +126,105 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Repositories" in summary
     assert "Tech News" in summary
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
+
+
+def test_unified_summary_includes_run_summary_and_source_health() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=8,
+        section_order=["paper", "repo", "news"],
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        metadata={
+            "run_summary": {
+                "counts": {
+                    "raw": 3,
+                    "normalized": 3,
+                    "deduplicated": 2,
+                    "score_results": 2,
+                    "enriched": 2,
+                },
+                "source_health": {
+                    "total": 2,
+                    "ok": 1,
+                    "failed": 1,
+                    "rate_limited": 1,
+                },
+                "sources": [
+                    {"source": "rss", "ok": True, "fetched_count": 2},
+                    {
+                        "source": "arxiv",
+                        "ok": False,
+                        "rate_limited": True,
+                        "error": "429 Too Many Requests",
+                    },
+                ],
+            },
+            "unified_child_run_summaries": [
+                {
+                    "mode": "tech_news",
+                    "counts": {"enriched": 1},
+                    "source_health": {"ok": 1, "failed": 0, "rate_limited": 0},
+                },
+                {
+                    "mode": "scholar",
+                    "counts": {"enriched": 0},
+                    "source_health": {"ok": 0, "failed": 1, "rate_limited": 1},
+                },
+            ],
+        },
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [_item("paper:1", "paper", "Paper", 8.0)],
+            context,
+        )
+    )
+
+    assert summary.index("## Today's Learning Path") < summary.index("## Run Summary")
+    assert summary.index("## Run Summary") < summary.index("## Research Papers")
+    assert "Items: 3 raw -> 3 normalized -> 2 deduplicated -> 2 enriched." in summary
+    assert "Sources: 1 ok, 1 failed, 1 rate limited." in summary
+    assert "arxiv failed: 429 Too Many Requests" in summary
+    assert "Child modes: tech_news 1 item(s), scholar 0 item(s)." in summary
+
+
+def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        metadata={
+            "run_summary": {
+                "counts": {
+                    "raw": 0,
+                    "normalized": 0,
+                    "deduplicated": 0,
+                    "score_results": 0,
+                    "enriched": 0,
+                },
+                "source_health": {
+                    "total": 1,
+                    "ok": 0,
+                    "failed": 1,
+                    "rate_limited": 0,
+                },
+                "sources": [
+                    {"source": "unified_sources", "ok": False, "error": "no source data"}
+                ],
+            }
+        },
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(UnifiedDigestModeConfig()).summarize([], context)
+    )
+
+    assert "No items were available for the unified digest." in summary
+    assert "## Run Summary" in summary
+    assert "unified_sources failed: no source data" in summary
 
 
 def test_unified_summary_starts_with_learning_path() -> None:

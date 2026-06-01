@@ -27,8 +27,10 @@ class UnifiedDigestSummarizer:
         lines = ["# Aurora Unified Digest", "", f"Selected {len(selected)} item(s).", ""]
         if not selected:
             lines.append("No items were available for the unified digest.")
+            lines.extend(["", *_run_summary_lines(context)])
             return "\n".join(lines)
         lines.extend(_learning_path_lines(selected))
+        lines.extend(_run_summary_lines(context))
         for item_type in self.config.section_order:
             section_items = [item for item in selected if item.type == item_type]
             if not section_items:
@@ -126,6 +128,81 @@ def _learning_path_lines(items: Sequence[SignalItem]) -> list[str]:
             lines.extend(_learning_item_lines(item))
 
     return lines
+
+
+def _run_summary_lines(context: StageContext) -> list[str]:
+    run_summary = context.metadata.get("run_summary")
+    child_summaries = context.metadata.get("unified_child_run_summaries")
+    mode_failures = context.metadata.get("unified_mode_failures")
+    if not isinstance(run_summary, dict) and not child_summaries and not mode_failures:
+        return []
+
+    lines = ["## Run Summary", ""]
+    if isinstance(run_summary, dict):
+        counts = run_summary.get("counts")
+        if isinstance(counts, dict):
+            lines.append(
+                "Items: "
+                f"{int(counts.get('raw') or 0)} raw -> "
+                f"{int(counts.get('normalized') or 0)} normalized -> "
+                f"{int(counts.get('deduplicated') or 0)} deduplicated -> "
+                f"{int(counts.get('enriched') or 0)} enriched."
+            )
+        health = run_summary.get("source_health")
+        if isinstance(health, dict):
+            lines.append(
+                "Sources: "
+                f"{int(health.get('ok') or 0)} ok, "
+                f"{int(health.get('failed') or 0)} failed, "
+                f"{int(health.get('rate_limited') or 0)} rate limited."
+            )
+        source_lines = _failed_source_lines(run_summary.get("sources"))
+        if source_lines:
+            lines.extend(source_lines)
+
+    child_line = _child_mode_summary_line(child_summaries)
+    if child_line:
+        lines.append(child_line)
+
+    if isinstance(mode_failures, list):
+        for failure in mode_failures:
+            if not isinstance(failure, dict):
+                continue
+            mode = str(failure.get("mode") or "unknown")
+            error = str(failure.get("error") or "unknown error")
+            lines.append(f"Mode {mode} failed: {error}")
+
+    lines.append("")
+    return lines
+
+
+def _failed_source_lines(sources: object) -> list[str]:
+    if not isinstance(sources, list):
+        return []
+    lines: list[str] = []
+    for source in sources:
+        if not isinstance(source, dict) or source.get("ok", True):
+            continue
+        name = str(source.get("source") or "unknown")
+        error = str(source.get("error") or "unknown error")
+        lines.append(f"{name} failed: {error}")
+    return lines
+
+
+def _child_mode_summary_line(child_summaries: object) -> str:
+    if not isinstance(child_summaries, list):
+        return ""
+    parts: list[str] = []
+    for summary in child_summaries:
+        if not isinstance(summary, dict):
+            continue
+        mode = str(summary.get("mode") or "unknown")
+        counts = summary.get("counts")
+        enriched = int(counts.get("enriched") or 0) if isinstance(counts, dict) else 0
+        parts.append(f"{mode} {enriched} item(s)")
+    if not parts:
+        return ""
+    return f"Child modes: {', '.join(parts)}."
 
 
 def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:

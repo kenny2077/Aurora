@@ -127,8 +127,29 @@ class PipelineRunner:
         )
         enriched_path = write_jsonl(run_dir / "enriched.jsonl", enriched_items)
 
+        output_paths = {
+            "normalized": normalized_path,
+            "deduplicated": deduplicated_path,
+            "score_results": score_results_path,
+            "enriched": enriched_path,
+        }
+        run_summary = _run_summary(
+            run_id=context.run_id,
+            mode=pipeline.mode,
+            raw_count=len(raw_items),
+            normalized_count=len(normalized_items),
+            deduplicated_count=len(deduplicated_items),
+            score_result_count=len(score_results),
+            enriched_count=len(enriched_items),
+            source_statuses=source_statuses,
+        )
+        context.metadata["run_summary"] = run_summary
+
         summary = await pipeline.summarize_stage.summarize(enriched_items, context)
         rendered_digest = await pipeline.render_stage.render(summary, enriched_items, context)
+        rendered_digest = rendered_digest.model_copy(
+            update={"metadata": {**rendered_digest.metadata, "run_summary": run_summary}}
+        )
         delivery_results = await pipeline.deliver_stage.deliver(rendered_digest, context)
 
         return PipelineRunResult(
@@ -142,12 +163,7 @@ class PipelineRunner:
             source_statuses=source_statuses,
             delivery_results=delivery_results,
             rendered_digest=rendered_digest,
-            output_paths={
-                "normalized": normalized_path,
-                "deduplicated": deduplicated_path,
-                "score_results": score_results_path,
-                "enriched": enriched_path,
-            },
+            output_paths=output_paths,
         )
 
     def _output_dir(self, context: StageContext) -> Path:
@@ -165,3 +181,41 @@ def _stage_name(stage: object) -> str:
             return value.strip()
     return stage.__class__.__name__
 
+
+def _run_summary(
+    *,
+    run_id: str,
+    mode: str,
+    raw_count: int,
+    normalized_count: int,
+    deduplicated_count: int,
+    score_result_count: int,
+    enriched_count: int,
+    source_statuses: list[SourceStatus],
+) -> dict[str, Any]:
+    return {
+        "run_id": run_id,
+        "mode": mode,
+        "counts": {
+            "raw": raw_count,
+            "normalized": normalized_count,
+            "deduplicated": deduplicated_count,
+            "score_results": score_result_count,
+            "enriched": enriched_count,
+        },
+        "source_health": {
+            "total": len(source_statuses),
+            "ok": sum(1 for status in source_statuses if status.ok),
+            "failed": sum(1 for status in source_statuses if not status.ok),
+            "rate_limited": sum(1 for status in source_statuses if status.rate_limited),
+        },
+        "sources": [_source_status_summary(status) for status in source_statuses],
+    }
+
+
+def _source_status_summary(status: SourceStatus) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in status.model_dump(mode="json").items()
+        if value is not None
+    }

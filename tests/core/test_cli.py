@@ -337,11 +337,44 @@ def test_real_unified_digest_run_uses_pipeline_and_writes_snapshots(
     assert (run_dir / "enriched.jsonl").read_text(encoding="utf-8") != ""
 
 
+def test_run_prints_source_health_summary(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["tech_news"]}}', encoding="utf-8")
+    monkeypatch.setattr("aurora.cli.build_tech_news_pipeline", _partially_failing_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "tech_news",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--run-id",
+            "test-run",
+        ]
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "tech_news: sources 1 ok, 1 failed, 0 rate limited" in output
+    assert "tech_news: source bad_fetch failed - fetch failed" in output
+
+
 class _Fetch:
     name = "fake"
 
     async def fetch(self, context: StageContext):
         return [{"id": "raw"}]
+
+
+class _FailingFetch:
+    name = "bad_fetch"
+
+    async def fetch(self, context: StageContext):
+        raise RuntimeError("fetch failed")
 
 
 class _Normalize:
@@ -402,6 +435,21 @@ def _fake_repo_learning_pipeline(config) -> ModePipeline:
 
 def _fake_unified_pipeline(config) -> ModePipeline:
     return _mode_pipeline("unified_digest", "news")
+
+
+def _partially_failing_pipeline(config) -> ModePipeline:
+    pipeline = _mode_pipeline("tech_news", "news")
+    return ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=[_FailingFetch(), _Fetch()],
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=pipeline.enrich_stage,
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=pipeline.deliver_stage,
+    )
 
 
 def _mode_pipeline(mode: str, item_type: str) -> ModePipeline:

@@ -109,11 +109,13 @@ class RecordingRender:
 class RecordingDeliver:
     def __init__(self, calls: list[str]) -> None:
         self.calls = calls
+        self.rendered_metadata: dict[str, Any] | None = None
 
     async def deliver(
         self, rendered: RenderedDigest, context: StageContext
     ) -> list[DeliveryResult]:
         self.calls.append("deliver")
+        self.rendered_metadata = rendered.metadata
         return [DeliveryResult(channel="dry_run")]
 
 
@@ -202,6 +204,56 @@ def test_pipeline_runner_isolates_fetch_failures(tmp_path) -> None:
     assert "normalize" in calls
 
 
+def test_pipeline_runner_attaches_run_summary_to_context_and_rendered_digest(tmp_path) -> None:
+    calls: list[str] = []
+    deliver = RecordingDeliver(calls)
+    pipeline = _pipeline(
+        calls,
+        fetch_stages=[
+            FailingFetch(calls),
+            RecordingFetch("good_fetch", [{"id": "ok"}], calls),
+        ],
+    )
+    pipeline = ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=pipeline.enrich_stage,
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=deliver,
+    )
+    context = StageContext(mode="tech_news", run_id="summary")
+
+    result = asyncio.run(PipelineRunner(tmp_path).run(pipeline, context))
+
+    run_summary = result.rendered_digest.metadata["run_summary"]
+    assert context.metadata["run_summary"] == run_summary
+    assert deliver.rendered_metadata == result.rendered_digest.metadata
+    assert run_summary["mode"] == "tech_news"
+    assert run_summary["run_id"] == "summary"
+    assert run_summary["counts"] == {
+        "raw": 1,
+        "normalized": 1,
+        "deduplicated": 1,
+        "score_results": 1,
+        "enriched": 1,
+    }
+    assert run_summary["source_health"] == {
+        "total": 2,
+        "ok": 1,
+        "failed": 1,
+        "rate_limited": 0,
+    }
+    assert run_summary["sources"][0]["source"] == "bad_fetch"
+    assert run_summary["sources"][0]["ok"] is False
+    assert run_summary["sources"][0]["error"] == "fetch failed"
+    assert run_summary["sources"][1]["source"] == "good_fetch"
+    assert run_summary["sources"][1]["fetched_count"] == 1
+
+
 def test_pipeline_runner_propagates_non_fetch_failures(tmp_path) -> None:
     calls: list[str] = []
 
@@ -212,4 +264,3 @@ def test_pipeline_runner_propagates_non_fetch_failures(tmp_path) -> None:
                 StageContext(mode="tech_news", run_id="fail"),
             )
         )
-
