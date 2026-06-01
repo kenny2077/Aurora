@@ -11,6 +11,7 @@ from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDig
 from aurora.modes.unified_digest.stages import (
     UnifiedDeduplicateStage,
     UnifiedDeliveryStage,
+    UnifiedEnrichStage,
     UnifiedFetchStage,
 )
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
@@ -454,6 +455,75 @@ def test_unified_delivery_updates_repo_recommendation_state(tmp_path: Path) -> N
     assert [result.channel for result in results] == ["repo_learning_state", "test"]
     assert results[0].metadata["recommended_count"] == 2
     assert recent == {"repo:org/one", "repo:org/two"}
+
+
+def test_unified_delivery_records_all_selected_items_and_themes(tmp_path: Path) -> None:
+    state_store = RepoLearningStateStore(tmp_path / "state.json")
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Digest",
+        markdown="body",
+        metadata={
+            "selected_item_ids": ["paper:one", "repo:org/one", "news:one"],
+            "recommended_repo_ids": ["repo:org/one"],
+            "connections": [
+                {
+                    "theme": "agents",
+                    "item_ids": ["paper:one", "repo:org/one"],
+                    "evidence_terms": ["agents"],
+                    "reason": "shared tags: agents",
+                }
+            ],
+        },
+    )
+    when = datetime(2026, 5, 25, tzinfo=timezone.utc)
+
+    results = asyncio.run(
+        UnifiedDeliveryStage(state_store, _Deliver([])).deliver(
+            rendered,
+            StageContext(mode="unified_digest", run_id="test", until=when),
+        )
+    )
+
+    assert results[0].metadata["selected_count"] == 3
+    assert results[0].metadata["theme_count"] == 1
+    assert state_store.recent_signal_ids(datetime(2026, 5, 24, tzinfo=timezone.utc)) == {
+        "paper:one",
+        "repo:org/one",
+        "news:one",
+    }
+    assert state_store.recent_themes(datetime(2026, 5, 24, tzinfo=timezone.utc)) == {"agents"}
+
+
+def test_unified_enrich_annotates_recently_seen_items(tmp_path: Path) -> None:
+    state_store = RepoLearningStateStore(tmp_path / "state.json")
+    state_store.mark_signals(
+        ["paper:recent"],
+        ["agents"],
+        datetime(2026, 5, 25, tzinfo=timezone.utc),
+    )
+    config = AuroraConfig(
+        run=RunConfig(state_path=tmp_path / "state.json"),
+        modes={"repo_learning": {"ranking": {"history_lookback_days": 14}}},
+    )
+    recent = _item("paper:recent", "paper", "Recent Paper", 8.0)
+    fresh = _item("paper:fresh", "paper", "Fresh Paper", 9.0)
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage().enrich(
+            [recent, fresh],
+            [],
+            StageContext(
+                mode="unified_digest",
+                run_id="test",
+                config=config,
+                until=datetime(2026, 5, 26, tzinfo=timezone.utc),
+            ),
+        )
+    )
+
+    assert enriched[0].metadata["recently_seen"] is True
+    assert "recently_seen" not in enriched[1].metadata
 
 
 def test_unified_pipeline_reports_included_mode_failures(tmp_path: Path) -> None:

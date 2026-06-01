@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Callable, Sequence
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 from urllib.parse import urlsplit, urlunsplit
 
@@ -114,7 +114,7 @@ class UnifiedScoreStage:
 
 
 class UnifiedEnrichStage:
-    """No extra enrichment in PR 7."""
+    """Annotate selected items with unified memory signals."""
 
     async def enrich(
         self,
@@ -122,7 +122,23 @@ class UnifiedEnrichStage:
         score_results: Sequence[ScoreResult],
         context: StageContext,
     ) -> list[SignalItem]:
-        return list(items)
+        if context.config is None:
+            return list(items)
+        cutoff = (context.until or datetime.now(timezone.utc)) - timedelta(
+            days=context.config.modes.repo_learning.ranking.history_lookback_days
+        )
+        recent_ids = RepoLearningStateStore(context.config.run.state_path).recent_signal_ids(cutoff)
+        if not recent_ids:
+            return list(items)
+        enriched: list[SignalItem] = []
+        for item in items:
+            if item.id not in recent_ids:
+                enriched.append(item)
+                continue
+            metadata = dict(item.metadata)
+            metadata["recently_seen"] = True
+            enriched.append(item.model_copy(update={"metadata": metadata}))
+        return enriched
 
 
 class UnifiedDeliveryStage:
@@ -144,9 +160,29 @@ class UnifiedDeliveryStage:
             repo_ids,
             context.until or datetime.now(timezone.utc),
         )
+        selected_ids = [
+            str(item_id)
+            for item_id in rendered.metadata.get("selected_item_ids", [])
+            if str(item_id).strip()
+        ]
+        themes = [
+            str(connection.get("theme"))
+            for connection in rendered.metadata.get("connections", [])
+            if isinstance(connection, dict) and str(connection.get("theme") or "").strip()
+        ]
+        self.state_store.mark_signals(
+            selected_ids,
+            themes,
+            context.until or datetime.now(timezone.utc),
+        )
         state_result = DeliveryResult(
             channel="repo_learning_state",
-            metadata={"recommended_count": len(repo_ids), "source_mode": "unified_digest"},
+            metadata={
+                "recommended_count": len(repo_ids),
+                "selected_count": len(selected_ids),
+                "theme_count": len(set(themes)),
+                "source_mode": "unified_digest",
+            },
         )
         if self.downstream is None:
             return [state_result]

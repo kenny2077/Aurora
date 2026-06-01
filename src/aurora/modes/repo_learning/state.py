@@ -37,6 +37,32 @@ class RepoLearningStateStore:
             encoding="utf-8",
         )
 
+    def mark_signals(self, item_ids: list[str], themes: list[str], when: datetime) -> None:
+        if not item_ids and not themes:
+            return
+        data = self._read_data()
+        memory = data.setdefault("learning_memory", {})
+        seen_items = memory.setdefault("seen_items", {})
+        seen_themes = memory.setdefault("seen_themes", {})
+        timestamp = when.astimezone(timezone.utc).isoformat()
+        for item_id in item_ids:
+            if str(item_id).strip():
+                seen_items[str(item_id)] = timestamp
+        for theme in themes:
+            if str(theme).strip():
+                seen_themes[str(theme)] = timestamp
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.write_text(
+            json.dumps(data, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+
+    def recent_signal_ids(self, cutoff: datetime) -> set[str]:
+        return _recent_keys(self._learning_memory_section("seen_items"), cutoff)
+
+    def recent_themes(self, cutoff: datetime) -> set[str]:
+        return _recent_keys(self._learning_memory_section("seen_themes"), cutoff)
+
     def _recommended(self) -> dict[str, str]:
         data = self._read_data()
         repo_learning = data.get("repo_learning")
@@ -55,6 +81,25 @@ class RepoLearningStateStore:
         except (OSError, json.JSONDecodeError):
             return {}
         return data if isinstance(data, dict) else {}
+
+    def _learning_memory_section(self, key: str) -> dict[str, str]:
+        data = self._read_data()
+        memory = data.get("learning_memory")
+        if not isinstance(memory, dict):
+            return {}
+        section = memory.get(key)
+        if not isinstance(section, dict):
+            return {}
+        return {str(item_key): str(value) for item_key, value in section.items()}
+
+
+def _recent_keys(values: dict[str, str], cutoff: datetime) -> set[str]:
+    recent: set[str] = set()
+    for key, raw_timestamp in values.items():
+        timestamp = _parse_datetime(str(raw_timestamp))
+        if timestamp is not None and timestamp >= cutoff:
+            recent.add(key)
+    return recent
 
 
 def _parse_datetime(value: str) -> datetime | None:
