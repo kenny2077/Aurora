@@ -276,8 +276,9 @@ def test_unified_summary_includes_cross_mode_connections() -> None:
     assert summary.index("## Connections") < summary.index("## Research Papers")
     assert "[Agent Planning Benchmark]" in summary
     assert "[org/agent-kit]" in summary
+    assert "agents:" in summary
     assert "shared repository org/agent-kit" in summary
-    assert "shared tags: agents, planning" in summary
+    assert "evidence: agents, org/agent-kit, planning" in summary
 
 
 def test_unified_renderer_metadata_includes_connections() -> None:
@@ -312,11 +313,45 @@ def test_unified_renderer_metadata_includes_connections() -> None:
 
     assert rendered.metadata["connections"] == [
         {
+            "theme": "agents",
             "item_ids": ["paper:1", "repo:org/vision-agent"],
-            "types": ["paper", "repo"],
+            "evidence_terms": ["agents", "cv", "org/vision-agent"],
             "reason": "shared repository org/vision-agent; shared tags: agents, cv",
         }
     ]
+
+
+def test_unified_connections_do_not_cluster_unrelated_items() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=9,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:vision",
+        "paper",
+        "Vision Segmentation",
+        9.0,
+        metadata={"categories": ["cs.CV"]},
+    ).model_copy(update={"tags": ["cv"]})
+    repo = _item(
+        "repo:org/scheduler",
+        "repo",
+        "org/scheduler",
+        8.0,
+        url="https://github.com/org/scheduler",
+        metadata={"full_name": "org/scheduler", "topics": ["workflow-automation"]},
+    )
+
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            "summary",
+            [paper, repo],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert rendered.metadata["connections"] == []
 
 
 def test_unified_summary_starts_with_learning_path() -> None:
