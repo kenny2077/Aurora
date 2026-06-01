@@ -227,6 +227,98 @@ def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:
     assert "unified_sources failed: no source data" in summary
 
 
+def test_unified_summary_includes_cross_mode_connections() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=9,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:agent-benchmark",
+        "paper",
+        "Agent Planning Benchmark",
+        9.0,
+        metadata={
+            "code_urls": ["https://github.com/org/agent-kit"],
+            "categories": ["cs.AI"],
+        },
+    ).model_copy(update={"tags": ["agents", "planning"]})
+    repo = _item(
+        "repo:org/agent-kit",
+        "repo",
+        "org/agent-kit",
+        8.5,
+        url="https://github.com/org/agent-kit",
+        metadata={
+            "full_name": "org/agent-kit",
+            "topics": ["agents", "planning"],
+        },
+    ).model_copy(update={"tags": ["agents"]})
+    news = _item(
+        "news:agent-kit",
+        "news",
+        "Agent Kit gains attention",
+        8.0,
+        metadata={"tags": ["agents"]},
+    ).model_copy(
+        update={
+            "raw_content": "Developers are discussing https://github.com/org/agent-kit for agent planning."
+        }
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [paper, repo, news],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert summary.index("## Connections") < summary.index("## Research Papers")
+    assert "[Agent Planning Benchmark]" in summary
+    assert "[org/agent-kit]" in summary
+    assert "shared repository org/agent-kit" in summary
+    assert "shared tags: agents, planning" in summary
+
+
+def test_unified_renderer_metadata_includes_connections() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=9,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:1",
+        "paper",
+        "Vision Agent Paper",
+        9.0,
+        metadata={"code_urls": ["https://github.com/org/vision-agent"]},
+    ).model_copy(update={"tags": ["agents", "cv"]})
+    repo = _item(
+        "repo:org/vision-agent",
+        "repo",
+        "org/vision-agent",
+        8.0,
+        url="https://github.com/org/vision-agent",
+        metadata={"full_name": "org/vision-agent", "topics": ["agents", "cv"]},
+    )
+
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            "summary",
+            [paper, repo],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert rendered.metadata["connections"] == [
+        {
+            "item_ids": ["paper:1", "repo:org/vision-agent"],
+            "types": ["paper", "repo"],
+            "reason": "shared repository org/vision-agent; shared tags: agents, cv",
+        }
+    ]
+
+
 def test_unified_summary_starts_with_learning_path() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,

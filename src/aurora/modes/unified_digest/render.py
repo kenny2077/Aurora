@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
+from itertools import combinations
+from typing import Any
+from urllib.parse import urlsplit
 
 from aurora.config import UnifiedDigestModeConfig
 from aurora.models import RenderedDigest, SignalItem
@@ -31,6 +35,7 @@ class UnifiedDigestSummarizer:
             return "\n".join(lines)
         lines.extend(_learning_path_lines(selected))
         lines.extend(_run_summary_lines(context))
+        lines.extend(_connection_lines(selected))
         for item_type in self.config.section_order:
             section_items = [item for item in selected if item.type == item_type]
             if not section_items:
@@ -77,6 +82,7 @@ class UnifiedDigestRenderer:
                     item_type: sum(1 for item in selected if item.type == item_type)
                     for item_type in self.config.section_order
                 },
+                "connections": build_connections(selected),
             },
         )
 
@@ -203,6 +209,140 @@ def _child_mode_summary_line(child_summaries: object) -> str:
     if not parts:
         return ""
     return f"Child modes: {', '.join(parts)}."
+
+
+def _connection_lines(items: Sequence[SignalItem]) -> list[str]:
+    connections = build_connections(items)
+    if not connections:
+        return []
+    lines = ["## Connections", ""]
+    by_id = {item.id: item for item in items}
+    for connection in connections:
+        item_ids = connection["item_ids"]
+        connected_items = [by_id[item_id] for item_id in item_ids if item_id in by_id]
+        if len(connected_items) != 2:
+            continue
+        first, second = connected_items
+        lines.append(
+            f"- [{first.title}]({first.url}) + [{second.title}]({second.url}): "
+            f"{connection['reason']}."
+        )
+    lines.append("")
+    return lines
+
+
+def build_connections(items: Sequence[SignalItem], *, limit: int = 5) -> list[dict[str, Any]]:
+    """Build deterministic cross-mode connections for selected digest items."""
+    connections: list[tuple[float, dict[str, Any]]] = []
+    for first, second in combinations(items, 2):
+        if first.type == second.type:
+            continue
+        reason = _connection_reason(first, second)
+        if not reason:
+            continue
+        priority = _connection_priority(first, second, reason)
+        connections.append(
+            (
+                priority,
+                {
+                    "item_ids": [first.id, second.id],
+                    "types": [first.type, second.type],
+                    "reason": reason,
+                },
+            )
+        )
+    connections.sort(
+        key=lambda pair: (
+            pair[0],
+            _item_score_by_id(items, pair[1]["item_ids"][0]),
+            pair[1]["item_ids"],
+        ),
+        reverse=True,
+    )
+    return [connection for _, connection in connections[:limit]]
+
+
+def _connection_reason(first: SignalItem, second: SignalItem) -> str:
+    reasons: list[str] = []
+    shared_repos = sorted(_repo_slugs(first).intersection(_repo_slugs(second)))
+    if shared_repos:
+        reasons.append(f"shared repository {shared_repos[0]}")
+    shared_tags = sorted(_item_tags(first).intersection(_item_tags(second)))
+    if shared_tags:
+        reasons.append(f"shared tags: {', '.join(shared_tags[:4])}")
+    return "; ".join(reasons)
+
+
+def _connection_priority(first: SignalItem, second: SignalItem, reason: str) -> float:
+    repo_bonus = 2.0 if "shared repository" in reason else 0.0
+    tag_bonus = 0.5 if "shared tags" in reason else 0.0
+    return repo_bonus + tag_bonus + ((_item_score(first) + _item_score(second)) / 20.0)
+
+
+def _item_score_by_id(items: Sequence[SignalItem], item_id: str) -> float:
+    for item in items:
+        if item.id == item_id:
+            return _item_score(item)
+    return 0.0
+
+
+def _repo_slugs(item: SignalItem) -> set[str]:
+    candidates: list[str] = [str(item.url), item.raw_content, item.title]
+    metadata = item.metadata
+    for key in ("full_name", "repository", "repo", "homepage", "readme_url", "html_url"):
+        value = metadata.get(key)
+        if value:
+            candidates.append(str(value))
+    for key in ("code_urls", "project_urls", "repo_urls"):
+        value = metadata.get(key)
+        if isinstance(value, list):
+            candidates.extend(str(entry) for entry in value)
+        elif value:
+            candidates.append(str(value))
+
+    slugs: set[str] = set()
+    for candidate in candidates:
+        slugs.update(_extract_repo_slugs(candidate))
+    return slugs
+
+
+def _extract_repo_slugs(value: str) -> set[str]:
+    slugs: set[str] = set()
+    text = value.strip()
+    if not text:
+        return slugs
+    if re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", text):
+        slugs.add(text.lower())
+    for match in re.finditer(r"github\.com[:/]+([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)", text):
+        slugs.add(_clean_repo_slug(match.group(1)))
+    parsed = urlsplit(text)
+    if parsed.netloc.lower().endswith("github.com"):
+        parts = [part for part in parsed.path.split("/") if part]
+        if len(parts) >= 2:
+            slugs.add(_clean_repo_slug(f"{parts[0]}/{parts[1]}"))
+    return slugs
+
+
+def _clean_repo_slug(value: str) -> str:
+    slug = value.strip().strip("/").lower()
+    if slug.endswith(".git"):
+        slug = slug[:-4]
+    return slug
+
+
+def _item_tags(item: SignalItem) -> set[str]:
+    values: list[Any] = [*item.tags]
+    for key in ("tags", "topics", "categories", "fields", "interests"):
+        metadata_value = item.metadata.get(key)
+        if isinstance(metadata_value, list):
+            values.extend(metadata_value)
+        elif metadata_value:
+            values.append(metadata_value)
+    return {_normalize_tag(value) for value in values if _normalize_tag(value)}
+
+
+def _normalize_tag(value: Any) -> str:
+    return re.sub(r"\s+", " ", str(value).strip().lower())
 
 
 def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:
