@@ -7,6 +7,7 @@ from typing import Any
 import pytest
 
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
+from aurora.config import AuroraConfig, RunConfig
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 
 
@@ -328,6 +329,40 @@ def test_pipeline_runner_redacts_secret_like_error_values_in_run_summary(tmp_pat
     assert "secret" not in error
     assert "hidden" not in error
     assert "[REDACTED]" in error
+
+
+def test_pipeline_runner_updates_source_quality_history(tmp_path) -> None:
+    calls: list[str] = []
+    config = AuroraConfig(run=RunConfig(cache_dir=tmp_path / "cache"))
+
+    first = asyncio.run(
+        PipelineRunner(tmp_path / "runs").run(
+            _pipeline(
+                calls,
+                fetch_stages=[FailingFetch(calls), RecordingFetch("good", [{"id": "ok"}], calls)],
+            ),
+            StageContext(mode="tech_news", run_id="quality-1", config=config),
+        )
+    )
+    second = asyncio.run(
+        PipelineRunner(tmp_path / "runs").run(
+            _pipeline(
+                calls,
+                fetch_stages=[FailingFetch(calls), RecordingFetch("good", [{"id": "ok"}], calls)],
+            ),
+            StageContext(mode="tech_news", run_id="quality-2", config=config),
+        )
+    )
+
+    quality = second.rendered_digest.metadata["run_summary"]["source_quality"]
+    assert quality["tech_news:bad_fetch"]["runs"] == 2
+    assert quality["tech_news:bad_fetch"]["failed_runs"] == 2
+    assert quality["tech_news:bad_fetch"]["quality_score"] == 0.0
+    assert quality["tech_news:good"]["runs"] == 2
+    assert quality["tech_news:good"]["ok_runs"] == 2
+    assert quality["tech_news:good"]["quality_score"] == 10.0
+    assert first.output_paths["run_summary"].exists()
+    assert (tmp_path / "cache" / "source_quality.json").exists()
 
 
 def test_pipeline_runner_propagates_non_fetch_failures(tmp_path) -> None:

@@ -23,6 +23,7 @@ from aurora.pipeline.stages import (
     SummarizeStage,
 )
 from aurora.storage.jsonl import write_jsonl
+from aurora.storage.source_quality import update_source_quality
 
 
 @dataclass(frozen=True)
@@ -144,6 +145,7 @@ class PipelineRunner:
             score_result_count=len(score_results),
             enriched_count=len(enriched_items),
             source_statuses=source_statuses,
+            source_quality=_source_quality(context, pipeline.mode, source_statuses),
         )
         context.metadata["run_summary"] = run_summary
 
@@ -166,6 +168,7 @@ class PipelineRunner:
             source_statuses=source_statuses,
             delivery_results=delivery_results,
             output_paths=output_paths,
+            source_quality=context.metadata.get("source_quality"),
         )
         _write_json(run_summary_path, final_run_summary)
 
@@ -211,6 +214,7 @@ def _run_summary(
     source_statuses: list[SourceStatus],
     delivery_results: list[DeliveryResult] | None = None,
     output_paths: dict[str, Path] | None = None,
+    source_quality: object | None = None,
 ) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "run_id": run_id,
@@ -238,6 +242,8 @@ def _run_summary(
         summary["output_paths"] = {
             key: str(value) for key, value in output_paths.items()
         }
+    if isinstance(source_quality, dict):
+        summary["source_quality"] = source_quality
     return summary
 
 
@@ -267,3 +273,17 @@ def _write_json(path: Path, payload: dict[str, Any]) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     return path
+
+
+def _source_quality(
+    context: StageContext, mode: str, source_statuses: list[SourceStatus]
+) -> dict[str, Any] | None:
+    if context.config is None or not source_statuses:
+        return None
+    quality = update_source_quality(
+        context.config.run.cache_dir,
+        mode=mode,
+        statuses=source_statuses,
+    )
+    context.metadata["source_quality"] = quality
+    return quality
