@@ -5,6 +5,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+import httpx
+
 from aurora.config import AuroraConfig, RunConfig, ScholarModeConfig
 from aurora.modes.scholar.cache import CACHE_RELATIVE_PATH
 from aurora.modes.scholar.fields import (
@@ -211,6 +213,84 @@ def test_enricher_ignores_expired_or_corrupt_scholar_cache(tmp_path: Path) -> No
 
     expired = asyncio.run(ScholarEnricher(config).enrich([], [], context))
     assert expired == []
+
+
+def test_semantic_scholar_enrichment_skips_when_api_key_missing(monkeypatch) -> None:
+    monkeypatch.delenv("SEMANTIC_SCHOLAR_API_KEY", raising=False)
+    item = _paper("paper", "Reasoning", {"source_ids": {"arxiv": "2605.1"}})
+    score = asyncio.run(ScholarScorer(ScholarModeConfig()).score([item], _context()))[0]
+
+    enriched = asyncio.run(ScholarEnricher(ScholarModeConfig()).enrich([item], [score], _context()))
+
+    assert enriched[0].metadata.get("semantic_scholar_paper_id") is None
+    assert enriched[0].metadata.get("citation_count") is None
+
+
+def test_semantic_scholar_enrichment_fills_citation_metadata(monkeypatch) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        assert request.headers["x-api-key"] == "test-key"
+        return httpx.Response(
+            200,
+            json={
+                "paperId": "S2-123",
+                "url": "https://www.semanticscholar.org/paper/S2-123",
+                "citationCount": 42,
+                "influentialCitationCount": 7,
+                "externalIds": {"ArXiv": "2605.1", "DOI": "10.1/test"},
+            },
+        )
+
+    item = _paper("paper", "Reasoning", {"source_ids": {"arxiv": "2605.1"}})
+    score = asyncio.run(ScholarScorer(ScholarModeConfig()).score([item], _context()))[0]
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(ScholarModeConfig(), http_client=client).enrich(
+                [item],
+                [score],
+                _context(),
+            )
+
+    enriched = asyncio.run(exercise())
+
+    metadata = enriched[0].metadata
+    assert len(requests) == 1
+    assert metadata["semantic_scholar_paper_id"] == "S2-123"
+    assert metadata["semantic_scholar_url"] == "https://www.semanticscholar.org/paper/S2-123"
+    assert metadata["citation_count"] == 42
+    assert metadata["influential_citation_count"] == 7
+    assert metadata["source_ids"]["semantic_scholar"] == "S2-123"
+    assert metadata["source_ids"]["doi"] == "10.1/test"
+
+
+def test_semantic_scholar_enrichment_honors_request_cap(monkeypatch) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(200, json={"paperId": "S2", "citationCount": 1})
+
+    config = ScholarModeConfig(sources={"semantic_scholar": {"max_requests_per_run": 1}})
+    items = [
+        _paper("first", "First", {"source_ids": {"arxiv": "2605.1"}}),
+        _paper("second", "Second", {"source_ids": {"arxiv": "2605.2"}}),
+    ]
+    scores = asyncio.run(ScholarScorer(config).score(items, _context()))
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(items, scores, _context())
+
+    enriched = asyncio.run(exercise())
+
+    assert len(requests) == 1
+    assert enriched[0].metadata["semantic_scholar_paper_id"] == "S2"
+    assert enriched[1].metadata.get("semantic_scholar_paper_id") is None
 
 
 def test_markdown_rendering_is_stable_score_ordered_and_capped() -> None:

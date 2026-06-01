@@ -8,6 +8,8 @@ from collections.abc import Sequence
 from datetime import datetime
 from typing import Any
 
+import httpx
+
 from aurora.ai.ranker import LLMRanker
 from aurora.config import ScholarModeConfig
 from aurora.modes.scholar.cache import load_scholar_cache, write_scholar_cache
@@ -19,6 +21,7 @@ from aurora.modes.scholar.fields import (
 )
 from aurora.models import ScoreResult, SignalItem
 from aurora.modes.scholar.prompts import build_scholar_prompt
+from aurora.modes.scholar.semantic_scholar import SemanticScholarClient
 from aurora.pipeline import StageContext
 
 
@@ -82,9 +85,11 @@ class ScholarEnricher:
         self,
         config: ScholarModeConfig | None = None,
         llm_ranker: LLMRanker | None = None,
+        http_client: httpx.AsyncClient | None = None,
     ) -> None:
         self.config = config
         self.llm_ranker = llm_ranker
+        self.http_client = http_client
 
     async def enrich(
         self,
@@ -123,9 +128,25 @@ class ScholarEnricher:
         if self.llm_ranker is not None:
             analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
             enriched = [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        if self.config is not None:
+            enriched = await self._semantic_scholar_enrich(enriched)
         if self.config is not None and self.config.fallback_cache_enabled:
             write_scholar_cache(enriched, context)
         return enriched
+
+    async def _semantic_scholar_enrich(self, items: list[SignalItem]) -> list[SignalItem]:
+        if self.config is None:
+            return items
+        if self.http_client is not None:
+            return await SemanticScholarClient(
+                self.config.sources.semantic_scholar,
+                http_client=self.http_client,
+            ).enrich_items(items)
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            return await SemanticScholarClient(
+                self.config.sources.semantic_scholar,
+                http_client=client,
+            ).enrich_items(items)
 
 
 def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:

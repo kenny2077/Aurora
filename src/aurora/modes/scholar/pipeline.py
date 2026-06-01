@@ -35,7 +35,7 @@ def build_scholar_pipeline(
         normalize_stage=ScholarNormalizeStage(),
         deduplicate_stage=ScholarDeduplicateStage(),
         score_stage=ScholarScorer(scholar),
-        enrich_stage=ScholarEnricher(scholar, llm_ranker),
+        enrich_stage=ScholarEnricher(scholar, llm_ranker, http_client=http_client),
         summarize_stage=ScholarSummarizer(scholar),
         render_stage=ScholarRenderer(),
         deliver_stage=ConfiguredDeliveryStage(config),
