@@ -1,12 +1,15 @@
 # Aurora Interest Presets
 
-Aurora supports user-selected interests through config and one-off CLI
-overrides. Tech news remains broad by default and prioritizes timely,
+Aurora is a daily learning radar. Use repo learning interests and scholar
+research fields to shape the paper and repository parts of the daily learning
+path. Tech news remains broad by default and prioritizes timely,
 high-engagement stories.
 
 ## Repo Learning
 
 Configure repository recommendations with `modes.repo_learning.interests`.
+These learning interests control what kinds of projects Aurora recommends for
+hands-on study.
 
 Built-in repo interests:
 
@@ -50,7 +53,8 @@ rtk uv run aurora run --mode repo_learning --repo-interest agents --repo-interes
 
 ## Scholar
 
-Configure research recommendations with `modes.scholar.fields`.
+Configure research recommendations with `modes.scholar.fields`. These research
+fields control which papers Aurora prioritizes for the daily reading path.
 
 Built-in research fields:
 
