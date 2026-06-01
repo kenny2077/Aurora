@@ -122,16 +122,27 @@ class OpenReviewFetchStage:
         records: list[dict[str, Any]] = []
         seen_ids: set[str] = set()
         for venue_id in self.config.sources.openreview.venue_ids:
-            response = await client.get(
-                OPENREVIEW_API_URL,
-                params={
-                    "content.venueid": venue_id,
-                    "details": "directReplies",
-                    "limit": str(self.config.max_candidates),
-                },
-                headers={"User-Agent": "Aurora-Scholar/0.1"},
-            )
-            response.raise_for_status()
+            try:
+                response = await client.get(
+                    OPENREVIEW_API_URL,
+                    params={
+                        "content.venueid": venue_id,
+                        "details": "directReplies",
+                        "limit": str(self.config.max_candidates),
+                    },
+                    headers={"User-Agent": "Aurora-Scholar/0.1"},
+                )
+                response.raise_for_status()
+            except httpx.HTTPStatusError as exc:
+                context.metadata.setdefault("scholar_source_failures", []).append(
+                    {
+                        "source": "openreview",
+                        "venue_id": venue_id,
+                        "status_code": str(exc.response.status_code),
+                        "error": str(exc),
+                    }
+                )
+                continue
             payload = response.json()
             for note in payload.get("notes", []):
                 if not isinstance(note, dict):

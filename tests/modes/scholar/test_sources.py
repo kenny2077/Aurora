@@ -154,3 +154,58 @@ def test_openreview_fetch_parses_notes_and_skips_invalid() -> None:
     assert records[0]["metadata"]["status"] == "accepted"
     assert records[0]["metadata"]["source_ids"]["doi"] == "10.1234/example"
     assert records[0]["metadata"]["pdf_url"] == "https://openreview.net/pdf?id=abc123"
+
+
+def test_openreview_fetch_records_venue_failures_and_continues() -> None:
+    cdate = int(datetime(2026, 5, 26, tzinfo=timezone.utc).timestamp() * 1000)
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        if "ICLR.cc%2F2026%2FConference" in str(request.url):
+            return httpx.Response(503, json={"message": "temporarily unavailable"})
+        return httpx.Response(
+            200,
+            json={
+                "notes": [
+                    {
+                        "id": "ok123",
+                        "forum": "forum123",
+                        "cdate": cdate,
+                        "content": {
+                            "title": {"value": "Working Paper"},
+                            "abstract": {"value": "A useful benchmark paper."},
+                            "venueid": {"value": "ICML.cc/2026/Conference"},
+                            "venue": {"value": "ICML 2026 Conference Paper"},
+                        },
+                    }
+                ]
+            },
+        )
+
+    context = StageContext(
+        mode="scholar",
+        run_id="test",
+        since=datetime(2026, 1, 1, tzinfo=timezone.utc),
+    )
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await OpenReviewFetchStage(
+                ScholarModeConfig(
+                    sources=ScholarSourcesConfig(
+                        openreview=OpenReviewSourceConfig(
+                            venue_ids=["ICLR.cc/2026/Conference", "ICML.cc/2026/Conference"]
+                        )
+                    )
+                ),
+                http_client=client,
+            ).fetch(context)
+
+    records = asyncio.run(exercise())
+
+    assert len(requests) == 2
+    assert [record["id"] for record in records] == ["openreview:ok123"]
+    assert context.metadata["scholar_source_failures"][0]["source"] == "openreview"
+    assert context.metadata["scholar_source_failures"][0]["venue_id"] == "ICLR.cc/2026/Conference"
+    assert context.metadata["scholar_source_failures"][0]["status_code"] == "503"
