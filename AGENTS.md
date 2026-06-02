@@ -25,6 +25,7 @@ Supported modes:
 
 ## Important Directories
 
+- `docs/navigation.md`: start here before broad repository exploration.
 - `src/aurora/models.py`: shared contracts such as `SignalItem`, `ScoreResult`,
   `RenderedDigest`, and `DeliveryResult`.
 - `src/aurora/config.py`: Pydantic config schema and defaults.
