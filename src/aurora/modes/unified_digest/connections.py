@@ -24,6 +24,32 @@ THEMES = {
     "multimodal",
     "devtools",
 }
+WEAK_TERMS = {
+    "ai",
+    "ml",
+    "rl",
+    "news",
+    "paper",
+    "repo",
+    "rss",
+    "hackernews",
+    "github_search",
+    "arxiv",
+    "openreview",
+    "python",
+    "typescript",
+    "javascript",
+    "go",
+    "rust",
+    "java",
+    "cs.ai",
+    "cs.lg",
+    "cs.cl",
+    "cs.cv",
+    "cs.ro",
+    "cs.se",
+}
+WEAK_THEMES = {"ai", "ml", "rl"}
 
 
 def build_connections(items: Sequence[SignalItem], *, limit: int = 5) -> list[dict[str, Any]]:
@@ -49,16 +75,19 @@ def build_connections(items: Sequence[SignalItem], *, limit: int = 5) -> list[di
 
 def _connection(first: SignalItem, second: SignalItem) -> dict[str, Any] | None:
     shared_repos = sorted(_repo_slugs(first).intersection(_repo_slugs(second)))
-    shared_tags = sorted(_item_terms(first).intersection(_item_terms(second)))
-    evidence = _evidence_terms(shared_tags, shared_repos)
+    shared_terms = sorted(_item_terms(first).intersection(_item_terms(second)))
+    strong_terms = [term for term in shared_terms if _is_strong_term(term)]
+    if not shared_repos and len(strong_terms) < 2:
+        return None
+    evidence = _evidence_terms(strong_terms, shared_repos)
     if not evidence:
         return None
 
     reasons: list[str] = []
     if shared_repos:
         reasons.append(f"shared repository {shared_repos[0]}")
-    if shared_tags:
-        reasons.append(f"shared tags: {', '.join(shared_tags[:4])}")
+    if strong_terms:
+        reasons.append(f"shared specific signals: {', '.join(strong_terms[:4])}")
     if not reasons:
         return None
     return {
@@ -72,8 +101,9 @@ def _connection(first: SignalItem, second: SignalItem) -> dict[str, Any] | None:
 def _priority(first: SignalItem, second: SignalItem, connection: dict[str, Any]) -> float:
     reason = str(connection["reason"])
     repo_bonus = 2.0 if "shared repository" in reason else 0.0
-    tag_bonus = 0.5 if "shared tags" in reason else 0.0
-    return repo_bonus + tag_bonus + ((_item_score(first) + _item_score(second)) / 20.0)
+    evidence_count = len(connection.get("evidence_terms", []))
+    signal_bonus = min(1.0, evidence_count * 0.25)
+    return repo_bonus + signal_bonus + ((_item_score(first) + _item_score(second)) / 20.0)
 
 
 def _evidence_terms(shared_tags: list[str], shared_repos: list[str]) -> list[str]:
@@ -83,11 +113,11 @@ def _evidence_terms(shared_tags: list[str], shared_repos: list[str]) -> list[str
 
 def _theme(evidence_terms: list[str]) -> str:
     for term in evidence_terms:
-        if term in THEMES:
+        if term in THEMES and term not in WEAK_THEMES:
             return term
     for term in evidence_terms:
         for theme in THEMES:
-            if theme in term:
+            if theme not in WEAK_THEMES and theme in term:
                 return theme
     return evidence_terms[0] if evidence_terms else "related"
 
@@ -145,14 +175,21 @@ def _item_terms(item: SignalItem) -> set[str]:
             values.extend(metadata_value)
         elif metadata_value:
             values.append(metadata_value)
-    explicit_terms = {_normalize_tag(value) for value in values if _normalize_tag(value)}
-    item_text = _normalize_tag(f"{item.title} {item.raw_content}")
-    theme_matches = {theme for theme in THEMES if theme in item_text}
-    return explicit_terms.union(theme_matches)
+    return {_normalize_tag(value) for value in values if _normalize_tag(value)}
 
 
 def _normalize_tag(value: Any) -> str:
-    return re.sub(r"\s+", " ", str(value).strip().lower())
+    normalized = re.sub(r"\s+", " ", str(value).strip().lower())
+    return normalized.replace("_", "-")
+
+
+def _is_strong_term(value: str) -> bool:
+    term = _normalize_tag(value)
+    if not term or term in WEAK_TERMS:
+        return False
+    if len(term) < 2:
+        return False
+    return True
 
 
 def _item_score(item: SignalItem) -> float:

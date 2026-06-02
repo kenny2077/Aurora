@@ -323,7 +323,7 @@ def test_unified_summary_includes_cross_mode_connections() -> None:
         "news",
         "Agent Kit gains attention",
         8.0,
-        metadata={"tags": ["agents"]},
+        metadata={"tags": ["agents", "planning"]},
     ).model_copy(
         update={
             "raw_content": "Developers are discussing https://github.com/org/agent-kit for agent planning."
@@ -342,6 +342,7 @@ def test_unified_summary_includes_cross_mode_connections() -> None:
     assert "[org/agent-kit]" in summary
     assert "agents:" in summary
     assert "shared repository org/agent-kit" in summary
+    assert "shared specific signals: agents, planning" in summary
     assert "evidence: agents, org/agent-kit, planning" in summary
 
 
@@ -380,7 +381,93 @@ def test_unified_renderer_metadata_includes_connections() -> None:
             "theme": "agents",
             "item_ids": ["paper:1", "repo:org/vision-agent"],
             "evidence_terms": ["agents", "cv", "org/vision-agent"],
-            "reason": "shared repository org/vision-agent; shared tags: agents, cv",
+            "reason": "shared repository org/vision-agent; shared specific signals: agents, cv",
+        }
+    ]
+
+
+def test_unified_connections_ignore_single_generic_ai_ml_or_rl_overlap() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=9,
+        section_order=["paper", "repo", "news"],
+    )
+    for generic_term in ("ai", "ml", "rl"):
+        repo = _item(
+            f"repo:org/{generic_term}",
+            "repo",
+            f"org/{generic_term}",
+            8.0,
+            url=f"https://github.com/org/{generic_term}",
+            metadata={"full_name": f"org/{generic_term}", "topics": [generic_term]},
+        ).model_copy(update={"tags": [generic_term]})
+        news = _item(
+            f"news:{generic_term}",
+            "news",
+            f"{generic_term.upper()} market update",
+            9.0,
+            metadata={"tags": [generic_term]},
+        ).model_copy(update={"tags": [generic_term]})
+
+        rendered = asyncio.run(
+            UnifiedDigestRenderer(config).render(
+                "summary",
+                [repo, news],
+                StageContext(mode="unified_digest", run_id="test"),
+            )
+        )
+
+        assert rendered.metadata["connections"] == []
+
+
+def test_unified_connections_require_multiple_specific_signals_without_repo() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=3,
+        max_total_items=9,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:segmentation",
+        "paper",
+        "Segmentation Benchmark",
+        9.0,
+        metadata={"categories": ["cs.CV"]},
+    ).model_copy(update={"tags": ["segmentation"]})
+    news = _item(
+        "news:segmentation",
+        "news",
+        "Segmentation model gains attention",
+        8.0,
+        metadata={"tags": ["segmentation"]},
+    ).model_copy(update={"tags": ["segmentation"]})
+
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            "summary",
+            [paper, news],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert rendered.metadata["connections"] == []
+
+    stronger_paper = paper.model_copy(update={"tags": ["segmentation", "benchmark"]})
+    stronger_news = news.model_copy(update={"tags": ["segmentation", "benchmark"]})
+
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            "summary",
+            [stronger_paper, stronger_news],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert rendered.metadata["connections"] == [
+        {
+            "theme": "benchmark",
+            "item_ids": ["paper:segmentation", "news:segmentation"],
+            "evidence_terms": ["benchmark", "segmentation"],
+            "reason": "shared specific signals: benchmark, segmentation",
         }
     ]
 
@@ -533,8 +620,8 @@ def test_unified_delivery_records_all_selected_items_and_themes(tmp_path: Path) 
                 {
                     "theme": "agents",
                     "item_ids": ["paper:one", "repo:org/one"],
-                    "evidence_terms": ["agents"],
-                    "reason": "shared tags: agents",
+                    "evidence_terms": ["agents", "planning"],
+                    "reason": "shared specific signals: agents, planning",
                 }
             ],
         },
