@@ -126,6 +126,86 @@ def test_enricher_applies_score_results_to_items() -> None:
     assert "score_breakdown" in enriched[0].metadata
 
 
+def test_enricher_generates_polished_hackernews_learning_notes() -> None:
+    item = _item(
+        "news:hn",
+        "Can the stockmarket swallow Anthropic, SpaceX and OpenAI?",
+        "https://example.com/story",
+        source="hackernews",
+        metadata={
+            "score": 1240,
+            "descendants": 314,
+            "discussion_url": "https://news.ycombinator.com/item?id=1",
+        },
+        raw_content=(
+            "https:&#x2F;&#x2F;archive.ph&#x2F;nKEVw [augstein]: For SpaceX yes "
+            "because the rules changed."
+        ),
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+
+    assert "Hacker News" in enriched.why_it_matters
+    assert "1240" in enriched.why_it_matters
+    assert enriched.learning_value
+    assert enriched.action_items
+    for value in (enriched.why_it_matters, enriched.learning_value):
+        assert "&#x" not in value
+        assert "https:" not in value
+        assert "[augstein]:" not in value
+
+
+def test_enricher_generates_clean_rss_learning_notes() -> None:
+    item = _item(
+        "news:rss",
+        "Nvidia releases a compact AI workstation",
+        "https://example.com/nvidia",
+        source="rss",
+        metadata={"feed_name": "Example Feed", "category": "AI infrastructure", "tags": ["GPU"]},
+        raw_content="<p>Nvidia&#x27;s new workstation targets local inference &amp; prototyping.</p>",
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+
+    assert "Example Feed" in enriched.why_it_matters
+    assert "local inference" in enriched.learning_value
+    for value in (enriched.why_it_matters, enriched.learning_value):
+        assert "<p>" not in value
+        assert "&#x" not in value
+        assert "&amp;" not in value
+
+
+def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> None:
+    item = _item(
+        "news:hn",
+        "AI Agent Guidelines for CS336 at Stanford",
+        "https://example.com/agents",
+        source="hackernews",
+        metadata={"score": 500, "descendants": 90},
+        raw_content="[aaaronic]: I think this one is overly verbose.",
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher(_LowQualityRanker()).enrich([item], [score], _context()))[0]
+
+    assert "Hacker News" in enriched.why_it_matters
+    assert "https:&#x2F;" not in enriched.why_it_matters
+    assert "[aaaronic]:" not in enriched.learning_value
+    assert enriched.action_items == [
+        "Read the source article and the Hacker News discussion.",
+        "Identify what changed and who is affected.",
+        "Decide whether the story changes a tool, research, or product bet you are making.",
+    ]
+
+
 def test_markdown_rendering_is_stable_and_score_ordered() -> None:
     low = _item("news:low", "Low", "https://example.com/low").model_copy(
         update={"final_score": 3.0}
@@ -151,6 +231,7 @@ def _item(
     source: str = "rss",
     published_at: datetime | None = None,
     metadata: dict | None = None,
+    raw_content: str = "",
 ) -> SignalItem:
     return SignalItem(
         id=item_id,
@@ -159,5 +240,22 @@ def _item(
         url=url,
         source=source,
         published_at=published_at or datetime(2026, 5, 26, tzinfo=timezone.utc),
+        raw_content=raw_content,
         metadata=metadata or {},
     )
+
+
+class _LowQualityRanker:
+    async def analyze_items(self, items, prompt_builder, context):
+        return {item.id: object() for item in items}
+
+    def apply_analysis(self, item, analysis):
+        return item.model_copy(
+            update={
+                "llm_score": 9.0,
+                "final_score": 9.0,
+                "why_it_matters": "https:&#x2F;&#x2F;example.com [aaaronic]: raw comment",
+                "learning_value": "[aaaronic]: raw escaped discussion excerpt",
+                "action_items": ["Copy this raw thread."],
+            }
+        )

@@ -8,6 +8,10 @@ from datetime import datetime, timezone
 
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
 from aurora.ai.ranker import LLMRanker
+from aurora.modes.tech_news.notes import (
+    build_tech_news_notes,
+    ensure_polished_tech_news_notes,
+)
 from aurora.modes.tech_news.prompts import build_tech_news_prompt
 from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
@@ -83,13 +87,16 @@ class TechNewsEnricher:
             metadata = dict(item.metadata)
             metadata["score_breakdown"] = score.score_breakdown
             metadata["score_reason"] = score.reason
+            notes = build_tech_news_notes(item)
             enriched.append(
                 item.model_copy(
                     update={
                         "deterministic_score": score.deterministic_score,
                         "final_score": score.final_score,
                         "tags": score.tags,
-                        "action_items": score.action_items,
+                        "why_it_matters": notes.why_it_matters,
+                        "learning_value": notes.learning_value,
+                        "action_items": score.action_items or notes.action_items,
                         "metadata": metadata,
                     }
                 )
@@ -97,7 +104,12 @@ class TechNewsEnricher:
         if self.llm_ranker is None:
             return enriched
         analyses = await self.llm_ranker.analyze_items(enriched, build_tech_news_prompt, context)
-        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        return [
+            ensure_polished_tech_news_notes(
+                self.llm_ranker.apply_analysis(item, analyses.get(item.id))
+            )
+            for item in enriched
+        ]
 
 
 def _source_authority(item: SignalItem) -> float:

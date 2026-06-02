@@ -133,6 +133,61 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
 
 
+def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["paper", "repo", "news"],
+    )
+    items = [
+        _item("paper:1", "paper", "Paper", 8.0),
+        _item("repo:1", "repo", "Repo", 7.0),
+        _item(
+            "news:1",
+            "news",
+            "AI Agent Guidelines for CS336 at Stanford",
+            9.0,
+            metadata={"score": 500, "descendants": 90},
+            why_it_matters="",
+            learning_value="",
+            raw_content=(
+                "https:&#x2F;&#x2F;example.com [aaaronic]: I think this one is "
+                "overly verbose and probably falls out of context."
+            ),
+        ),
+    ]
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
+
+    assert "### News to Watch" in summary
+    assert "Hacker News" in summary
+    assert "https:&#x2F;" not in summary
+    assert "[aaaronic]:" not in summary
+    assert "## Research Papers" in summary
+    assert "## Repositories" in summary
+
+
+def test_unified_rendering_prefers_polished_news_notes() -> None:
+    config = UnifiedDigestModeConfig(max_items_per_type=8, max_total_items=20)
+    item = _item(
+        "news:1",
+        "news",
+        "Polished News",
+        9.0,
+        why_it_matters="This is a clean reason for the digest.",
+        learning_value="Use it to calibrate a practical product decision.",
+        raw_content="[raw]: noisy thread text",
+    )
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([item], context))
+
+    assert "This is a clean reason for the digest." in summary
+    assert "Use it to calibrate a practical product decision." in summary
+    assert "[raw]:" not in summary
+
+
 def test_unified_summary_includes_run_summary_and_source_health() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,
@@ -660,6 +715,7 @@ def _item(
     why_it_matters: str | None = None,
     learning_value: str | None = None,
     action_items: list[str] | None = None,
+    raw_content: str | None = None,
 ) -> SignalItem:
     return SignalItem(
         id=item_id,
@@ -668,7 +724,7 @@ def _item(
         url=url or f"https://example.com/{item_id.replace(':', '-')}",
         source="test",
         published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
-        raw_content=f"{title} content",
+        raw_content=raw_content if raw_content is not None else f"{title} content",
         metadata=metadata or {},
         deterministic_score=score,
         final_score=score,

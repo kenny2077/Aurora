@@ -5,6 +5,11 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from aurora.config import UnifiedDigestModeConfig
+from aurora.modes.tech_news.notes import (
+    build_tech_news_notes,
+    display_tech_news_learning,
+    display_tech_news_why,
+)
 from aurora.modes.unified_digest.connections import build_connections
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
@@ -46,7 +51,7 @@ class UnifiedDigestSummarizer:
                     ]
                 )
             for index, item in enumerate(section_items, start=1):
-                why = item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
+                why = _why_text(item)
                 lines.extend(
                     [
                         f"{index}. [{item.title}]({item.url}) - {item.final_score or 0.0}/10",
@@ -262,8 +267,8 @@ def _top_items(items: Sequence[SignalItem], item_type: str, *, limit: int) -> li
 
 
 def _learning_item_lines(item: SignalItem) -> list[str]:
-    why = item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
-    learning = item.learning_value or item.summary or _excerpt(item.raw_content, 160)
+    why = _why_text(item)
+    learning = _learning_text(item)
     lines = [
         f"- [{item.title}]({item.url}) - {_item_score(item):.1f}/10",
         f"  - Source: {item.source}",
@@ -277,6 +282,18 @@ def _learning_item_lines(item: SignalItem) -> list[str]:
     return lines
 
 
+def _why_text(item: SignalItem) -> str:
+    if item.type == "news":
+        return display_tech_news_why(item)
+    return item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
+
+
+def _learning_text(item: SignalItem) -> str:
+    if item.type == "news":
+        return display_tech_news_learning(item)
+    return item.learning_value or item.summary or _excerpt(item.raw_content, 160)
+
+
 def _action_items(item: SignalItem) -> list[str]:
     if item.action_items:
         return list(item.action_items)
@@ -287,11 +304,7 @@ def _action_items(item: SignalItem) -> list[str]:
         actions.append("Write one implementation question to investigate next.")
         return actions
     if item.type == "news":
-        return [
-            "Read the source or discussion thread.",
-            "Identify the ecosystem impact for your current work.",
-            "Decide whether this deserves a follow-up experiment.",
-        ]
+        return build_tech_news_notes(item).action_items
     return []
 
 
