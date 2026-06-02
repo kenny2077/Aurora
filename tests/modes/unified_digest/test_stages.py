@@ -133,6 +133,49 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
 
 
+def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["repo", "paper", "news"],
+    )
+    repo = _item(
+        "repo:org/noisy",
+        "repo",
+        "org/noisy",
+        9.0,
+        url="https://github.com/org/noisy",
+        metadata={
+            "recommendation_evidence": [
+                "6k stars",
+                "README found",
+                "examples/quickstart.py",
+            ],
+            "quality_warnings": [
+                "very high open issue count",
+                "README or package files were not found during enrichment",
+            ],
+        },
+        why_it_matters="org/noisy is worth studying because it has concrete learning evidence.",
+        learning_value="Study examples/quickstart.py and pyproject.toml.",
+        action_items=["Inspect examples/quickstart.py."],
+    )
+    paper = _item("paper:1", "paper", "Paper", 8.0)
+    news = _item("news:1", "news", "News", 7.0)
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([repo, paper, news], context))
+
+    assert "### Repo to Study" in summary
+    assert "  - Evidence: 6k stars; README found; examples/quickstart.py" in summary
+    assert "  - Watch: very high open issue count; README or package files were not found during enrichment" in summary
+    assert "## Repositories" in summary
+    assert "   - Evidence: 6k stars; README found; examples/quickstart.py" in summary
+    assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
+    assert "## Research Papers" in summary
+    assert "## Tech News" in summary
+
+
 def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,

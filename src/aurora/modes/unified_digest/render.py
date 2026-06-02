@@ -59,6 +59,7 @@ class UnifiedDigestSummarizer:
                         f"   - Why: {why}",
                     ]
                 )
+                lines.extend(_repo_signal_lines(item, indent="   "))
             lines.append("")
         return "\n".join(lines).rstrip()
 
@@ -275,11 +276,32 @@ def _learning_item_lines(item: SignalItem) -> list[str]:
         f"  - Why: {why}",
         f"  - Learn: {learning}",
     ]
+    lines.extend(_repo_signal_lines(item, indent="  "))
     action_items = _action_items(item)
     if action_items:
         lines.append(f"  - Action: {'; '.join(action_items)}")
     lines.append("")
     return lines
+
+
+def _repo_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
+    if item.type != "repo":
+        return []
+    metadata = item.metadata
+    evidence = _metadata_text_list(metadata.get("recommendation_evidence"))
+    warnings = _metadata_text_list(metadata.get("quality_warnings"))
+    lines: list[str] = []
+    if evidence:
+        lines.append(f"{indent}- Evidence: {'; '.join(evidence[:6])}")
+    if warnings:
+        lines.append(f"{indent}- Watch: {'; '.join(warnings[:4])}")
+    return lines
+
+
+def _metadata_text_list(value: object) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(item).strip() for item in value if str(item).strip()]
 
 
 def _why_text(item: SignalItem) -> str:

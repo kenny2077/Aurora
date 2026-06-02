@@ -219,6 +219,131 @@ def test_enricher_fetches_readme_tree_and_fills_learning_fields() -> None:
     assert len(enriched.action_items) == 3
 
 
+def test_enricher_explains_repo_with_evidence_and_specific_actions() -> None:
+    item = _repo(
+        "repo:org/evidence",
+        "org/evidence",
+        {
+            "owner": "org",
+            "name": "evidence",
+            "full_name": "org/evidence",
+            "default_branch": "main",
+            "stars": 5200,
+            "forks": 420,
+            "open_issues": 35,
+            "topics": ["agent", "workflow", "mcp"],
+            "language": "Python",
+            "license": "MIT",
+            "homepage": "https://evidence.dev",
+            "description": "Agent workflow toolkit",
+        },
+    )
+    score = ScoreResult(
+        item_id=item.id,
+        deterministic_score=9.0,
+        final_score=9.0,
+        score_breakdown={
+            "relevance": 9.0,
+            "learning_value": 8.0,
+            "architecture_clarity": 8.0,
+            "documentation_quality": 8.0,
+            "community_signal": 7.0,
+        },
+        tags=["github_search", "agent", "workflow"],
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "raw.githubusercontent.com":
+            return httpx.Response(200, text="# Evidence\n\nRun examples/quickstart.py.")
+        return httpx.Response(
+            200,
+            json={
+                "tree": [
+                    {"path": "pyproject.toml", "type": "blob"},
+                    {"path": "docs/architecture.md", "type": "blob"},
+                    {"path": "examples/quickstart.py", "type": "blob"},
+                    {"path": ".github/workflows/ci.yml", "type": "blob"},
+                ]
+            },
+        )
+
+    async def exercise() -> SignalItem:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return (
+                await RepoLearningEnricher(
+                    RepoLearningModeConfig(ranking=RepoLearningRankingConfig(enrich_top_n=1)),
+                    http_client=client,
+                ).enrich([item], [score], _context())
+            )[0]
+
+    enriched = asyncio.run(exercise())
+
+    assert "5.2k stars" in enriched.why_it_matters
+    assert "README found" in enriched.why_it_matters
+    assert "pyproject.toml" in enriched.learning_value
+    assert "docs/architecture.md" in enriched.learning_value
+    assert "examples/quickstart.py" in enriched.learning_value
+    assert enriched.metadata["recommendation_evidence"][:3] == [
+        "5.2k stars",
+        "420 forks",
+        "active recently",
+    ]
+    assert "README found" in enriched.metadata["recommendation_evidence"]
+    assert "examples/quickstart.py" in enriched.metadata["recommendation_evidence"]
+    assert enriched.metadata["quality_warnings"] == []
+    assert any("pyproject.toml" in action for action in enriched.action_items)
+    assert any("examples/quickstart.py" in action for action in enriched.action_items)
+
+
+def test_enricher_flags_noisy_repo_quality_warnings() -> None:
+    item = _repo(
+        "repo:org/noisy",
+        "org/noisy",
+        {
+            "owner": "org",
+            "name": "noisy",
+            "full_name": "org/noisy",
+            "default_branch": "main",
+            "stars": 6000,
+            "forks": 20,
+            "open_issues": 900,
+            "topics": [],
+            "language": None,
+            "description": "",
+        },
+        description="",
+    )
+    score = ScoreResult(
+        item_id=item.id,
+        deterministic_score=8.5,
+        final_score=8.5,
+        score_breakdown={"community_signal": 8.0, "documentation_quality": 2.0},
+    )
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "raw.githubusercontent.com":
+            return httpx.Response(404)
+        return httpx.Response(200, json={"tree": []})
+
+    async def exercise() -> SignalItem:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return (
+                await RepoLearningEnricher(
+                    RepoLearningModeConfig(ranking=RepoLearningRankingConfig(enrich_top_n=1)),
+                    http_client=client,
+                ).enrich([item], [score], _context())
+            )[0]
+
+    enriched = asyncio.run(exercise())
+
+    assert enriched.metadata["quality_warnings"]
+    assert "very high open issue count" in enriched.metadata["quality_warnings"]
+    assert "README or package files were not found during enrichment" in enriched.metadata["quality_warnings"]
+    assert "missing clear topics or language metadata" in enriched.metadata["quality_warnings"]
+    assert "Watch:" not in enriched.why_it_matters
+    assert "Read the README" in enriched.action_items[0]
+
+
 def test_enricher_passes_stage_context_to_llm_ranker() -> None:
     context = _context()
     item = _repo(

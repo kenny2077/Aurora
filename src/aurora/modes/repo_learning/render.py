@@ -26,6 +26,8 @@ class RepoLearningSummarizer:
             stars = int(metadata.get("stars") or 0)
             language = metadata.get("language") or "unknown"
             package_files = ", ".join((metadata.get("package_files") or [])[:5]) or "not enriched"
+            evidence = "; ".join((metadata.get("recommendation_evidence") or [])[:6])
+            warnings = "; ".join((metadata.get("quality_warnings") or [])[:4])
             lines.extend(
                 [
                     f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
@@ -33,6 +35,8 @@ class RepoLearningSummarizer:
                     f"- Stars: {stars}",
                     f"- Language: {language}",
                     f"- Why: {item.why_it_matters}",
+                    *([f"- Evidence: {evidence}"] if evidence else []),
+                    *([f"- Watch: {warnings}"] if warnings else []),
                     f"- Study: {item.learning_value}",
                     f"- Files: {package_files}",
                     "- Actions:",

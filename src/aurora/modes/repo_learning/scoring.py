@@ -170,6 +170,10 @@ class RepoLearningEnricher:
                 metadata["score_reason"] = score.reason
                 if score.score_breakdown.get("recently_recommended_penalty", 0.0) > 0:
                     metadata["recently_recommended"] = True
+            if item.updated_at is not None:
+                metadata["updated_at"] = item.updated_at
+            metadata["recommendation_evidence"] = recommendation_evidence(metadata)
+            metadata["quality_warnings"] = quality_warnings(metadata)
 
             raw_content = _raw_content(metadata, item.raw_content)
             enriched.append(
@@ -216,20 +220,23 @@ def extract_package_files(paths: Sequence[str], *, limit: int = 30) -> list[str]
 
 def why_recommended(metadata: dict[str, Any]) -> str:
     full_name = metadata.get("full_name") or "this repository"
-    stars = int(metadata.get("stars") or 0)
-    language = metadata.get("language") or "the project stack"
-    topics = ", ".join((metadata.get("topics") or [])[:3])
-    if topics:
-        return f"{full_name} combines {language} implementation details with strong signals around {topics}."
-    if stars:
-        return f"{full_name} has strong community traction with {stars} stars and useful learning surface."
+    evidence = recommendation_evidence(metadata)
+    if evidence:
+        return (
+            f"{full_name} is worth studying because it has concrete learning evidence: "
+            f"{', '.join(evidence[:5])}."
+        )
     return f"{full_name} is a relevant repository candidate for hands-on learning."
 
 
 def what_to_study(metadata: dict[str, Any]) -> str:
-    package_files = metadata.get("package_files") or []
-    if package_files:
-        return f"Study {', '.join(package_files[:3])} to map dependencies, entrypoints, and examples."
+    groups = _study_file_groups(metadata)
+    targets = _ordered_study_targets(groups)
+    if targets:
+        return (
+            f"Study {', '.join(targets[:5])} to map dependencies, docs, examples, "
+            "automation, and project structure."
+        )
     if metadata.get("readme_excerpt"):
         return "Study the README to identify architecture, setup flow, and extension points."
     return "Study the repository description, topics, and project structure before cloning."
@@ -237,17 +244,116 @@ def what_to_study(metadata: dict[str, Any]) -> str:
 
 def repo_action_items(metadata: dict[str, Any]) -> list[str]:
     full_name = str(metadata.get("full_name") or "the repository")
+    groups = _study_file_groups(metadata)
+    targets = _ordered_study_targets(groups)
+    actions: list[str] = []
+    if targets:
+        actions.append(f"Inspect concrete learning files: {', '.join(targets[:5])}.")
+    else:
+        actions.append("Read the README and inspect the top-level project structure.")
+    if groups["examples"]:
+        actions.append(f"Trace or run the smallest example: {groups['examples'][0]}.")
+    elif groups["docs"]:
+        actions.append(f"Map the setup and architecture from {groups['docs'][0]}.")
+    elif metadata.get("readme_excerpt"):
+        actions.append("Extract setup steps, architecture notes, and extension points from the README.")
+    else:
+        actions.append(f"Clone {full_name} only after confirming it has a useful setup path.")
+    if groups["workflows"]:
+        actions.append(f"Use {groups['workflows'][0]} to understand CI or automation assumptions.")
+    else:
+        actions.append("In one week, build a small extension or integration around the core workflow.")
+    return actions[:3]
+
+
+def recommendation_evidence(metadata: dict[str, Any]) -> list[str]:
+    evidence: list[str] = []
+    stars = int(metadata.get("stars") or 0)
+    forks = int(metadata.get("forks") or 0)
+    topics = [str(topic) for topic in metadata.get("topics") or [] if str(topic).strip()]
+    package_files = [str(path) for path in metadata.get("package_files") or [] if str(path).strip()]
+    groups = _study_file_groups(metadata)
+    if stars:
+        evidence.append(f"{_format_count(stars)} stars")
+    if forks:
+        evidence.append(f"{_format_count(forks)} forks")
+    if metadata.get("updated_at") or metadata.get("pushed_at"):
+        evidence.append("active recently")
+    if metadata.get("readme_excerpt"):
+        evidence.append("README found")
+    if groups["examples"]:
+        evidence.append(groups["examples"][0])
+    if groups["docs"]:
+        evidence.append(groups["docs"][0])
+    if groups["manifests"]:
+        evidence.append(groups["manifests"][0])
+    if groups["workflows"]:
+        evidence.append(groups["workflows"][0])
+    if metadata.get("homepage"):
+        evidence.append("homepage linked")
+    if metadata.get("license"):
+        evidence.append(f"{metadata['license']} license")
+    if metadata.get("language"):
+        evidence.append(f"{metadata['language']} codebase")
+    if topics:
+        evidence.append(f"topics: {', '.join(topics[:3])}")
+    return list(dict.fromkeys(evidence))
+
+
+def quality_warnings(metadata: dict[str, Any]) -> list[str]:
+    warnings: list[str] = []
+    open_issues = int(metadata.get("open_issues") or 0)
     package_files = metadata.get("package_files") or []
-    first_action = (
-        f"Read package and example files: {', '.join(package_files[:5])}."
-        if package_files
-        else "Read the README and inspect the top-level project structure."
+    if metadata.get("repo_learning_enrichment_error"):
+        warnings.append("GitHub enrichment failed")
+    if open_issues > 500:
+        warnings.append("very high open issue count")
+    if not metadata.get("readme_excerpt") and not package_files:
+        warnings.append("README or package files were not found during enrichment")
+    if not metadata.get("topics") and not metadata.get("language"):
+        warnings.append("missing clear topics or language metadata")
+    score_breakdown = metadata.get("score_breakdown")
+    documentation_quality = (
+        float(score_breakdown.get("documentation_quality", 10.0))
+        if isinstance(score_breakdown, dict)
+        else 10.0
     )
-    return [
-        first_action,
-        f"Clone {full_name} and run the smallest documented example in one day.",
-        "In one week, build a small extension or integration around the core workflow.",
-    ]
+    if documentation_quality <= 3.0:
+        warnings.append("weak documentation signal")
+    return list(dict.fromkeys(warnings))
+
+
+def _study_file_groups(metadata: dict[str, Any]) -> dict[str, list[str]]:
+    groups = {"manifests": [], "docs": [], "examples": [], "workflows": []}
+    for raw_path in metadata.get("package_files") or []:
+        path = str(raw_path).strip()
+        if not path:
+            continue
+        lower = path.lower()
+        basename = PurePosixPath(path).name.lower()
+        if lower.startswith(".github/workflows/"):
+            groups["workflows"].append(path)
+        elif lower.startswith(("examples/", "example/")):
+            groups["examples"].append(path)
+        elif lower.startswith("docs/"):
+            groups["docs"].append(path)
+        elif basename in PACKAGE_BASENAMES:
+            groups["manifests"].append(path)
+    return groups
+
+
+def _ordered_study_targets(groups: dict[str, list[str]]) -> list[str]:
+    targets: list[str] = []
+    for key in ("manifests", "docs", "examples", "workflows"):
+        targets.extend(groups[key][:2])
+    return list(dict.fromkeys(targets))
+
+
+def _format_count(value: int) -> str:
+    if value < 1000:
+        return str(value)
+    compact = f"{value / 1000:.1f}".rstrip("0").rstrip(".")
+    return f"{compact}k"
 
 
 def _fetch_repo_context_error(metadata: dict[str, Any], error: Exception) -> None:
