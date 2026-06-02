@@ -166,6 +166,9 @@ def _run_summary_lines(context: StageContext) -> list[str]:
     child_line = _child_mode_summary_line(child_summaries)
     if child_line:
         lines.append(child_line)
+    child_warning_lines = _child_warning_lines(child_summaries)
+    if child_warning_lines:
+        lines.extend(child_warning_lines)
 
     if isinstance(mode_failures, list):
         for failure in mode_failures:
@@ -206,6 +209,24 @@ def _child_mode_summary_line(child_summaries: object) -> str:
     if not parts:
         return ""
     return f"Child modes: {', '.join(parts)}."
+
+
+def _child_warning_lines(child_summaries: object) -> list[str]:
+    if not isinstance(child_summaries, list):
+        return []
+    lines: list[str] = []
+    for summary in child_summaries:
+        if not isinstance(summary, dict):
+            continue
+        mode = str(summary.get("mode") or "unknown")
+        warnings = summary.get("warnings")
+        if not isinstance(warnings, list):
+            continue
+        for warning in warnings:
+            text = str(warning).strip()
+            if text:
+                lines.append(f"{mode} warning: {text}")
+    return lines
 
 
 def _connection_lines(items: Sequence[SignalItem]) -> list[str]:

@@ -4,7 +4,11 @@ import asyncio
 from datetime import datetime, timezone
 from pathlib import Path
 
+import httpx
+
 from aurora.config import AuroraConfig, RunConfig, UnifiedDigestModeConfig
+from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.scoring import ScholarEnricher
 from aurora.modes.repo_learning.state import RepoLearningStateStore
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer
@@ -173,6 +177,9 @@ def test_unified_summary_includes_run_summary_and_source_health() -> None:
                     "mode": "scholar",
                     "counts": {"enriched": 0},
                     "source_health": {"ok": 0, "failed": 1, "rate_limited": 1},
+                    "warnings": [
+                        "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+                    ],
                 },
             ],
         },
@@ -191,6 +198,7 @@ def test_unified_summary_includes_run_summary_and_source_health() -> None:
     assert "Sources: 1 ok, 1 failed, 1 rate limited." in summary
     assert "arxiv failed: 429 Too Many Requests" in summary
     assert "Child modes: tech_news 1 item(s), scholar 0 item(s)." in summary
+    assert "scholar warning: Semantic Scholar enrichment rate-limited" in summary
 
 
 def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:
@@ -604,6 +612,43 @@ def test_unified_fetch_collects_cached_scholar_papers(tmp_path: Path) -> None:
     assert collected[0].metadata["cached_fallback"] is True
 
 
+def test_unified_fetch_keeps_scholar_papers_when_semantic_scholar_rate_limits(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(429, json={"message": "Too Many Requests"})
+
+    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    config = AuroraConfig(
+        run=RunConfig(output_dir=tmp_path, cache_dir=tmp_path / "cache"),
+        modes={"unified_digest": {"include_modes": ["scholar"]}},
+    )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
+
+    async def exercise() -> list[SignalItem]:
+        try:
+            return await UnifiedFetchStage(
+                config,
+                {"scholar": lambda config: _semantic_scholar_pipeline(config, client)},
+            ).fetch(context)
+        finally:
+            await client.aclose()
+
+    collected = asyncio.run(exercise())
+
+    assert len(requests) == 1
+    assert [item.id for item in collected] == ["paper:semantic"]
+    assert "unified_mode_failures" not in context.metadata
+    child_summary = context.metadata["unified_child_run_summaries"][0]
+    assert child_summary["warnings"] == [
+        "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+    ]
+
+
 def _item(
     item_id: str,
     item_type: str,
@@ -661,6 +706,27 @@ def _cached_pipeline(mode: str, item: SignalItem) -> ModePipeline:
         deduplicate_stage=_Dedup(),
         score_stage=_Score(),
         enrich_stage=_CachedEnrich(item),
+        summarize_stage=_Summarize(),
+        render_stage=_Render(),
+        deliver_stage=_Deliver([]),
+    )
+
+
+def _semantic_scholar_pipeline(config: AuroraConfig, client: httpx.AsyncClient) -> ModePipeline:
+    paper = _item(
+        "paper:semantic",
+        "paper",
+        "Semantic Paper",
+        8.0,
+        metadata={"source_ids": {"arxiv": "2606.1"}},
+    )
+    return ModePipeline(
+        mode="scholar",
+        fetch_stages=[_Fetch([paper])],
+        normalize_stage=_Normalize(),
+        deduplicate_stage=_Dedup(),
+        score_stage=_Score(),
+        enrich_stage=ScholarEnricher(config.modes.scholar, http_client=client),
         summarize_stage=_Summarize(),
         render_stage=_Render(),
         deliver_stage=_Deliver([]),

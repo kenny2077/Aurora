@@ -146,6 +146,7 @@ class PipelineRunner:
             enriched_count=len(enriched_items),
             source_statuses=source_statuses,
             source_quality=_source_quality(context, pipeline.mode, source_statuses),
+            context_metadata=context.metadata,
         )
         context.metadata["run_summary"] = run_summary
 
@@ -169,6 +170,7 @@ class PipelineRunner:
             delivery_results=delivery_results,
             output_paths=output_paths,
             source_quality=context.metadata.get("source_quality"),
+            context_metadata=context.metadata,
         )
         _write_json(run_summary_path, final_run_summary)
 
@@ -215,6 +217,7 @@ def _run_summary(
     delivery_results: list[DeliveryResult] | None = None,
     output_paths: dict[str, Path] | None = None,
     source_quality: object | None = None,
+    context_metadata: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     summary: dict[str, Any] = {
         "run_id": run_id,
@@ -244,6 +247,9 @@ def _run_summary(
         }
     if isinstance(source_quality, dict):
         summary["source_quality"] = source_quality
+    warnings = _summary_warnings(context_metadata)
+    if warnings:
+        summary["warnings"] = warnings
     return summary
 
 
@@ -267,6 +273,21 @@ def _redact_secret_like_text(value: str) -> str:
     for pattern in patterns:
         redacted = re.sub(pattern, r"\1[REDACTED]", redacted)
     return redacted
+
+
+def _summary_warnings(context_metadata: dict[str, Any] | None) -> list[str]:
+    if not isinstance(context_metadata, dict):
+        return []
+    warnings: list[str] = []
+    for key in ("warnings", "semantic_scholar_warnings"):
+        raw_warnings = context_metadata.get(key)
+        if not isinstance(raw_warnings, list):
+            continue
+        for warning in raw_warnings:
+            text = _redact_secret_like_text(str(warning)).strip()
+            if text and text not in warnings:
+                warnings.append(text)
+    return warnings
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> Path:

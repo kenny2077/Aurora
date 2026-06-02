@@ -129,24 +129,26 @@ class ScholarEnricher:
             analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
             enriched = [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
         if self.config is not None:
-            enriched = await self._semantic_scholar_enrich(enriched)
+            enriched = await self._semantic_scholar_enrich(enriched, context)
         if self.config is not None and self.config.fallback_cache_enabled:
             write_scholar_cache(enriched, context)
         return enriched
 
-    async def _semantic_scholar_enrich(self, items: list[SignalItem]) -> list[SignalItem]:
+    async def _semantic_scholar_enrich(
+        self, items: list[SignalItem], context: StageContext
+    ) -> list[SignalItem]:
         if self.config is None:
             return items
         if self.http_client is not None:
             return await SemanticScholarClient(
                 self.config.sources.semantic_scholar,
                 http_client=self.http_client,
-            ).enrich_items(items)
+            ).enrich_items(items, context)
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             return await SemanticScholarClient(
                 self.config.sources.semantic_scholar,
                 http_client=client,
-            ).enrich_items(items)
+            ).enrich_items(items, context)
 
 
 def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:

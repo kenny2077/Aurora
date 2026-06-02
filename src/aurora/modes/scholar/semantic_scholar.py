@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
+from json import JSONDecodeError
 from typing import Any
 from urllib.parse import quote
 
@@ -11,10 +12,17 @@ import httpx
 
 from aurora.config import SemanticScholarSourceConfig
 from aurora.models import SignalItem
+from aurora.pipeline import StageContext
 
 
 SEMANTIC_SCHOLAR_API_URL = "https://api.semanticscholar.org/graph/v1"
 FIELDS = "paperId,url,externalIds,citationCount,influentialCitationCount"
+RATE_LIMIT_WARNING = (
+    "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+)
+FAILURE_WARNING = (
+    "Semantic Scholar enrichment skipped for one or more papers; deterministic scholar scoring used."
+)
 
 
 class SemanticScholarClient:
@@ -34,13 +42,16 @@ class SemanticScholarClient:
     def is_configured(self) -> bool:
         return self.config.enabled and bool(os.getenv(self.config.api_key_env))
 
-    async def enrich_items(self, items: Sequence[SignalItem]) -> list[SignalItem]:
+    async def enrich_items(
+        self, items: Sequence[SignalItem], context: StageContext | None = None
+    ) -> list[SignalItem]:
         if not self.is_configured() or self.config.max_requests_per_run == 0:
             return list(items)
         enriched: list[SignalItem] = []
         request_count = 0
+        rate_limited = False
         for item in items:
-            if request_count >= self.config.max_requests_per_run:
+            if rate_limited or request_count >= self.config.max_requests_per_run:
                 enriched.append(item)
                 continue
             paper_id = _lookup_id(item)
@@ -48,7 +59,13 @@ class SemanticScholarClient:
                 enriched.append(item)
                 continue
             request_count += 1
-            metadata = await self._fetch_metadata(paper_id)
+            try:
+                metadata = await self._fetch_metadata(paper_id)
+            except (httpx.HTTPError, JSONDecodeError, ValueError, TypeError) as exc:
+                rate_limited = _is_rate_limit_error(exc)
+                _record_failure(context, item, paper_id, exc, rate_limited=rate_limited)
+                enriched.append(item)
+                continue
             enriched.append(_apply_metadata(item, metadata) if metadata else item)
         return enriched
 
@@ -107,3 +124,55 @@ def _apply_metadata(item: SignalItem, payload: dict[str, Any]) -> SignalItem:
         source_ids["arxiv"] = str(external_ids["ArXiv"])
     metadata["source_ids"] = source_ids
     return item.model_copy(update={"metadata": metadata})
+
+
+def _is_rate_limit_error(exc: Exception) -> bool:
+    return isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429
+
+
+def _record_failure(
+    context: StageContext | None,
+    item: SignalItem,
+    paper_id: str,
+    exc: Exception,
+    *,
+    rate_limited: bool,
+) -> None:
+    if context is None:
+        return
+    context.metadata["semantic_scholar_enrichment_failed_count"] = (
+        int(context.metadata.get("semantic_scholar_enrichment_failed_count") or 0) + 1
+    )
+    if rate_limited:
+        context.metadata["semantic_scholar_rate_limited"] = True
+    warning = RATE_LIMIT_WARNING if rate_limited else FAILURE_WARNING
+    warnings = context.metadata.setdefault("semantic_scholar_warnings", [])
+    if isinstance(warnings, list) and warning not in warnings:
+        warnings.append(warning)
+    failures = context.metadata.setdefault("semantic_scholar_failures", [])
+    if isinstance(failures, list):
+        failures.append(
+            {
+                "item_id": item.id,
+                "paper_id": paper_id,
+                "status_code": _status_code(exc),
+                "rate_limited": rate_limited,
+                "error": _error_summary(exc),
+            }
+        )
+
+
+def _status_code(exc: Exception) -> int | None:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return exc.response.status_code
+    return None
+
+
+def _error_summary(exc: Exception) -> str:
+    if isinstance(exc, httpx.HTTPStatusError):
+        return f"HTTP {exc.response.status_code} {exc.response.reason_phrase}".strip()
+    if isinstance(exc, httpx.RequestError):
+        return exc.__class__.__name__
+    if isinstance(exc, JSONDecodeError):
+        return "invalid JSON response"
+    return exc.__class__.__name__

@@ -293,6 +293,75 @@ def test_semantic_scholar_enrichment_honors_request_cap(monkeypatch) -> None:
     assert enriched[1].metadata.get("semantic_scholar_paper_id") is None
 
 
+def test_semantic_scholar_rate_limit_does_not_kill_scholar_enrichment(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(429, json={"message": "Too Many Requests"})
+
+    config = ScholarModeConfig()
+    items = [
+        _paper("first", "First", {"source_ids": {"arxiv": "2606.1"}}),
+        _paper("second", "Second", {"source_ids": {"arxiv": "2606.2"}}),
+    ]
+    scores = asyncio.run(ScholarScorer(config).score(items, _context()))
+    context = _cached_context(tmp_path)
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                items, scores, context
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert len(requests) == 1
+    assert [item.id for item in enriched] == ["first", "second"]
+    assert all(item.final_score is not None for item in enriched)
+    assert all(item.why_it_matters for item in enriched)
+    assert all(item.learning_value for item in enriched)
+    assert context.metadata["semantic_scholar_rate_limited"] is True
+    assert context.metadata["semantic_scholar_enrichment_failed_count"] == 1
+    assert "Semantic Scholar enrichment rate-limited" in context.metadata["semantic_scholar_warnings"][0]
+    assert (tmp_path / "cache" / CACHE_RELATIVE_PATH).exists()
+
+
+def test_semantic_scholar_failures_do_not_kill_scholar_enrichment(monkeypatch) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    item = _paper("paper", "Reasoning", {"source_ids": {"arxiv": "2606.1"}})
+    config = ScholarModeConfig()
+    score = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+
+    async def exercise_with(handler) -> tuple[list[SignalItem], StageContext]:
+        context = _context()
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            enriched = await ScholarEnricher(config, http_client=client).enrich(
+                [item], [score], context
+            )
+        return enriched, context
+
+    async def network_error(request: httpx.Request) -> httpx.Response:
+        raise httpx.ConnectError("connection failed", request=request)
+
+    cases = [
+        lambda request: httpx.Response(500, json={"message": "server error"}),
+        lambda request: httpx.Response(200, content=b"not-json"),
+        network_error,
+    ]
+
+    for handler in cases:
+        enriched, context = asyncio.run(exercise_with(handler))
+
+        assert [paper.id for paper in enriched] == ["paper"]
+        assert enriched[0].final_score == score.final_score
+        assert context.metadata["semantic_scholar_enrichment_failed_count"] == 1
+        assert context.metadata["semantic_scholar_warnings"]
+
+
 def test_markdown_rendering_is_stable_score_ordered_and_capped() -> None:
     config = ScholarModeConfig(final_item_count=1, score_threshold=0)
     low = _paper("low", "Low Paper", {"authors": ["Low"]}).model_copy(update={"final_score": 4.0})
