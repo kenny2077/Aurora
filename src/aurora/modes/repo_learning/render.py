@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from aurora.config import RepoLearningModeConfig
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
+from aurora.presentation import render_repo_digest_html
 
 
 class RepoLearningSummarizer:
@@ -57,11 +58,16 @@ class RepoLearningRenderer:
         self, summary: str, items: Sequence[SignalItem], context: StageContext
     ) -> RenderedDigest:
         selected = _selected_items(items, self.config)
+        html, web_html = render_repo_digest_html("Aurora Repo Learning", selected, context)
         return RenderedDigest(
             mode="repo_learning",
             title="Aurora Repo Learning",
             markdown=summary,
-            metadata={"recommended_repo_ids": [item.id for item in selected]},
+            html=html,
+            metadata={
+                "recommended_repo_ids": [item.id for item in selected],
+                "web_html": web_html,
+            },
         )
 
 

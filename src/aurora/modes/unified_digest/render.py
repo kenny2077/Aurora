@@ -13,6 +13,7 @@ from aurora.modes.tech_news.notes import (
 from aurora.modes.unified_digest.connections import build_connections
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
+from aurora.presentation import render_unified_digest_html
 
 
 SECTION_TITLES = {
@@ -74,10 +75,19 @@ class UnifiedDigestRenderer:
         self, summary: str, items: Sequence[SignalItem], context: StageContext
     ) -> RenderedDigest:
         selected = select_items(items, self.config)
+        connections = build_connections(selected)
+        html, web_html = render_unified_digest_html(
+            "Aurora Unified Digest",
+            selected,
+            context,
+            connections,
+            self.config.section_order,
+        )
         return RenderedDigest(
             mode="unified_digest",
             title="Aurora Unified Digest",
             markdown=summary,
+            html=html,
             metadata={
                 "selected_item_ids": [item.id for item in selected],
                 "recommended_repo_ids": [item.id for item in selected if item.type == "repo"],
@@ -85,7 +95,8 @@ class UnifiedDigestRenderer:
                     item_type: sum(1 for item in selected if item.type == item_type)
                     for item_type in self.config.section_order
                 },
-                "connections": build_connections(selected),
+                "connections": connections,
+                "web_html": web_html,
             },
         )
 

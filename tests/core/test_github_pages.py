@@ -15,9 +15,11 @@ def test_github_pages_delivery_writes_jekyll_site(tmp_path: Path) -> None:
         mode="unified_digest",
         title="Aurora Unified Digest",
         markdown="# Aurora Unified Digest\n\n## Research Papers\n\n1. [Paper](https://example.com) - 9.2/10",
+        html="<html>email</html>",
         metadata={
             "item_counts": {"paper": 1, "repo": 0, "news": 0},
             "selected_item_ids": ["paper:one"],
+            "web_html": '<section class="aurora-section"><article class="aurora-card">Product UI</article></section>',
         },
     )
     context = StageContext(
@@ -52,6 +54,9 @@ def test_github_pages_delivery_writes_jekyll_site(tmp_path: Path) -> None:
     assert "## Latest Published Digest" in index
     assert "{{ latest.content }}" in index
     assert ".aurora-latest-digest" in css
+    assert ".aurora-card" in css
+    assert ".aurora-kpis" in css
+    assert ".aurora-warning" in css
     repo_page = (site_dir / "repo_learning" / "index.md").read_text(encoding="utf-8")
     assert "No dedicated Repo Learning digest has been published yet." in repo_page
     assert "latest unified digest" in repo_page
@@ -62,7 +67,9 @@ def test_github_pages_delivery_writes_jekyll_site(tmp_path: Path) -> None:
     assert "run_id: \"run-20260526T033547Z\"" in post
     assert "item_count: 1" in post
     assert "paper: 1" in post
-    assert "# Aurora Unified Digest" in post
+    assert "Product UI" in post
+    assert "aurora-card" in post
+    assert "# Aurora Unified Digest" not in post
     assert "Aurora run did not publish a site artifact" not in post
 
 
@@ -88,3 +95,28 @@ def test_github_pages_latest_mode_page_links_archive_post(tmp_path: Path) -> Non
     assert "permalink: \"/tech_news/\"" in latest
     assert "/archive/2026-05-26-tech-news/" in latest
     assert "Selected 2 tech news item(s)." in latest
+
+
+def test_github_pages_falls_back_to_markdown_when_web_html_absent(tmp_path: Path) -> None:
+    context = StageContext(
+        mode="tech_news",
+        run_id="run-1",
+        until=datetime(2026, 5, 25, 16, 0, tzinfo=timezone.utc),
+        config=AuroraConfig(),
+    )
+
+    write_pages_artifact(
+        RenderedDigest(
+            mode="tech_news",
+            title="Aurora Tech News",
+            markdown="# Aurora Tech News\n\nSelected 2 tech news item(s).",
+        ),
+        context,
+        GitHubPagesDeliveryConfig(publish_dir=tmp_path / "site"),
+    )
+
+    post = (tmp_path / "site" / "_posts" / "2026-05-26-tech-news.md").read_text(
+        encoding="utf-8"
+    )
+    assert "# Aurora Tech News" in post
+    assert "Selected 2 tech news item(s)." in post

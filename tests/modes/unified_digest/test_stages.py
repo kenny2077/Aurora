@@ -103,6 +103,10 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     assert rendered.metadata["selected_item_ids"] == ["repo:2", "paper:1"]
     assert rendered.metadata["recommended_repo_ids"] == ["repo:2"]
     assert rendered.metadata["item_counts"] == {"repo": 1, "paper": 1, "news": 0}
+    assert rendered.html is not None
+    assert "Today's Learning Path" in rendered.html
+    assert "aurora-repo-card" in rendered.html
+    assert "web_html" in rendered.metadata
 
 
 def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other_sections() -> None:
@@ -131,6 +135,8 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Repositories" in summary
     assert "Tech News" in summary
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
+    assert "Research Papers" in str(rendered.metadata["web_html"])
+    assert "Tech News" in str(rendered.metadata["web_html"])
 
 
 def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
@@ -165,6 +171,7 @@ def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
     context = StageContext(mode="unified_digest", run_id="test")
 
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([repo, paper, news], context))
+    rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, [repo, paper, news], context))
 
     assert "### Repo to Study" in summary
     assert "  - Evidence: 6k stars; README found; examples/quickstart.py" in summary
@@ -174,6 +181,9 @@ def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
     assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
+    assert "Evidence-backed" not in str(rendered.metadata["web_html"])
+    assert "Evidence:" in str(rendered.metadata["web_html"])
+    assert "Watch:" in str(rendered.metadata["web_html"])
 
 
 def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
@@ -297,6 +307,15 @@ def test_unified_summary_includes_run_summary_and_source_health() -> None:
     assert "arxiv failed: 429 Too Many Requests" in summary
     assert "Child modes: tech_news 1 item(s), scholar 0 item(s)." in summary
     assert "scholar warning: Semantic Scholar enrichment rate-limited" in summary
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            summary,
+            [_item("paper:1", "paper", "Paper", 8.0)],
+            context,
+        )
+    )
+    assert "Run diagnostics" in str(rendered.metadata["web_html"])
+    assert "Semantic Scholar enrichment rate-limited" in str(rendered.metadata["web_html"])
 
 
 def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:

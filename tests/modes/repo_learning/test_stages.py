@@ -408,6 +408,11 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert "org/high" in summary
     assert "org/low" not in summary
     assert rendered.metadata["recommended_repo_ids"] == ["repo:org/high"]
+    assert rendered.html is not None
+    assert "aurora-repo-card" in rendered.html
+    assert rendered.metadata["web_html"]
+    assert "org/high" in str(rendered.metadata["web_html"])
+    assert "pyproject.toml" in str(rendered.metadata["web_html"])
     assert delivery[0].metadata["recommended_count"] == 1
     assert recent == {"repo:org/high"}
 

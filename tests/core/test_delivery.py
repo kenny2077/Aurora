@@ -1,13 +1,21 @@
 from __future__ import annotations
 
 import asyncio
+import smtplib
 from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
 
-from aurora.config import AuroraConfig, DeliveryConfig, FilesystemDeliveryConfig, GitHubPagesDeliveryConfig
+from aurora.config import (
+    AuroraConfig,
+    DeliveryConfig,
+    EmailDeliveryConfig,
+    FilesystemDeliveryConfig,
+    GitHubPagesDeliveryConfig,
+)
 from aurora.delivery import ConfiguredDeliveryStage
+from aurora.delivery.email import send_email
 from aurora.models import RenderedDigest
 from aurora.pipeline import StageContext
 
@@ -97,6 +105,53 @@ def test_configured_delivery_can_skip_delivery(tmp_path: Path) -> None:
 
     assert results[0].metadata == {"skipped": True}
     assert not (tmp_path / "reports").exists()
+
+
+def test_email_delivery_sends_html_alternative_when_present(monkeypatch) -> None:
+    sent_messages = []
+
+    class FakeSMTP:
+        def __init__(self, host: str, port: int) -> None:
+            self.host = host
+            self.port = port
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, tb) -> None:
+            return None
+
+        def login(self, username: str, password: str) -> None:
+            assert username == "sender@example.com"
+            assert password == "password"
+
+        def send_message(self, message) -> None:
+            sent_messages.append(message)
+
+    monkeypatch.setenv("AURORA_TEST_RECIPIENTS", "reader@example.com")
+    monkeypatch.setenv("AURORA_TEST_SMTP_USERNAME", "sender@example.com")
+    monkeypatch.setenv("AURORA_TEST_EMAIL_PASSWORD", "password")
+    monkeypatch.setattr(smtplib, "SMTP_SSL", FakeSMTP)
+
+    result = send_email(
+        RenderedDigest(
+            mode="repo_learning",
+            title="Aurora Repo Learning",
+            markdown="# Plain text",
+            html="<html><body><main>Product UI</main></body></html>",
+        ),
+        EmailDeliveryConfig(
+            recipients_env="AURORA_TEST_RECIPIENTS",
+            smtp_username_env="AURORA_TEST_SMTP_USERNAME",
+            password_env="AURORA_TEST_EMAIL_PASSWORD",
+        ),
+    )
+
+    assert result.ok is True
+    assert len(sent_messages) == 1
+    message = sent_messages[0]
+    assert message.get_body(preferencelist=("plain",)).get_content().strip() == "# Plain text"
+    assert "Product UI" in message.get_body(preferencelist=("html",)).get_content()
 
 
 def test_strict_delivery_raises_when_channel_fails(tmp_path: Path) -> None:
