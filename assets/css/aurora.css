@@ -1,20 +1,27 @@
 body {
-  color: #1c2430;
+  background: #f6f8fb;
+  color: #172033;
 }
 
 .page-header {
-  background-color: #12355b;
-  background-image: linear-gradient(120deg, #12355b, #3d7a89);
+  background-color: #0f172a;
+  background-image: linear-gradient(120deg, #0f172a, #0f6bff);
+  padding: 3rem 1rem 2.5rem;
 }
 
 .main-content {
-  max-width: 980px;
+  max-width: 1120px;
+  color: #172033;
+}
+
+.main-content a {
+  color: #0f6bff;
 }
 
 .main-content h1,
 .main-content h2,
 .main-content h3 {
-  color: #12355b;
+  color: #172033;
 }
 
 .aurora-mode-nav {
@@ -26,9 +33,9 @@ body {
 
 .aurora-mode-nav a,
 .aurora-pill {
-  border: 1px solid #c7d5df;
+  border: 1px solid #dce4ee;
   border-radius: 6px;
-  color: #12355b;
+  color: #0f3f8c;
   display: inline-block;
   font-size: 0.85rem;
   line-height: 1.2;
@@ -37,11 +44,11 @@ body {
 }
 
 .aurora-mode-nav a:hover {
-  background: #eef6f8;
+  background: #e8f2ff;
 }
 
 .aurora-pill {
-  background: #eef6f8;
+  background: #e8f2ff;
   margin-left: 0.35rem;
 }
 
@@ -50,7 +57,7 @@ body {
 }
 
 .aurora-latest-digest {
-  border-top: 1px solid #d6e1e7;
+  border-top: 1px solid #dce4ee;
   margin: 1.25rem 0 2rem;
   padding-top: 0.5rem;
 }
@@ -62,4 +69,107 @@ body {
 
 .main-content li {
   margin: 0.35rem 0;
+}
+
+.aurora-kpis {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin: 1rem 0 1.5rem;
+}
+
+.aurora-kpi,
+.aurora-card,
+.aurora-row {
+  background: #ffffff;
+  border: 1px solid #dce4ee;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.aurora-kpi {
+  padding: 0.9rem 1rem;
+}
+
+.aurora-kpi b {
+  color: #172033;
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.aurora-kpi span,
+.aurora-meta {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.aurora-section {
+  margin: 1.75rem 0;
+}
+
+.aurora-card {
+  margin: 0 0 1rem;
+  padding: 1rem;
+}
+
+.aurora-repo-card h3,
+.aurora-row h3 {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: space-between;
+  margin: 0 0 0.5rem;
+}
+
+.aurora-card p,
+.aurora-row p {
+  margin: 0.55rem 0;
+}
+
+.aurora-score,
+.aurora-badge {
+  border-radius: 6px;
+  display: inline-block;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  padding: 0.25rem 0.45rem;
+}
+
+.aurora-score {
+  background: #e8f2ff;
+  color: #0b5bd3;
+  font-weight: 700;
+}
+
+.aurora-badge {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #334155;
+  margin: 0 0.25rem 0.25rem 0;
+}
+
+.aurora-badge-good {
+  background: #ecfdf5;
+  border-color: #bbf7d0;
+  color: #047857;
+}
+
+.aurora-warning {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: 8px;
+  color: #92400e;
+  margin: 0.75rem 0;
+  padding: 0.65rem 0.75rem;
+}
+
+.aurora-actions {
+  margin: 0.75rem 0 0;
+}
+
+.aurora-row {
+  margin: 0 0 0.75rem;
+  padding: 0.9rem 1rem;
 }
