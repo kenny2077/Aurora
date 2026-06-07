@@ -60,6 +60,7 @@ class UnifiedDigestSummarizer:
                         f"   - Why: {why}",
                     ]
                 )
+                lines.extend(_paper_signal_lines(item, indent="   "))
                 lines.extend(_repo_signal_lines(item, indent="   "))
             lines.append("")
         return "\n".join(lines).rstrip()
@@ -306,6 +307,22 @@ def _repo_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
         lines.append(f"{indent}- Evidence: {'; '.join(evidence[:6])}")
     if warnings:
         lines.append(f"{indent}- Watch: {'; '.join(warnings[:4])}")
+    return lines
+
+
+def _paper_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
+    if item.type != "paper":
+        return []
+    lines: list[str] = []
+    learning = _learning_text(item)
+    if learning:
+        lines.append(f"{indent}- Learn: {learning}")
+    action_items = _action_items(item)
+    if action_items:
+        lines.append(f"{indent}- Action: {'; '.join(action_items)}")
+    semantic_url = str(item.metadata.get("semantic_scholar_url") or "").strip()
+    if semantic_url:
+        lines.append(f"{indent}- Semantic Scholar: {semantic_url}")
     return lines
 
 

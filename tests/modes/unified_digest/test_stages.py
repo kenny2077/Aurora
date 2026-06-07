@@ -618,6 +618,36 @@ def test_unified_summary_starts_with_learning_path() -> None:
     assert "Fourth News" not in summary.split("## Research Papers", maxsplit=1)[0]
 
 
+def test_unified_paper_section_includes_analysis_actions_and_semantic_scholar_link() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=2,
+        max_total_items=6,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:1",
+        "paper",
+        "Analyzed Paper",
+        9.0,
+        metadata={"semantic_scholar_url": "https://www.semanticscholar.org/paper/S2"},
+        why_it_matters="This clarifies an agent evaluation method.",
+        learning_value="Study the benchmark design.",
+        action_items=["Read the method.", "Compare the experiments."],
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [paper],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    section = summary.split("## Research Papers", maxsplit=1)[1]
+    assert "Learn: Study the benchmark design." in section
+    assert "Action: Read the method.; Compare the experiments." in section
+    assert "Semantic Scholar: https://www.semanticscholar.org/paper/S2" in section
+
+
 def test_unified_learning_path_notes_missing_types_and_fallback_actions() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,

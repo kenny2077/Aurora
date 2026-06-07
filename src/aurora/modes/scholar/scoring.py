@@ -103,52 +103,101 @@ class ScholarEnricher:
                 context.metadata["scholar_cached_fallback_used"] = True
             return cached
 
-        scores_by_id = {score.item_id: score for score in score_results}
-        enriched: list[SignalItem] = []
-        for item in items:
-            score = scores_by_id.get(item.id)
-            if score is None:
-                enriched.append(item)
-                continue
-            metadata = dict(item.metadata)
-            metadata["score_breakdown"] = score.score_breakdown
-            metadata["score_reason"] = score.reason
-            enriched.append(
-                item.model_copy(
-                    update={
-                        "deterministic_score": score.deterministic_score,
-                        "final_score": score.final_score,
-                        "tags": score.tags,
-                        "metadata": metadata,
-                        "why_it_matters": _why_it_matters(item),
-                        "learning_value": _learning_value(item),
-                    }
-                )
-            )
-        if self.llm_ranker is not None:
-            analyses = await self.llm_ranker.analyze_items(enriched, build_scholar_prompt, context)
-            enriched = [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        enriched = _apply_score_results(items, score_results)
         if self.config is not None:
-            enriched = await self._semantic_scholar_enrich(enriched, context)
+            enriched = await self._semantic_scholar_enrich_top_candidates(enriched, context)
+            rescored = await ScholarScorer(self.config).score(enriched, context)
+            enriched = _apply_score_results(enriched, rescored)
+        if self.llm_ranker is not None:
+            enriched = await self._llm_analyze_top_candidates(enriched, context)
         if self.config is not None and self.config.fallback_cache_enabled:
             write_scholar_cache(enriched, context)
         return enriched
 
-    async def _semantic_scholar_enrich(
+    async def _semantic_scholar_enrich_top_candidates(
         self, items: list[SignalItem], context: StageContext
     ) -> list[SignalItem]:
         if self.config is None:
             return items
+        ordered = sorted(items, key=_item_score, reverse=True)
         if self.http_client is not None:
-            return await SemanticScholarClient(
+            enriched_ordered = await SemanticScholarClient(
                 self.config.sources.semantic_scholar,
                 http_client=self.http_client,
-            ).enrich_items(items, context)
+            ).enrich_items(ordered, context)
+            return _restore_item_order(items, enriched_ordered)
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
-            return await SemanticScholarClient(
+            enriched_ordered = await SemanticScholarClient(
                 self.config.sources.semantic_scholar,
                 http_client=client,
-            ).enrich_items(items, context)
+            ).enrich_items(ordered, context)
+            return _restore_item_order(items, enriched_ordered)
+
+    async def _llm_analyze_top_candidates(
+        self, items: list[SignalItem], context: StageContext
+    ) -> list[SignalItem]:
+        if self.llm_ranker is None:
+            return items
+        candidate_count = len(items)
+        if self.config is not None:
+            candidate_count = min(len(items), max(self.config.final_item_count * 4, self.config.final_item_count))
+        ordered = sorted(items, key=_item_score, reverse=True)
+        candidates = ordered[:candidate_count]
+        analyses = await self.llm_ranker.analyze_items(candidates, build_scholar_prompt, context)
+        analyzed_by_id = {
+            item.id: self.llm_ranker.apply_analysis(item, analyses.get(item.id))
+            for item in candidates
+        }
+        return [analyzed_by_id.get(item.id, item) for item in items]
+
+
+def _apply_score_results(
+    items: Sequence[SignalItem], score_results: Sequence[ScoreResult]
+) -> list[SignalItem]:
+    scores_by_id = {score.item_id: score for score in score_results}
+    enriched: list[SignalItem] = []
+    for item in items:
+        score = scores_by_id.get(item.id)
+        if score is None:
+            enriched.append(item)
+            continue
+        metadata = dict(item.metadata)
+        metadata["score_breakdown"] = dict(score.score_breakdown)
+        metadata["score_reason"] = score.reason
+        enriched.append(
+            item.model_copy(
+                update={
+                    "metadata": metadata,
+                    "deterministic_score": score.deterministic_score,
+                    "final_score": score.final_score,
+                    "tags": list(dict.fromkeys([*item.tags, *score.tags])),
+                    "why_it_matters": item.why_it_matters or _why_it_matters(item),
+                    "learning_value": item.learning_value or _learning_value(item),
+                    "action_items": item.action_items or _default_action_items(item),
+                }
+            )
+        )
+    return enriched
+
+
+def _restore_item_order(
+    original: Sequence[SignalItem], enriched_ordered: Sequence[SignalItem]
+) -> list[SignalItem]:
+    enriched_by_id = {item.id: item for item in enriched_ordered}
+    return [enriched_by_id.get(item.id, item) for item in original]
+
+
+def _item_score(item: SignalItem) -> float:
+    return item.final_score if item.final_score is not None else item.deterministic_score or 0.0
+
+
+def _default_action_items(item: SignalItem) -> list[str]:
+    actions = ["Read the abstract and identify the core contribution."]
+    if item.metadata.get("code_urls") or item.metadata.get("project_urls"):
+        actions.append("Inspect the linked implementation or project page.")
+    if item.metadata.get("semantic_scholar_url"):
+        actions.append("Check citation context and related work on Semantic Scholar.")
+    return actions
 
 
 def _venue_signal(item: SignalItem, config: ScholarModeConfig) -> float:

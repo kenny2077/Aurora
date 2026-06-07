@@ -179,12 +179,21 @@ def render_repo_card(item: SignalItem) -> str:
 
 def render_item_row(item: SignalItem) -> str:
     why = item.why_it_matters or item.summary or item.raw_content
+    learning_html = ""
+    if item.type == "paper":
+        learning = item.learning_value or item.summary
+        if learning:
+            learning_html += f"<p><b>Learn:</b> {escape(learning)}</p>"
+        if item.action_items:
+            actions = "".join(f"<li>{escape(action)}</li>" for action in item.action_items[:3])
+            learning_html += f'<ul class="aurora-actions">{actions}</ul>'
     return (
         '<article class="aurora-row">'
         f'<h3><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '
         f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
         f'<p class="aurora-meta">{escape(item.source)}</p>'
         f"<p>{escape(why)}</p>"
+        f"{learning_html}"
         "</article>"
     )
 
@@ -228,12 +237,18 @@ def _learning_path_html(items: Sequence[SignalItem]) -> str:
         if item.type == "repo":
             cards.append(render_repo_card(item))
         else:
+            learning_html = (
+                f"<p><b>Learn:</b> {escape(item.learning_value)}</p>"
+                if item.type == "paper" and item.learning_value
+                else ""
+            )
             cards.append(
                 '<article class="aurora-card">'
                 f'<h3>{escape(label)}</h3>'
                 f'<p><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '
                 f'<span class="aurora-score">{_score(item):.1f}/10</span></p>'
                 f"<p>{escape(item.why_it_matters or item.summary or item.raw_content)}</p>"
+                f"{learning_html}"
                 "</article>"
             )
     return '<section class="aurora-section"><h2>Today\'s Learning Path</h2>' + "".join(cards) + "</section>"
@@ -314,10 +329,8 @@ def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:
 def _top_terms(values) -> list[str]:
     terms: list[str] = []
     for value in values:
-        if value is None:
-            continue
         term = str(value).strip()
-        if term:
+        if term and term.lower() != "none":
             terms.append(term)
     counter = Counter(terms)
     return [value for value, _count in counter.most_common(3)]

@@ -1,4 +1,8 @@
-"""Prompt constants for future scholar LLM analysis."""
+"""Prompt constants for scholar LLM analysis."""
+
+from __future__ import annotations
+
+import json
 
 RESEARCH_ANALYSIS_SYSTEM = """You are a rigorous machine learning research paper analyst for Aurora.
 
@@ -19,6 +23,7 @@ Return exactly this JSON object shape:
   "why_it_matters": "...",
   "learning_value": "...",
   "suggested_learning_path": "...",
+  "action_items": ["..."],
   "tags": ["..."]
 }"""
 
@@ -51,10 +56,26 @@ Respond with valid JSON only."""
 
 def build_scholar_prompt(item) -> tuple[str, str]:
     """Build an optional LLM analysis prompt for one normalized paper."""
-    from aurora.ai.ranker import item_prompt_payload
-
+    metadata = item.metadata
     return (
         RESEARCH_ANALYSIS_SYSTEM,
-        "Analyze this research paper for novelty, learning value, and implementation usefulness:\n"
-        + item_prompt_payload(item),
+        RESEARCH_ANALYSIS_USER.format(
+            title=item.title,
+            authors=", ".join(str(author) for author in metadata.get("authors") or []),
+            source=item.source,
+            url=str(item.url),
+            pdf_url=metadata.get("pdf_url") or "",
+            venue=metadata.get("venue") or "",
+            venue_year=metadata.get("venue_year") or "",
+            status=metadata.get("status") or "",
+            published_at=item.published_at,
+            updated_at=item.updated_at,
+            categories=", ".join(str(category) for category in metadata.get("categories") or []),
+            code_urls=", ".join(str(url) for url in metadata.get("code_urls") or []),
+            project_urls=", ".join(str(url) for url in metadata.get("project_urls") or []),
+            citation_count=metadata.get("citation_count") or 0,
+            source_ids=json.dumps(metadata.get("source_ids") or {}, sort_keys=True),
+            deterministic_score=item.deterministic_score,
+            abstract=item.raw_content[:4000],
+        ),
     )

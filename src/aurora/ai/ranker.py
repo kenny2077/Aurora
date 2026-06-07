@@ -26,6 +26,8 @@ class LLMAnalysis(BaseModel):
     why_it_matters: str = ""
     learning_value: str = ""
     action_items: list[str] = Field(default_factory=list)
+    suggested_learning_path: str = ""
+    tags: list[str] = Field(default_factory=list)
 
 
 PromptBuilder = Callable[[SignalItem], tuple[str, str]]
@@ -51,11 +53,22 @@ class LLMRanker:
         prompt_builder: PromptBuilder,
         context: StageContext,
     ) -> dict[str, LLMAnalysis]:
-        if context.metadata.get("skip_llm") or not self.client.is_configured():
+        context.metadata["llm_analysis_requested_count"] = len(items)
+        if context.metadata.get("skip_llm"):
+            context.metadata["llm_analysis_skipped_count"] = len(items)
+            context.metadata.setdefault("warnings", []).append("LLM analysis skipped by --skip-llm.")
+            return {}
+        if not self.client.is_configured():
+            context.metadata["llm_analysis_skipped_count"] = len(items)
+            context.metadata.setdefault("warnings", []).append(
+                f"LLM analysis skipped because {self.config.api_key_env} is not configured."
+            )
             return {}
         semaphore = asyncio.Semaphore(self.config.analysis_concurrency)
+        failed_count = 0
 
         async def analyze(item: SignalItem) -> tuple[str, LLMAnalysis | None]:
+            nonlocal failed_count
             async with semaphore:
                 if self.config.throttle_sec:
                     await asyncio.sleep(self.config.throttle_sec)
@@ -64,10 +77,18 @@ class LLMRanker:
                     payload = await self.client.complete_json(system_prompt, user_prompt)
                     return item.id, LLMAnalysis.model_validate(payload)
                 except Exception:
+                    failed_count += 1
                     return item.id, None
 
         results = await asyncio.gather(*(analyze(item) for item in items))
-        return {item_id: analysis for item_id, analysis in results if analysis is not None}
+        analyses = {item_id: analysis for item_id, analysis in results if analysis is not None}
+        context.metadata["llm_analysis_succeeded_count"] = len(analyses)
+        context.metadata["llm_analysis_failed_count"] = failed_count
+        if failed_count:
+            context.metadata.setdefault("warnings", []).append(
+                f"LLM analysis failed for {failed_count} item(s); deterministic fallback used."
+            )
+        return analyses
 
     def apply_analysis(self, item: SignalItem, analysis: LLMAnalysis | None) -> SignalItem:
         """Apply one analysis result, preserving deterministic fallback fields."""
@@ -77,6 +98,9 @@ class LLMRanker:
                     "final_score": combine_scores(item.deterministic_score, item.llm_score, self.weights),
                 }
             )
+        action_items = analysis.action_items or _action_items_from_suggested_path(
+            analysis.suggested_learning_path
+        )
         return item.model_copy(
             update={
                 "llm_score": analysis.score,
@@ -84,7 +108,8 @@ class LLMRanker:
                 "summary": analysis.summary or item.summary,
                 "why_it_matters": analysis.why_it_matters or item.why_it_matters,
                 "learning_value": analysis.learning_value or item.learning_value,
-                "action_items": analysis.action_items or item.action_items,
+                "action_items": action_items or item.action_items,
+                "tags": list(dict.fromkeys([*item.tags, *analysis.tags])),
             }
         )
 
@@ -107,3 +132,11 @@ def item_prompt_payload(item: SignalItem) -> str:
         sort_keys=True,
         default=str,
     )
+
+
+def _action_items_from_suggested_path(value: str) -> list[str]:
+    text = str(value or "").strip()
+    if not text:
+        return []
+    parts = [part.strip(" .") for part in text.replace("\n", " ").split(".") if part.strip(" .")]
+    return [part + "." for part in parts[:4]]

@@ -24,11 +24,11 @@ on:
           - "true"
       skip_llm:
         description: Skip optional LLM enrichment for faster Pages publishing
-        default: "true"
+        default: "false"
         type: choice
         options:
-          - "true"
           - "false"
+          - "true"
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -95,7 +95,11 @@ jobs:
           CONFIG_PATH="data/actions.config.json"
           MODE="${{ github.event.inputs.mode || 'unified_digest' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
-          SKIP_LLM="${{ github.event.inputs.skip_llm || 'true' }}"
+          SKIP_LLM="${{ github.event.inputs.skip_llm || 'false' }}"
+          if [ "$DRY_RUN" != "true" ] && [ "$SKIP_LLM" != "true" ] && [ -z "$DEEPSEEK_API_KEY" ]; then
+            echo "::error::Missing required LLM secret: DEEPSEEK_API_KEY"
+            exit 1
+          fi
           ARGS=(--config "$CONFIG_PATH" --mode "$MODE")
           if [ "$SKIP_LLM" = "true" ]; then
             ARGS+=(--skip-llm)

@@ -9,7 +9,7 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "schedule:" in workflow
     assert "workflow_dispatch:" in workflow
     assert "skip_llm:" in workflow
-    assert "default: \"true\"" in workflow
+    assert "default: \"false\"" in workflow
     assert "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: \"true\"" in workflow
     assert "aurora:" in workflow
     assert "timeout-minutes: 30" in workflow
@@ -21,11 +21,13 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "python -m pip install --user \"uv==0.11.15\"" in workflow
     assert "uv run aurora config validate --config data/actions.config.json" in workflow
     assert "Missing required email secret" in workflow
+    assert "Missing required LLM secret: DEEPSEEK_API_KEY" in workflow
     assert "Restore Aurora state" in workflow
     assert ".aurora/aurora_state.json" in workflow
     assert "CONFIG_PATH=\"data/actions.config.json\"" in workflow
     assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
     assert "ARGS=(--config \"$CONFIG_PATH\" --mode \"$MODE\")" in workflow
+    assert "SKIP_LLM=\"${{ github.event.inputs.skip_llm || 'false' }}\"" in workflow
     assert "ARGS+=(--skip-llm)" in workflow
     assert "uv run aurora run \"${ARGS[@]}\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow

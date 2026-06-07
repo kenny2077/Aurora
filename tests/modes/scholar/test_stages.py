@@ -18,7 +18,7 @@ from aurora.modes.scholar.prompts import RESEARCH_ANALYSIS_SYSTEM, RESEARCH_ANAL
 from aurora.modes.scholar.render import ScholarRenderer, ScholarSummarizer
 from aurora.modes.scholar.scoring import ScholarEnricher, ScholarScorer
 from aurora.modes.scholar.stages import ScholarDeduplicateStage, ScholarNormalizeStage
-from aurora.models import SignalItem
+from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
 
 
@@ -267,13 +267,143 @@ def test_semantic_scholar_enrichment_fills_citation_metadata(monkeypatch) -> Non
     assert metadata["source_ids"]["doi"] == "10.1/test"
 
 
+def test_semantic_scholar_title_search_enriches_openreview_without_ids(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        assert request.url.path == "/graph/v1/paper/search"
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {
+                        "paperId": "S2-title",
+                        "title": "OpenReview Match",
+                        "url": "https://www.semanticscholar.org/paper/S2-title",
+                        "citationCount": 9,
+                        "influentialCitationCount": 1,
+                        "externalIds": {"CorpusId": "123"},
+                        "fieldsOfStudy": ["Machine Learning"],
+                        "authors": [{"name": "Ada Lovelace"}],
+                        "openAccessPdf": {"url": "https://paper.example.com/openreview-match.pdf"},
+                        "tldr": {"text": "A concise Semantic Scholar summary."},
+                    }
+                ]
+            },
+        )
+
+    item = _paper(
+        "paper",
+        "OpenReview Match",
+        {"source_ids": {"openreview": "forum-id"}},
+    ).model_copy(update={"source": "openreview"})
+    score = asyncio.run(ScholarScorer(ScholarModeConfig()).score([item], _context()))[0]
+    context = _cached_context(tmp_path)
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(ScholarModeConfig(), http_client=client).enrich(
+                [item], [score], context
+            )
+
+    enriched = asyncio.run(exercise())
+
+    metadata = enriched[0].metadata
+    assert len(requests) == 1
+    assert metadata["semantic_scholar_paper_id"] == "S2-title"
+    assert metadata["semantic_scholar_url"] == "https://www.semanticscholar.org/paper/S2-title"
+    assert metadata["citation_count"] == 9
+    assert metadata["source_ids"]["corpus_id"] == "123"
+    assert metadata["topics"] == ["Machine Learning"]
+    assert metadata["authors"] == ["Ada Lovelace"]
+    assert metadata["pdf_url"] == "https://paper.example.com/openreview-match.pdf"
+    assert metadata["semantic_scholar_tldr"] == "A concise Semantic Scholar summary."
+
+
+def test_semantic_scholar_title_search_rejects_low_similarity(monkeypatch) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={"data": [{"paperId": "S2-wrong", "title": "A Totally Different Paper"}]},
+        )
+
+    item = _paper("paper", "OpenReview Match", {"source_ids": {"openreview": "forum-id"}})
+    score = asyncio.run(ScholarScorer(ScholarModeConfig()).score([item], _context()))[0]
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(ScholarModeConfig(), http_client=client).enrich(
+                [item], [score], _context()
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert "semantic_scholar_paper_id" not in enriched[0].metadata
+
+
+def test_semantic_scholar_cache_reuses_metadata_without_second_request(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    calls = 0
+
+    def first_handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        return httpx.Response(
+            200,
+            json={
+                "paperId": "S2-cache",
+                "title": "Cached Match",
+                "citationCount": 5,
+                "externalIds": {"ArXiv": "2605.1"},
+            },
+        )
+
+    item = _paper("paper", "Cached Match", {"source_ids": {"arxiv": "2605.1"}})
+    config = ScholarModeConfig()
+    score = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+    context = _cached_context(tmp_path)
+
+    async def first() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(first_handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich([item], [score], context)
+
+    asyncio.run(first())
+
+    def failing_handler(request: httpx.Request) -> httpx.Response:
+        raise AssertionError("Semantic Scholar should not be called when metadata is cached")
+
+    second_context = _cached_context(tmp_path)
+
+    async def second() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(failing_handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich([item], [score], second_context)
+
+    enriched = asyncio.run(second())
+
+    assert calls == 1
+    assert enriched[0].metadata["semantic_scholar_paper_id"] == "S2-cache"
+    assert second_context.metadata["semantic_scholar_cached_count"] == 1
+
+
 def test_semantic_scholar_enrichment_honors_request_cap(monkeypatch) -> None:
     monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
     requests: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
-        return httpx.Response(200, json={"paperId": "S2", "citationCount": 1})
+        arxiv_id = request.url.path.rsplit("ARXIV:", maxsplit=1)[-1]
+        return httpx.Response(
+            200,
+            json={"paperId": "S2", "citationCount": 1, "externalIds": {"ArXiv": arxiv_id}},
+        )
 
     config = ScholarModeConfig(sources={"semantic_scholar": {"max_requests_per_run": 1}})
     items = [
@@ -291,6 +421,77 @@ def test_semantic_scholar_enrichment_honors_request_cap(monkeypatch) -> None:
     assert len(requests) == 1
     assert enriched[0].metadata["semantic_scholar_paper_id"] == "S2"
     assert enriched[1].metadata.get("semantic_scholar_paper_id") is None
+
+
+def test_enricher_spends_semantic_scholar_requests_on_top_scored_candidates(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requested_paths: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requested_paths.append(str(request.url))
+        assert request.url.path.endswith("/paper/ARXIV:2605.9")
+        return httpx.Response(
+            200,
+            json={
+                "paperId": "S2-high",
+                "title": "High Paper",
+                "externalIds": {"ArXiv": "2605.9"},
+            },
+        )
+
+    low = _paper("low", "Low Paper", {"source_ids": {"arxiv": "2605.1"}})
+    high = _paper("high", "High Paper", {"source_ids": {"arxiv": "2605.9"}})
+    scores = [
+        ScoreResult(item_id="low", deterministic_score=3.0, final_score=3.0),
+        ScoreResult(item_id="high", deterministic_score=9.0, final_score=9.0),
+    ]
+    config = ScholarModeConfig(sources={"semantic_scholar": {"max_requests_per_run": 1}})
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                [low, high], scores, _context()
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert len(requested_paths) == 1
+    assert enriched[0].metadata.get("semantic_scholar_paper_id") is None
+    assert enriched[1].metadata["semantic_scholar_paper_id"] == "S2-high"
+
+
+def test_enricher_rescores_after_semantic_scholar_citation_enrichment(monkeypatch) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "paperId": "S2-cited",
+                "title": "Cited Paper",
+                "citationCount": 250,
+                "influentialCitationCount": 50,
+                "externalIds": {"ArXiv": "2605.1"},
+            },
+        )
+
+    item = _paper("paper", "Cited Paper", {"source_ids": {"arxiv": "2605.1"}})
+    config = ScholarModeConfig(score_threshold=0)
+    initial = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                [item], [initial], _context()
+            )
+
+    enriched = asyncio.run(exercise())[0]
+
+    assert initial.score_breakdown["citation_signal"] == 0.0
+    assert enriched.metadata["score_breakdown"]["citation_signal"] > 0.9
+    assert enriched.final_score >= initial.final_score
 
 
 def test_semantic_scholar_rate_limit_does_not_kill_scholar_enrichment(
@@ -379,9 +580,58 @@ def test_markdown_rendering_is_stable_score_ordered_and_capped() -> None:
     assert rendered.markdown == summary
 
 
+def test_scholar_rendering_includes_enrichment_analysis_links_and_status() -> None:
+    config = ScholarModeConfig(final_item_count=1, score_threshold=0)
+    item = _paper(
+        "paper",
+        "Analyzed Paper",
+        {
+            "authors": ["Ada"],
+            "venue": "ICLR",
+            "status": "accepted",
+            "pdf_url": "https://paper.example.com/paper.pdf",
+            "semantic_scholar_url": "https://www.semanticscholar.org/paper/S2",
+            "code_urls": ["https://github.com/org/repo"],
+            "project_urls": ["https://paper.example.com/project"],
+            "semantic_scholar_tldr": "Semantic Scholar TLDR.",
+        },
+    ).model_copy(
+        update={
+            "final_score": 8.7,
+            "summary": "LLM summary.",
+            "why_it_matters": "LLM why.",
+            "learning_value": "LLM learning.",
+            "action_items": ["Read the method.", "Inspect the code."],
+        }
+    )
+    context = StageContext(
+        mode="scholar",
+        run_id="test",
+        metadata={
+            "semantic_scholar_enriched_count": 1,
+            "semantic_scholar_requests_made": 1,
+            "llm_analysis_requested_count": 1,
+            "llm_analysis_succeeded_count": 1,
+        },
+    )
+
+    summary = asyncio.run(ScholarSummarizer(config).summarize([item], context))
+
+    assert "## Source Status" in summary
+    assert "Semantic Scholar: 1 enriched" in summary
+    assert "LLM analysis: 1 succeeded" in summary
+    assert "- Summary: LLM summary." in summary
+    assert "- Why: LLM why." in summary
+    assert "- Learn: LLM learning." in summary
+    assert "[Semantic Scholar](https://www.semanticscholar.org/paper/S2)" in summary
+    assert "- Read the method." in summary
+
+
 def test_scholar_prompt_constants_include_required_json_fields() -> None:
     assert '"score"' in RESEARCH_ANALYSIS_SYSTEM
     assert '"why_it_matters"' in RESEARCH_ANALYSIS_SYSTEM
+    assert '"action_items"' in RESEARCH_ANALYSIS_SYSTEM
+    assert '"tags"' in RESEARCH_ANALYSIS_SYSTEM
     assert "{abstract}" in RESEARCH_ANALYSIS_USER
     assert "{deterministic_score}" in RESEARCH_ANALYSIS_USER
 

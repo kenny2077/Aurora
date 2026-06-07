@@ -70,6 +70,25 @@ def test_llm_ranker_isolates_failures_and_applies_analysis() -> None:
     assert fallback.final_score == 7.0
 
 
+def test_llm_ranker_uses_suggested_learning_path_and_tags() -> None:
+    item = _item("paper:1")
+    ranker = LLMRanker(AIConfig(), weights=FinalScoreWeights())
+    analysis = LLMAnalysis(
+        score=8.0,
+        suggested_learning_path="Read the method. Reproduce the smallest experiment.",
+        tags=["agents", "benchmarks"],
+    )
+
+    enriched = ranker.apply_analysis(item, analysis)
+
+    assert enriched.action_items == [
+        "Read the method.",
+        "Reproduce the smallest experiment.",
+    ]
+    assert "agents" in enriched.tags
+    assert "benchmarks" in enriched.tags
+
+
 def _prompt(item: SignalItem) -> tuple[str, str]:
     return "system", item.id
 
