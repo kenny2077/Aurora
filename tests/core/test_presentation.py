@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 
 from aurora.models import SignalItem
 from aurora.pipeline import StageContext
-from aurora.presentation import render_repo_card, render_repo_digest_html, safe_url
+from aurora.presentation import render_repo_card, render_repo_digest_html, render_unified_digest_html, safe_url
 
 
 def test_repo_card_includes_evidence_warnings_guidance_and_actions() -> None:
@@ -88,6 +88,64 @@ def test_repo_digest_html_handles_missing_optional_metadata() -> None:
     assert "org/minimal" in web_html
     assert "not enriched" in web_html
     assert "None" not in web_html
+
+
+def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
+    news = SignalItem(
+        id="news:1",
+        type="news",
+        title="Important News",
+        url="https://example.com/news",
+        source="hackernews",
+        published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
+        summary="A concise news summary.",
+        final_score=9.0,
+    )
+    repo = _repo(
+        "org/product",
+        metadata={"full_name": "org/product", "recommendation_evidence": ["README found"]},
+        why="Worth studying.",
+        learn="Study the README.",
+    )
+    paper = SignalItem(
+        id="paper:1",
+        type="paper",
+        title="Useful Paper",
+        url="https://example.com/paper",
+        source="arxiv",
+        published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
+        summary="Paper summary.",
+        learning_value="Learn the evaluation setup.",
+        metadata={"venue": "NeurIPS 2025", "status": "spotlight"},
+        final_score=8.0,
+    )
+
+    _email_html, web_html = render_unified_digest_html(
+        "Aurora Unified Digest",
+        [news, repo, paper],
+        StageContext(
+            mode="unified_digest",
+            run_id="test",
+            metadata={
+                "run_summary": {"source_health": {"ok": 1, "failed": 0, "rate_limited": 0}},
+                "unified_child_run_summaries": [
+                    {"mode": "scholar", "warnings": ["Semantic Scholar rate-limited"]}
+                ],
+            },
+        ),
+        [{"theme": "agents", "reason": "shared signal", "evidence_terms": ["agents"]}],
+        ["news", "repo", "paper"],
+    )
+
+    assert "aurora-kpi" not in web_html
+    assert "Today's Learning Path" not in web_html
+    assert "Connections" not in web_html
+    assert "Run diagnostics" not in web_html
+    assert "Semantic Scholar rate-limited" not in web_html
+    assert web_html.index("Tech News") < web_html.index("GitHub Repos") < web_html.index("Research Papers")
+    assert "Important News" in web_html
+    assert "org/product" in web_html
+    assert "Useful Paper" in web_html
 
 
 def _repo(

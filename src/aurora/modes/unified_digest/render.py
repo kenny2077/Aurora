@@ -18,7 +18,7 @@ from aurora.presentation import render_unified_digest_html
 
 SECTION_TITLES = {
     "paper": "Research Papers",
-    "repo": "Repositories",
+    "repo": "GitHub Repos",
     "news": "Tech News",
 }
 
@@ -31,14 +31,10 @@ class UnifiedDigestSummarizer:
 
     async def summarize(self, items: Sequence[SignalItem], context: StageContext) -> str:
         selected = select_items(items, self.config)
-        lines = ["# Aurora Unified Digest", "", f"Selected {len(selected)} item(s).", ""]
+        lines = ["# Aurora Unified Digest", ""]
         if not selected:
             lines.append("No items were available for the unified digest.")
-            lines.extend(["", *_run_summary_lines(context)])
             return "\n".join(lines)
-        lines.extend(_learning_path_lines(selected))
-        lines.extend(_run_summary_lines(context))
-        lines.extend(_connection_lines(selected))
         for item_type in self.config.section_order:
             section_items = [item for item in selected if item.type == item_type]
             if not section_items:
@@ -52,16 +48,7 @@ class UnifiedDigestSummarizer:
                     ]
                 )
             for index, item in enumerate(section_items, start=1):
-                why = _why_text(item)
-                lines.extend(
-                    [
-                        f"{index}. [{item.title}]({item.url}) - {item.final_score or 0.0}/10",
-                        f"   - Source: {item.source}",
-                        f"   - Why: {why}",
-                    ]
-                )
-                lines.extend(_paper_signal_lines(item, indent="   "))
-                lines.extend(_repo_signal_lines(item, indent="   "))
+                lines.extend(_section_item_lines(index, item))
             lines.append("")
         return "\n".join(lines).rstrip()
 
@@ -109,11 +96,17 @@ def select_items(
     for item_type in config.section_order:
         section_items = [item for item in items if item.type == item_type]
         section_items.sort(key=_item_score, reverse=True)
-        for item in section_items[: config.max_items_per_type]:
+        limit = _section_limit(config, item_type)
+        for item in section_items[:limit]:
             if len(selected) >= config.max_total_items:
                 return selected
             selected.append(item)
     return selected
+
+
+def _section_limit(config: UnifiedDigestModeConfig, item_type: str) -> int:
+    limit = config.section_limits.get(item_type) if hasattr(config, "section_limits") else None
+    return limit if limit is not None else config.max_items_per_type
 
 
 def _excerpt(value: str, limit: int) -> str:
@@ -121,6 +114,34 @@ def _excerpt(value: str, limit: int) -> str:
     if len(text) <= limit:
         return text
     return text[: limit - 3].rstrip() + "..."
+
+
+def _section_item_lines(index: int, item: SignalItem) -> list[str]:
+    score = item.final_score or 0.0
+    if item.type == "repo":
+        lines = [
+            f"{index}. [{item.title}]({item.url}) - {score}/10",
+            f"   - Source: {item.source}",
+            f"   - Why: {_why_text(item)}",
+            f"   - Study: {_learning_text(item)}",
+        ]
+        lines.extend(_repo_signal_lines(item, indent="   "))
+        return lines
+    if item.type == "paper":
+        metadata = item.metadata
+        venue = metadata.get("venue") or item.source
+        status = metadata.get("status") or "unknown"
+        return [
+            f"{index}. [{item.title}]({item.url}) - {score}/10",
+            f"   - Venue/status: {venue} / {status}",
+            f"   - Summary: {_summary_text(item)}",
+            f"   - Learn: {_learning_text(item)}",
+        ]
+    return [
+        f"{index}. [{item.title}]({item.url}) - {score}/10",
+        f"   - Source: {item.source}",
+        f"   - Summary: {_summary_text(item)}",
+    ]
 
 
 def _learning_path_lines(items: Sequence[SignalItem]) -> list[str]:
@@ -336,6 +357,12 @@ def _why_text(item: SignalItem) -> str:
     if item.type == "news":
         return display_tech_news_why(item)
     return item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
+
+
+def _summary_text(item: SignalItem) -> str:
+    if item.type == "news":
+        return item.summary or display_tech_news_why(item)
+    return item.summary or item.why_it_matters or _excerpt(item.raw_content, 180)
 
 
 def _learning_text(item: SignalItem) -> str:

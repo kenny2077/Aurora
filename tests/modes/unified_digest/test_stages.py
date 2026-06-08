@@ -11,7 +11,7 @@ from aurora.config import ScholarModeConfig
 from aurora.modes.scholar.scoring import ScholarEnricher
 from aurora.modes.repo_learning.state import RepoLearningStateStore
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
-from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer
+from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer, select_items
 from aurora.modes.unified_digest.stages import (
     UnifiedDeduplicateStage,
     UnifiedDeliveryStage,
@@ -81,12 +81,13 @@ def test_cross_mode_dedup_collapses_url_title_paper_and_repo_duplicates() -> Non
 
 def test_unified_rendering_respects_section_order_and_caps() -> None:
     config = UnifiedDigestModeConfig(
-        max_items_per_type=1,
-        max_total_items=2,
-        section_order=["repo", "paper", "news"],
+        section_limits={"news": 2, "repo": 1, "paper": 1},
+        max_total_items=4,
+        section_order=["news", "repo", "paper"],
     )
     items = [
         _item("news:1", "news", "News", 10.0),
+        _item("news:2", "news", "Second News", 9.5),
         _item("paper:1", "paper", "Paper", 8.0),
         _item("repo:1", "repo", "Repo", 7.0),
         _item("repo:2", "repo", "Better Repo", 9.0),
@@ -96,24 +97,72 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
     rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, items, context))
 
-    assert summary.index("Repositories") < summary.index("Research Papers")
+    assert summary.index("## Tech News") < summary.index("## GitHub Repos") < summary.index("## Research Papers")
     assert "Better Repo" in summary
+    assert "Second News" in summary
     assert "[Repo](" not in summary
-    assert "[News](" not in summary
-    assert rendered.metadata["selected_item_ids"] == ["repo:2", "paper:1"]
+    assert rendered.metadata["selected_item_ids"] == ["news:1", "news:2", "repo:2", "paper:1"]
     assert rendered.metadata["recommended_repo_ids"] == ["repo:2"]
-    assert rendered.metadata["item_counts"] == {"repo": 1, "paper": 1, "news": 0}
+    assert rendered.metadata["item_counts"] == {"news": 2, "repo": 1, "paper": 1}
     assert rendered.html is not None
-    assert "Today's Learning Path" in rendered.html
+    assert "Today's Learning Path" not in rendered.html
+    assert "Run diagnostics" not in rendered.html
     assert "aurora-repo-card" in rendered.html
     assert "web_html" in rendered.metadata
+
+
+def test_unified_default_section_limits_select_five_news_three_repos_and_three_papers() -> None:
+    config = UnifiedDigestModeConfig(max_total_items=20)
+    items = [
+        *[_item(f"news:{index}", "news", f"News {index}", 10.0 - index * 0.1) for index in range(6)],
+        *[_item(f"repo:{index}", "repo", f"Repo {index}", 9.0 - index * 0.1) for index in range(4)],
+        *[_item(f"paper:{index}", "paper", f"Paper {index}", 8.0 - index * 0.1) for index in range(4)],
+    ]
+
+    selected = select_items(items, config)
+
+    assert [item.type for item in selected].count("news") == 5
+    assert [item.type for item in selected].count("repo") == 3
+    assert [item.type for item in selected].count("paper") == 3
+    assert [item.id for item in selected] == [
+        "news:0",
+        "news:1",
+        "news:2",
+        "news:3",
+        "news:4",
+        "repo:0",
+        "repo:1",
+        "repo:2",
+        "paper:0",
+        "paper:1",
+        "paper:2",
+    ]
+
+
+def test_unified_section_limit_falls_back_to_max_items_per_type_when_missing() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=2,
+        max_total_items=10,
+        section_limits={"news": 1},
+    )
+    items = [
+        *[_item(f"news:{index}", "news", f"News {index}", 10.0 - index) for index in range(3)],
+        *[_item(f"repo:{index}", "repo", f"Repo {index}", 9.0 - index) for index in range(3)],
+        *[_item(f"paper:{index}", "paper", f"Paper {index}", 8.0 - index) for index in range(3)],
+    ]
+
+    selected = select_items(items, config)
+
+    assert [item.type for item in selected].count("news") == 1
+    assert [item.type for item in selected].count("repo") == 2
+    assert [item.type for item in selected].count("paper") == 2
 
 
 def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other_sections() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,
         max_total_items=20,
-        section_order=["paper", "repo", "news"],
+        section_order=["news", "repo", "paper"],
     )
     items = [
         _item(
@@ -132,7 +181,7 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, items, context))
 
     assert "Using cached scholar results because live sources returned no papers." in summary
-    assert "Repositories" in summary
+    assert "GitHub Repos" in summary
     assert "Tech News" in summary
     assert rendered.metadata["item_counts"] == {"paper": 1, "repo": 1, "news": 1}
     assert "Research Papers" in str(rendered.metadata["web_html"])
@@ -173,10 +222,8 @@ def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([repo, paper, news], context))
     rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, [repo, paper, news], context))
 
-    assert "### Repo to Study" in summary
-    assert "  - Evidence: 6k stars; README found; examples/quickstart.py" in summary
-    assert "  - Watch: very high open issue count; README or package files were not found during enrichment" in summary
-    assert "## Repositories" in summary
+    assert "### Repo to Study" not in summary
+    assert "## GitHub Repos" in summary
     assert "   - Evidence: 6k stars; README found; examples/quickstart.py" in summary
     assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
     assert "## Research Papers" in summary
@@ -213,12 +260,12 @@ def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
 
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
 
-    assert "### News to Watch" in summary
+    assert "### News to Watch" not in summary
     assert "Hacker News" in summary
     assert "https:&#x2F;" not in summary
     assert "[aaaronic]:" not in summary
     assert "## Research Papers" in summary
-    assert "## Repositories" in summary
+    assert "## GitHub Repos" in summary
 
 
 def test_unified_rendering_prefers_polished_news_notes() -> None:
@@ -237,15 +284,15 @@ def test_unified_rendering_prefers_polished_news_notes() -> None:
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([item], context))
 
     assert "This is a clean reason for the digest." in summary
-    assert "Use it to calibrate a practical product decision." in summary
+    assert "Use it to calibrate a practical product decision." not in summary
     assert "[raw]:" not in summary
 
 
-def test_unified_summary_includes_run_summary_and_source_health() -> None:
+def test_unified_summary_hides_run_summary_and_source_health_from_visible_digest() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,
         max_total_items=8,
-        section_order=["paper", "repo", "news"],
+        section_order=["news", "repo", "paper"],
     )
     context = StageContext(
         mode="unified_digest",
@@ -300,13 +347,12 @@ def test_unified_summary_includes_run_summary_and_source_health() -> None:
         )
     )
 
-    assert summary.index("## Today's Learning Path") < summary.index("## Run Summary")
-    assert summary.index("## Run Summary") < summary.index("## Research Papers")
-    assert "Items: 3 raw -> 3 normalized -> 2 deduplicated -> 2 enriched." in summary
-    assert "Sources: 1 ok, 1 failed, 1 rate limited." in summary
-    assert "arxiv failed: 429 Too Many Requests" in summary
-    assert "Child modes: tech_news 1 item(s), scholar 0 item(s)." in summary
-    assert "scholar warning: Semantic Scholar enrichment rate-limited" in summary
+    assert "## Today's Learning Path" not in summary
+    assert "## Run Summary" not in summary
+    assert "Items: 3 raw -> 3 normalized -> 2 deduplicated -> 2 enriched." not in summary
+    assert "Sources: 1 ok, 1 failed, 1 rate limited." not in summary
+    assert "arxiv failed: 429 Too Many Requests" not in summary
+    assert "scholar warning: Semantic Scholar enrichment rate-limited" not in summary
     rendered = asyncio.run(
         UnifiedDigestRenderer(config).render(
             summary,
@@ -314,11 +360,11 @@ def test_unified_summary_includes_run_summary_and_source_health() -> None:
             context,
         )
     )
-    assert "Run diagnostics" in str(rendered.metadata["web_html"])
-    assert "Semantic Scholar enrichment rate-limited" in str(rendered.metadata["web_html"])
+    assert "Run diagnostics" not in str(rendered.metadata["web_html"])
+    assert "Semantic Scholar enrichment rate-limited" not in str(rendered.metadata["web_html"])
 
 
-def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:
+def test_unified_summary_hides_run_summary_when_no_items_survive() -> None:
     context = StageContext(
         mode="unified_digest",
         run_id="test",
@@ -349,11 +395,11 @@ def test_unified_summary_includes_run_summary_when_no_items_survive() -> None:
     )
 
     assert "No items were available for the unified digest." in summary
-    assert "## Run Summary" in summary
-    assert "unified_sources failed: no source data" in summary
+    assert "## Run Summary" not in summary
+    assert "unified_sources failed: no source data" not in summary
 
 
-def test_unified_summary_includes_cross_mode_connections() -> None:
+def test_unified_summary_hides_cross_mode_connections_but_renderer_keeps_metadata() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,
         max_total_items=9,
@@ -392,20 +438,15 @@ def test_unified_summary_includes_cross_mode_connections() -> None:
         }
     )
 
-    summary = asyncio.run(
-        UnifiedDigestSummarizer(config).summarize(
-            [paper, repo, news],
-            StageContext(mode="unified_digest", run_id="test"),
-        )
-    )
+    context = StageContext(mode="unified_digest", run_id="test")
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([paper, repo, news], context))
+    rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, [paper, repo, news], context))
 
-    assert summary.index("## Connections") < summary.index("## Research Papers")
+    assert "## Connections" not in summary
     assert "[Agent Planning Benchmark]" in summary
     assert "[org/agent-kit]" in summary
-    assert "agents:" in summary
-    assert "shared repository org/agent-kit" in summary
-    assert "shared specific signals: agents, planning" in summary
-    assert "evidence: agents, org/agent-kit, planning" in summary
+    assert "shared repository org/agent-kit" not in summary
+    assert rendered.metadata["connections"]
 
 
 def test_unified_renderer_metadata_includes_connections() -> None:
@@ -567,11 +608,11 @@ def test_unified_connections_do_not_cluster_unrelated_items() -> None:
     assert rendered.metadata["connections"] == []
 
 
-def test_unified_summary_starts_with_learning_path() -> None:
+def test_unified_summary_starts_with_tech_news_section_only() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,
         max_total_items=8,
-        section_order=["paper", "repo", "news"],
+        section_order=["news", "repo", "paper"],
     )
     items = [
         _item(
@@ -605,17 +646,16 @@ def test_unified_summary_starts_with_learning_path() -> None:
         )
     )
 
-    assert summary.index("## Today's Learning Path") < summary.index("## Research Papers")
-    assert "### Paper to Understand" in summary
-    assert "### Repo to Study" in summary
-    assert "### News to Watch" in summary
+    assert summary.startswith("# Aurora Unified Digest\n\n## Tech News")
+    assert "## Today's Learning Path" not in summary
+    assert "### Paper to Understand" not in summary
+    assert "### Repo to Study" not in summary
+    assert "### News to Watch" not in summary
     assert "It explains a useful agent planning pattern." in summary
     assert "Study the evaluation setup." in summary
-    assert "Read the method section." in summary
-    assert "Clone the repo." in summary
     assert "Top News" in summary
     assert "Third News" in summary
-    assert "Fourth News" not in summary.split("## Research Papers", maxsplit=1)[0]
+    assert "Fourth News" in summary
 
 
 def test_unified_paper_section_includes_analysis_actions_and_semantic_scholar_link() -> None:
@@ -644,11 +684,11 @@ def test_unified_paper_section_includes_analysis_actions_and_semantic_scholar_li
 
     section = summary.split("## Research Papers", maxsplit=1)[1]
     assert "Learn: Study the benchmark design." in section
-    assert "Action: Read the method.; Compare the experiments." in section
-    assert "Semantic Scholar: https://www.semanticscholar.org/paper/S2" in section
+    assert "Action: Read the method.; Compare the experiments." not in section
+    assert "Semantic Scholar: https://www.semanticscholar.org/paper/S2" not in section
 
 
-def test_unified_learning_path_notes_missing_types_and_fallback_actions() -> None:
+def test_unified_summary_omits_learning_path_missing_type_messages() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=3,
         max_total_items=8,
@@ -671,10 +711,11 @@ def test_unified_learning_path_notes_missing_types_and_fallback_actions() -> Non
         )
     )
 
-    assert "## Today's Learning Path" in summary
-    assert "Read the abstract and identify the core claim." in summary
-    assert "No repository candidate is available for today's learning path." in summary
-    assert "No news item is available for today's learning path." in summary
+    assert "## Today's Learning Path" not in summary
+    assert "Read the abstract and identify the core claim." not in summary
+    assert "No repository candidate is available for today's learning path." not in summary
+    assert "No news item is available for today's learning path." not in summary
+    assert "## Research Papers" in summary
 
 
 def test_unified_delivery_updates_repo_recommendation_state(tmp_path: Path) -> None:

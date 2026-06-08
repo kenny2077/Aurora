@@ -125,7 +125,7 @@ jobs:
             echo "No digest posts were generated under site/_posts."
             exit 1
           fi
-          if grep -R "Selected 0 item(s)" site/_posts/*.md; then
+          if grep -R "No items were available for the unified digest." site/_posts/*.md; then
             echo "Generated digest is empty; refusing to publish an empty Pages update."
             exit 1
           fi

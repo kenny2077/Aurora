@@ -287,6 +287,20 @@ def _summary_warnings(context_metadata: dict[str, Any] | None) -> list[str]:
             text = _redact_secret_like_text(str(warning)).strip()
             if text and text not in warnings:
                 warnings.append(text)
+    child_summaries = context_metadata.get("unified_child_run_summaries")
+    if isinstance(child_summaries, list):
+        for summary in child_summaries:
+            if not isinstance(summary, dict):
+                continue
+            mode = str(summary.get("mode") or "unknown").strip() or "unknown"
+            raw_warnings = summary.get("warnings")
+            if not isinstance(raw_warnings, list):
+                continue
+            for warning in raw_warnings:
+                text = _redact_secret_like_text(str(warning)).strip()
+                formatted = f"{mode}: {text}" if text else ""
+                if formatted and formatted not in warnings:
+                    warnings.append(formatted)
     return warnings
 
 

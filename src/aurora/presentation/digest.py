@@ -92,26 +92,14 @@ def render_unified_digest_html(
     section_order: Sequence[str],
 ) -> tuple[str, str]:
     """Return full email HTML and Pages-safe fragment for a unified digest."""
-    counts = {item_type: sum(1 for item in selected if item.type == item_type) for item_type in section_order}
-    stats = [
-        ("Papers", str(counts.get("paper", 0))),
-        ("Repos", str(counts.get("repo", 0))),
-        ("News", str(counts.get("news", 0))),
-        ("Total", str(len(selected))),
-    ]
-    sections = [
-        render_stat_band(stats),
-        _learning_path_html(selected),
-        _connections_html(connections),
-        _diagnostics_html(context),
-    ]
+    sections = []
     for item_type in section_order:
         items = [item for item in selected if item.type == item_type]
         if not items:
             continue
         if item_type == "repo":
             sections.append(
-                '<section class="aurora-section"><h2>Repositories</h2>'
+                '<section class="aurora-section"><h2>GitHub Repos</h2>'
                 + "".join(render_repo_card(item) for item in items)
                 + "</section>"
             )
@@ -123,8 +111,7 @@ def render_unified_digest_html(
                 + "</section>"
             )
     fragment = "".join(section for section in sections if section)
-    subtitle = f"Generated {format_datetime(context.until or context.started_at)}"
-    return email_document(title, fragment, subtitle=subtitle), fragment
+    return email_document(title, fragment), fragment
 
 
 def render_stat_band(stats: Sequence[tuple[str, str]]) -> str:
@@ -178,22 +165,24 @@ def render_repo_card(item: SignalItem) -> str:
 
 
 def render_item_row(item: SignalItem) -> str:
-    why = item.why_it_matters or item.summary or item.raw_content
-    learning_html = ""
+    body = item.summary or item.why_it_matters or item.raw_content
+    meta = item.source
+    extra_html = ""
     if item.type == "paper":
+        metadata = item.metadata
+        venue = metadata.get("venue") or item.source
+        status = metadata.get("status") or "unknown"
+        meta = f"{venue} / {status}"
         learning = item.learning_value or item.summary
         if learning:
-            learning_html += f"<p><b>Learn:</b> {escape(learning)}</p>"
-        if item.action_items:
-            actions = "".join(f"<li>{escape(action)}</li>" for action in item.action_items[:3])
-            learning_html += f'<ul class="aurora-actions">{actions}</ul>'
+            extra_html = f"<p><b>Learn:</b> {escape(learning)}</p>"
     return (
         '<article class="aurora-row">'
         f'<h3><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '
         f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
-        f'<p class="aurora-meta">{escape(item.source)}</p>'
-        f"<p>{escape(why)}</p>"
-        f"{learning_html}"
+        f'<p class="aurora-meta">{escape(str(meta))}</p>'
+        f"<p>{escape(body)}</p>"
+        f"{extra_html}"
         "</article>"
     )
 

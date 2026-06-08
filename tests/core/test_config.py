@@ -60,7 +60,8 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.unified_digest.include_modes == ["tech_news", "scholar", "repo_learning"]
     assert config.modes.unified_digest.max_items_per_type == 8
     assert config.modes.unified_digest.max_total_items == 20
-    assert config.modes.unified_digest.section_order == ["paper", "repo", "news"]
+    assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]
+    assert config.modes.unified_digest.section_limits == {"news": 5, "repo": 3, "paper": 3}
 
 
 @pytest.mark.parametrize(
@@ -89,6 +90,8 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"unified_digest": {"include_modes": []}}},
         {"modes": {"unified_digest": {"include_modes": ["tech_news", "tech_news"]}}},
         {"modes": {"unified_digest": {"section_order": ["paper", "repo"]}}},
+        {"modes": {"unified_digest": {"section_limits": {"news": 0}}}},
+        {"modes": {"unified_digest": {"section_limits": {"unknown": 3}}}},
     ],
 )
 def test_aurora_config_rejects_invalid_ranges(payload: dict) -> None:
@@ -161,3 +164,6 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.modes.tech_news.sources.hackernews.min_score == 30
     assert config.modes.scholar.score_threshold == 5.5
     assert config.modes.repo_learning.sources.github_search.min_stars == 100
+    assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]
+    assert config.modes.unified_digest.section_limits == {"news": 5, "repo": 3, "paper": 3}
+    assert config.modes.unified_digest.max_total_items == 11

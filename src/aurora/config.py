@@ -545,8 +545,11 @@ class UnifiedDigestModeConfig(BaseModel):
     )
     max_items_per_type: int = Field(default=8, ge=1)
     max_total_items: int = Field(default=20, ge=1)
+    section_limits: dict[SignalSection, int] = Field(
+        default_factory=lambda: {"news": 5, "repo": 3, "paper": 3}
+    )
     cross_mode_clusters: bool = True
-    section_order: list[SignalSection] = Field(default_factory=lambda: ["paper", "repo", "news"])
+    section_order: list[SignalSection] = Field(default_factory=lambda: ["news", "repo", "paper"])
 
     @field_validator("include_modes")
     @classmethod
@@ -564,6 +567,16 @@ class UnifiedDigestModeConfig(BaseModel):
     def validate_section_order(cls, values: list[SignalSection]) -> list[SignalSection]:
         if sorted(values) != ["news", "paper", "repo"]:
             raise ValueError("section_order must contain news, paper, and repo exactly once")
+        return values
+
+    @field_validator("section_limits")
+    @classmethod
+    def validate_section_limits(cls, values: dict[SignalSection, int]) -> dict[SignalSection, int]:
+        for section, limit in values.items():
+            if section not in {"news", "paper", "repo"}:
+                raise ValueError("section_limits keys must be news, paper, or repo")
+            if limit < 1:
+                raise ValueError("section_limits values must be at least 1")
         return values
 
 

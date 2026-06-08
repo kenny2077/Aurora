@@ -87,9 +87,14 @@
       "enabled": true,
       "include_modes": ["tech_news", "scholar", "repo_learning"],
       "max_items_per_type": 8,
-      "max_total_items": 20,
+      "max_total_items": 11,
+      "section_limits": {
+        "news": 5,
+        "repo": 3,
+        "paper": 3
+      },
       "cross_mode_clusters": true,
-      "section_order": ["paper", "repo", "news"]
+      "section_order": ["news", "repo", "paper"]
     }
   }
 }

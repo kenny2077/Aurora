@@ -35,7 +35,7 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "test -s site/repo_learning/index.md" in workflow
     assert "test -s site/scholar/index.md" in workflow
     assert "test -s site/tech_news/index.md" in workflow
-    assert "Selected 0 item(s)" in workflow
+    assert "No items were available for the unified digest." in workflow
     assert "refusing to publish an empty Pages update" in workflow
     assert "cp data/aurora_state.json site/.aurora/aurora_state.json" in workflow
     assert "git -C \"$PUBLISH_DIR\" fetch --depth=1 origin gh-pages" in workflow

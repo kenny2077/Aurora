@@ -366,6 +366,34 @@ def test_run_prints_source_health_summary(tmp_path: Path, monkeypatch, capsys) -
     assert "tech_news: source bad_fetch failed - fetch failed" in output
 
 
+def test_run_prints_run_summary_warnings(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["unified_digest"]}}', encoding="utf-8")
+    monkeypatch.setattr("aurora.cli.build_unified_digest_pipeline", _warning_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "unified_digest",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--run-id",
+            "test-run",
+        ]
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert (
+        "unified_digest: warning scholar: Semantic Scholar enrichment rate-limited; "
+        "deterministic scholar scoring used."
+    ) in output
+
+
 class _Fetch:
     name = "fake"
 
@@ -409,6 +437,19 @@ class _Enrich:
         return [items[0].model_copy(update={"final_score": 8.0})]
 
 
+class _WarningEnrich:
+    async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
+        context.metadata["unified_child_run_summaries"] = [
+            {
+                "mode": "scholar",
+                "warnings": [
+                    "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+                ],
+            }
+        ]
+        return [items[0].model_copy(update={"final_score": 8.0})]
+
+
 class _Summarize:
     async def summarize(self, items, context: StageContext) -> str:
         return "summary"
@@ -449,6 +490,21 @@ def _partially_failing_pipeline(config) -> ModePipeline:
         deduplicate_stage=pipeline.deduplicate_stage,
         score_stage=pipeline.score_stage,
         enrich_stage=pipeline.enrich_stage,
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=pipeline.deliver_stage,
+    )
+
+
+def _warning_pipeline(config) -> ModePipeline:
+    pipeline = _mode_pipeline("unified_digest", "news")
+    return ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=_WarningEnrich(),
         summarize_stage=pipeline.summarize_stage,
         render_stage=pipeline.render_stage,
         deliver_stage=pipeline.deliver_stage,

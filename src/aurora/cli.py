@@ -205,6 +205,7 @@ def _handle_run(args: argparse.Namespace) -> int:
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
         _print_source_health(result)
+        _print_run_warnings(result)
         for delivery_result in result.delivery_results:
             status = "ok" if delivery_result.ok else "failed"
             suffix = f" - {delivery_result.error}" if delivery_result.error else ""
@@ -346,6 +347,19 @@ def _print_source_health(result: Any) -> None:
         if not status.ok:
             suffix = f" - {status.error}" if status.error else ""
             print(f"{result.mode}: source {status.source} failed{suffix}")
+
+
+def _print_run_warnings(result: Any) -> None:
+    run_summary = result.rendered_digest.metadata.get("run_summary")
+    if not isinstance(run_summary, dict):
+        return
+    warnings = run_summary.get("warnings")
+    if not isinstance(warnings, list):
+        return
+    for warning in warnings:
+        text = str(warning).strip()
+        if text:
+            print(f"{result.mode}: warning {text}")
 
 
 def _build_dry_run_pipeline(mode: str) -> ModePipeline:
