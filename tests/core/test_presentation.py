@@ -99,6 +99,7 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
         source="hackernews",
         published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
         summary="A concise news summary.",
+        metadata={"source_credibility": "Likely true: primary source announcement."},
         final_score=9.0,
     )
     repo = _repo(
@@ -144,6 +145,7 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "Semantic Scholar rate-limited" not in web_html
     assert web_html.index("Tech News") < web_html.index("GitHub Repos") < web_html.index("Research Papers")
     assert "Important News" in web_html
+    assert "Likely true: primary source announcement." in web_html
     assert "org/product" in web_html
     assert "Useful Paper" in web_html
 

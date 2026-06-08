@@ -3,7 +3,10 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 
+from aurora.ai.ranker import LLMRanker
+from aurora.config import AIConfig, FinalScoreWeights
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
+from aurora.modes.tech_news.notes import display_tech_news_credibility
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
 from aurora.modes.tech_news.scoring import TechNewsEnricher, TechNewsScorer
 from aurora.modes.tech_news.stages import TechNewsDeduplicateStage, TechNewsNormalizeStage
@@ -158,6 +161,50 @@ def test_enricher_generates_polished_hackernews_learning_notes() -> None:
         assert "[augstein]:" not in value
 
 
+def test_deterministic_tech_news_credibility_fallback_is_source_based() -> None:
+    hn_item = _item(
+        "news:hn",
+        "Important HN Story",
+        "https://example.com/story",
+        source="hackernews",
+        metadata={"score": 500, "descendants": 80},
+    )
+    rss_item = _item(
+        "news:rss",
+        "RSS Story",
+        "https://example.com/rss",
+        source="rss",
+        metadata={"feed_name": "Official Blog"},
+    )
+
+    assert display_tech_news_credibility(hn_item) == "Hacker News discussion; community signal, not independently verified."
+    assert display_tech_news_credibility(rss_item) == "Official Blog source; verify against the original article."
+
+
+def test_enricher_records_llm_source_credibility_when_available() -> None:
+    item = _item(
+        "news:llm",
+        "OpenAI ships a new model",
+        "https://example.com/model",
+        source="rss",
+        metadata={"feed_name": "OpenAI Blog"},
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+    ranker = LLMRanker(
+        AIConfig(api_key_env="AURORA_TEST_KEY"),
+        weights=FinalScoreWeights(deterministic=0.5, llm=0.5),
+        client=_CredibilityClient(),
+    )
+
+    enriched = asyncio.run(TechNewsEnricher(ranker).enrich([item], [score], _context()))[0]
+
+    assert enriched.summary == "A concise LLM summary."
+    assert enriched.metadata["source_credibility"] == "Likely true: primary source announcement."
+    assert display_tech_news_credibility(enriched) == "Likely true: primary source announcement."
+
+
 def test_enricher_generates_clean_rss_learning_notes() -> None:
     item = _item(
         "news:rss",
@@ -259,3 +306,18 @@ class _LowQualityRanker:
                 "action_items": ["Copy this raw thread."],
             }
         )
+
+
+class _CredibilityClient:
+    def is_configured(self) -> bool:
+        return True
+
+    async def complete_json(self, system_prompt: str, user_prompt: str) -> dict:
+        return {
+            "score": 8.0,
+            "summary": "A concise LLM summary.",
+            "why_it_matters": "A clean LLM reason.",
+            "learning_value": "A clean LLM learning note.",
+            "action_items": ["Read the primary source."],
+            "source_credibility": "Likely true: primary source announcement.",
+        }

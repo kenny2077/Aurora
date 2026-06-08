@@ -8,8 +8,9 @@ from aurora.models import SignalItem
 
 TECH_NEWS_ANALYSIS_SYSTEM = """
 You rank timely technology news. Return only JSON with:
-{"score": number, "summary": string, "why_it_matters": string, "learning_value": string, "action_items": [string]}
+{"score": number, "summary": string, "why_it_matters": string, "learning_value": string, "action_items": [string], "source_credibility": string}
 Favor broad impact, high engagement, and freshness over niche topic matching.
+For source_credibility, give a short source/plausibility assessment such as "Likely true: primary source announcement" or "Unverified: community discussion"; do not claim full fact-checking.
 """.strip()
 
 

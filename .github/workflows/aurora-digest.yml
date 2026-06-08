@@ -22,6 +22,14 @@ on:
         options:
           - "false"
           - "true"
+      topic:
+        description: Shared repo and research topic
+        default: agents_harness
+        type: choice
+        options:
+          - machine_learning
+          - agents_harness
+          - computer_vision
       skip_llm:
         description: Skip optional LLM enrichment for faster Pages publishing
         default: "false"
@@ -95,12 +103,14 @@ jobs:
           CONFIG_PATH="data/actions.config.json"
           MODE="${{ github.event.inputs.mode || 'unified_digest' }}"
           DRY_RUN="${{ github.event.inputs.dry_run || 'false' }}"
+          TOPIC="${{ github.event.inputs.topic || 'agents_harness' }}"
           SKIP_LLM="${{ github.event.inputs.skip_llm || 'false' }}"
           if [ "$DRY_RUN" != "true" ] && [ "$SKIP_LLM" != "true" ] && [ -z "$DEEPSEEK_API_KEY" ]; then
             echo "::error::Missing required LLM secret: DEEPSEEK_API_KEY"
             exit 1
           fi
           ARGS=(--config "$CONFIG_PATH" --mode "$MODE")
+          ARGS+=(--topic "$TOPIC")
           if [ "$SKIP_LLM" = "true" ]; then
             ARGS+=(--skip-llm)
           fi

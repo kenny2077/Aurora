@@ -23,6 +23,11 @@ from aurora.storage.config_loader import load_config
 
 MODE_CHOICES = ("tech_news", "scholar", "repo_learning", "unified_digest", "all")
 IMPLEMENTED_MODES = ("tech_news", "scholar", "repo_learning", "unified_digest")
+TOPIC_PRESET_MAP = {
+    "machine_learning": "ml",
+    "agents_harness": "agents",
+    "computer_vision": "cv",
+}
 
 
 class _DryRunFetch:
@@ -120,6 +125,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--output-dir", type=Path, default=None)
     run_parser.add_argument("--run-id", default=None)
     run_parser.add_argument("--hours", type=int, default=None)
+    run_parser.add_argument("--topic", choices=tuple(TOPIC_PRESET_MAP), default=None)
     run_parser.add_argument("--repo-interest", action="append", default=None)
     run_parser.add_argument("--research-field", action="append", default=None)
     run_parser.add_argument("--skip-llm", action="store_true")
@@ -221,6 +227,17 @@ def _select_modes(config: AuroraConfig, mode: str | None) -> list[ModeName]:
 
 def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> AuroraConfig:
     modes = config.modes
+    if args.topic:
+        if args.repo_interest or args.research_field:
+            raise ValueError("--topic cannot be combined with --repo-interest or --research-field")
+        preset = TOPIC_PRESET_MAP[args.topic]
+        repo_learning = type(modes.repo_learning).model_validate(
+            {**modes.repo_learning.model_dump(mode="python"), "interests": [preset]}
+        )
+        scholar = type(modes.scholar).model_validate(
+            {**modes.scholar.model_dump(mode="python"), "fields": [preset]}
+        )
+        modes = modes.model_copy(update={"repo_learning": repo_learning, "scholar": scholar})
     if args.repo_interest:
         repo_learning = type(modes.repo_learning).model_validate(
             {**modes.repo_learning.model_dump(mode="python"), "interests": args.repo_interest}

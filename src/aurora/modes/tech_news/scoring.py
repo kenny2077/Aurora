@@ -104,12 +104,17 @@ class TechNewsEnricher:
         if self.llm_ranker is None:
             return enriched
         analyses = await self.llm_ranker.analyze_items(enriched, build_tech_news_prompt, context)
-        return [
-            ensure_polished_tech_news_notes(
-                self.llm_ranker.apply_analysis(item, analyses.get(item.id))
-            )
-            for item in enriched
-        ]
+        analyzed: list[SignalItem] = []
+        for item in enriched:
+            analysis = analyses.get(item.id)
+            updated = self.llm_ranker.apply_analysis(item, analysis)
+            source_credibility = getattr(analysis, "source_credibility", "")
+            if analysis is not None and source_credibility:
+                metadata = dict(updated.metadata)
+                metadata["source_credibility"] = source_credibility
+                updated = updated.model_copy(update={"metadata": metadata})
+            analyzed.append(ensure_polished_tech_news_notes(updated))
+        return analyzed
 
 
 def _source_authority(item: SignalItem) -> float:

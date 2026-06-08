@@ -248,6 +248,87 @@ def test_real_scholar_run_applies_research_field_override(
     assert observed_fields == ["ml", "agents"]
 
 
+def test_run_topic_override_applies_to_repo_learning_and_scholar(
+    tmp_path: Path, monkeypatch
+) -> None:
+    observed_interests: list[str] = []
+    observed_fields: list[str] = []
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text(
+        '{"run": {"enabled_modes": ["repo_learning", "scholar"]}}',
+        encoding="utf-8",
+    )
+
+    def fake_repo_pipeline(config) -> ModePipeline:
+        observed_interests.extend(config.modes.repo_learning.interests)
+        return _fake_repo_learning_pipeline(config)
+
+    def fake_scholar_pipeline(config) -> ModePipeline:
+        observed_fields.extend(config.modes.scholar.fields)
+        return _fake_scholar_pipeline(config)
+
+    monkeypatch.setattr("aurora.cli.build_repo_learning_pipeline", fake_repo_pipeline)
+    monkeypatch.setattr("aurora.cli.build_scholar_pipeline", fake_scholar_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "all",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--topic",
+            "agents_harness",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed_interests == ["agents"]
+    assert observed_fields == ["agents"]
+
+
+def test_run_topic_override_rejects_advanced_interest_overrides(
+    tmp_path: Path, capsys
+) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text('{"run": {"enabled_modes": ["repo_learning"]}}', encoding="utf-8")
+
+    repo_conflict = main(
+        [
+            "run",
+            "--mode",
+            "repo_learning",
+            "--config",
+            str(config_path),
+            "--topic",
+            "machine_learning",
+            "--repo-interest",
+            "agents",
+        ]
+    )
+    field_conflict = main(
+        [
+            "run",
+            "--mode",
+            "scholar",
+            "--config",
+            str(config_path),
+            "--topic",
+            "computer_vision",
+            "--research-field",
+            "cv",
+        ]
+    )
+
+    captured = capsys.readouterr()
+    assert repo_conflict != 0
+    assert field_conflict != 0
+    assert "--topic cannot be combined" in captured.err
+
+
 def test_real_repo_learning_run_uses_pipeline_and_writes_non_empty_snapshots(
     tmp_path: Path, monkeypatch
 ) -> None:

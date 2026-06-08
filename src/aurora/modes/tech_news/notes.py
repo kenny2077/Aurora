@@ -55,6 +55,30 @@ def display_tech_news_learning(item: SignalItem) -> str:
     return build_tech_news_notes(item).learning_value
 
 
+def display_tech_news_credibility(item: SignalItem) -> str:
+    """Return a short source-quality line without claiming full fact checking."""
+    value = _clean_credibility_text(str(item.metadata.get("source_credibility") or ""))
+    if value:
+        return value
+    if _looks_like_hacker_news(item):
+        return "Hacker News discussion; community signal, not independently verified."
+    feed_name = clean_note_text(str(item.metadata.get("feed_name") or ""))
+    if feed_name:
+        return f"{feed_name} source; verify against the original article."
+    if item.source == "rss":
+        return "RSS source; verify against the original article."
+    return "Unverified community or web source; check the original link."
+
+
+def _clean_credibility_text(value: str) -> str:
+    text = html.unescape(value or "")
+    text = HTML_TAG_PATTERN.sub(" ", text)
+    text = COMMENT_PREFIX_PATTERN.sub(" ", text)
+    text = URL_PATTERN.sub(" ", text)
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+
 def clean_note_text(value: str) -> str:
     """Decode and remove markup, raw URLs, and HN author prefixes."""
     text = html.unescape(value or "")

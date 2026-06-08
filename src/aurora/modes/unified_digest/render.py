@@ -7,6 +7,7 @@ from collections.abc import Sequence
 from aurora.config import UnifiedDigestModeConfig
 from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
+    display_tech_news_credibility,
     display_tech_news_learning,
     display_tech_news_why,
 )
@@ -140,6 +141,7 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
     return [
         f"{index}. [{item.title}]({item.url}) - {score}/10",
         f"   - Source: {item.source}",
+        f"   - Credibility: {display_tech_news_credibility(item)}",
         f"   - Summary: {_summary_text(item)}",
     ]
 
