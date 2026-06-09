@@ -430,7 +430,8 @@ reference repos and avoids adding a YAML dependency.
           "enabled": true,
           "api_key_env": "SEMANTIC_SCHOLAR_API_KEY",
           "cache_ttl_hours": 168,
-          "max_requests_per_run": 40
+          "max_requests_per_run": 40,
+          "rate_limit_interval_sec": 1.1
         },
         "paperswithcode": {"enabled": true},
         "firecrawl": {"enabled": false, "api_key_env": "FIRECRAWL_API_KEY", "top_n": 10}
@@ -775,4 +776,3 @@ Plan:
    `NOTICE` if the implementation closely follows the same structure.
 9. Keep third-party dependency licenses separate from Horizon attribution.
 10. Update attribution in the same PR that introduces any derived code.
-

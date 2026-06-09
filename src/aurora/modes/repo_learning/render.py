@@ -24,22 +24,15 @@ class RepoLearningSummarizer:
             return "\n".join(lines)
         for index, item in enumerate(selected, start=1):
             metadata = item.metadata
-            stars = int(metadata.get("stars") or 0)
-            language = metadata.get("language") or "unknown"
-            package_files = ", ".join((metadata.get("package_files") or [])[:5]) or "not enriched"
-            evidence = "; ".join((metadata.get("recommendation_evidence") or [])[:6])
             warnings = "; ".join((metadata.get("quality_warnings") or [])[:4])
             lines.extend(
                 [
                     f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
                     "",
-                    f"- Stars: {stars}",
-                    f"- Language: {language}",
-                    f"- Why: {item.why_it_matters}",
-                    *([f"- Evidence: {evidence}"] if evidence else []),
+                    f"- {_repo_stats_text(metadata)}",
+                    f"- Value: {item.why_it_matters}",
                     *([f"- Watch: {warnings}"] if warnings else []),
                     f"- Study: {item.learning_value}",
-                    f"- Files: {package_files}",
                     "- Actions:",
                     *[f"  - {action}" for action in item.action_items],
                     "",
@@ -76,3 +69,24 @@ def _selected_items(
 ) -> list[SignalItem]:
     selected = sorted(items, key=lambda item: item.final_score or 0.0, reverse=True)
     return selected[: config.ranking.final_item_count]
+
+
+def _repo_stats_text(metadata: dict) -> str:
+    return " | ".join(
+        [
+            f"{_format_count(metadata.get('stars'))} stars",
+            f"{_format_count(metadata.get('forks'))} forks",
+            f"{_format_count(metadata.get('open_issues'))} open issues",
+        ]
+    )
+
+
+def _format_count(value: object) -> str:
+    try:
+        number = int(value or 0)
+    except (TypeError, ValueError):
+        return "0"
+    if number < 1000:
+        return str(number)
+    compact = f"{number / 1000:.1f}".rstrip("0").rstrip(".")
+    return f"{compact}k"

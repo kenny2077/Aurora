@@ -531,6 +531,64 @@ def test_semantic_scholar_rate_limit_does_not_kill_scholar_enrichment(
     assert (tmp_path / "cache" / CACHE_RELATIVE_PATH).exists()
 
 
+def test_semantic_scholar_enrichment_waits_between_live_requests(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    sleep_calls: list[float] = []
+
+    async def fake_sleep(delay: float) -> None:
+        sleep_calls.append(delay)
+
+    monkeypatch.setattr("aurora.modes.scholar.semantic_scholar.asyncio.sleep", fake_sleep)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        title = str(request.url.params.get("query") or "Paper")
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {
+                        "paperId": f"S2-{title}",
+                        "title": title,
+                        "citationCount": 0,
+                        "externalIds": {},
+                    }
+                ]
+            },
+        )
+
+    config = ScholarModeConfig(
+        sources={
+            "semantic_scholar": {
+                "rate_limit_interval_sec": 1.0,
+                "max_requests_per_run": 2,
+            }
+        }
+    )
+    items = [
+        _paper("first", "First", {"source_ids": {}}),
+        _paper("second", "Second", {"source_ids": {}}),
+    ]
+    scores = asyncio.run(ScholarScorer(config).score(items, _context()))
+    context = _cached_context(tmp_path)
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                items, scores, context
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert [item.metadata.get("semantic_scholar_paper_id") for item in enriched] == [
+        "S2-First",
+        "S2-Second",
+    ]
+    assert len(sleep_calls) == 1
+    assert 0.99 <= sleep_calls[0] <= 1.0
+
+
 def test_semantic_scholar_failures_do_not_kill_scholar_enrichment(monkeypatch) -> None:
     monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
     item = _paper("paper", "Reasoning", {"source_ids": {"arxiv": "2606.1"}})

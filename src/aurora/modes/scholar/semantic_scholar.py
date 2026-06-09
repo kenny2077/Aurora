@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
+import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -27,10 +29,10 @@ FIELDS = (
     "venue,year,fieldsOfStudy,authors,openAccessPdf,tldr"
 )
 RATE_LIMIT_WARNING = (
-    "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+    "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured."
 )
 FAILURE_WARNING = (
-    "Semantic Scholar enrichment skipped for one or more papers; deterministic scholar scoring used."
+    "Semantic Scholar enrichment skipped for one or more papers; scoring continued with available metadata and AI analysis when configured."
 )
 TITLE_MATCH_THRESHOLD = 0.92
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
@@ -67,6 +69,7 @@ class SemanticScholarClient:
         self._cache: dict[str, Any] = {"version": 1, "entries": {}}
         self._cache_loaded = False
         self._cache_dirty = False
+        self._last_request_at: float | None = None
 
     def is_configured(self) -> bool:
         return self.config.enabled and bool(os.getenv(self.config.api_key_env))
@@ -152,6 +155,7 @@ class SemanticScholarClient:
     ) -> dict[str, Any] | None:
         if self.stats.requests_made >= self.config.max_requests_per_run:
             return None
+        await self._pace_request()
         self.stats.requests_made += 1
         response = await self.http_client.get(
             f"{self.base_url}{path}",
@@ -166,6 +170,14 @@ class SemanticScholarClient:
         response.raise_for_status()
         payload = response.json()
         return payload if isinstance(payload, dict) else None
+
+    async def _pace_request(self) -> None:
+        interval = max(0.0, float(self.config.rate_limit_interval_sec))
+        if interval and self._last_request_at is not None:
+            elapsed = time.monotonic() - self._last_request_at
+            if elapsed < interval:
+                await asyncio.sleep(interval - elapsed)
+        self._last_request_at = time.monotonic()
 
     def _configure_cache(self, context: StageContext | None) -> None:
         self._cache_path = (

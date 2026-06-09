@@ -7,7 +7,7 @@ from aurora.pipeline import StageContext
 from aurora.presentation import render_repo_card, render_repo_digest_html, render_unified_digest_html, safe_url
 
 
-def test_repo_card_includes_evidence_warnings_guidance_and_actions() -> None:
+def test_repo_card_shows_compact_stats_value_guidance_and_actions() -> None:
     item = _repo(
         "org/product",
         metadata={
@@ -22,7 +22,7 @@ def test_repo_card_includes_evidence_warnings_guidance_and_actions() -> None:
             "recommendation_evidence": ["5.2k stars", "README found", "examples/run.py"],
             "quality_warnings": ["high issue load"],
         },
-        why="Evidence-backed repository.",
+        why="Valuable repository.",
         learn="Study pyproject.toml and examples/run.py.",
         actions=["Inspect pyproject.toml.", "Trace examples/run.py."],
     )
@@ -33,8 +33,16 @@ def test_repo_card_includes_evidence_warnings_guidance_and_actions() -> None:
     assert "9.2/10" in html
     assert "5.2k stars" in html
     assert "420 forks" in html
-    assert "README found" in html
     assert "high issue load" in html
+    assert "<b>Value:</b> Valuable repository." in html
+    assert "<b>Why:</b>" not in html
+    assert "MIT license" not in html
+    assert "homepage" not in html
+    assert "Python" not in html
+    assert "agents" not in html
+    assert "Files:" not in html
+    assert "Evidence:" not in html
+    assert "README found" not in html
     assert "Study pyproject.toml and examples/run.py." in html
     assert "Trace examples/run.py." in html
 
@@ -58,7 +66,9 @@ def test_repo_card_escapes_text_and_rejects_unsafe_urls() -> None:
 
     assert "<script>" not in html
     assert "&lt;script&gt;" in html
-    assert "&lt;Python&gt;" in html
+    assert "&lt;Python&gt;" not in html
+    assert "agent&lt;script&gt;" not in html
+    assert "README &lt;found&gt;" not in html
     assert "<bad>" not in html
     assert "x=&lt;bad&gt;" in safe_url("https://example.com/?x=<bad>")
     assert safe_url("javascript:alert(1)") == "#"
@@ -86,7 +96,7 @@ def test_repo_digest_html_handles_missing_optional_metadata() -> None:
     assert "<!doctype html>" in email_html
     assert "aurora-kpi" in web_html
     assert "org/minimal" in web_html
-    assert "not enriched" in web_html
+    assert "Evidence:" not in web_html
     assert "None" not in web_html
 
 

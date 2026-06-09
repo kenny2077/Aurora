@@ -395,7 +395,16 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
             "why_it_matters": "High signal.",
             "learning_value": "Study package files.",
             "action_items": ["Read files."],
-            "metadata": {"stars": 100, "language": "Python", "package_files": ["pyproject.toml"]},
+            "metadata": {
+                "stars": 100,
+                "forks": 7,
+                "open_issues": 2,
+                "language": "Python",
+                "license": "MIT",
+                "homepage": "https://high.example.com",
+                "package_files": ["pyproject.toml"],
+                "recommendation_evidence": ["README found"],
+            },
         }
     )
 
@@ -407,12 +416,21 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert "Selected 1 GitHub repo(s)." in summary
     assert "org/high" in summary
     assert "org/low" not in summary
+    assert "100 stars | 7 forks | 2 open issues" in summary
+    assert "- Value: High signal." in summary
+    assert "- Why:" not in summary
+    assert "- Language:" not in summary
+    assert "- Evidence:" not in summary
+    assert "- Files:" not in summary
+    assert "MIT license" not in summary
+    assert "homepage" not in summary
     assert rendered.metadata["recommended_repo_ids"] == ["repo:org/high"]
     assert rendered.html is not None
     assert "aurora-repo-card" in rendered.html
     assert rendered.metadata["web_html"]
     assert "org/high" in str(rendered.metadata["web_html"])
-    assert "pyproject.toml" in str(rendered.metadata["web_html"])
+    assert "Files:" not in str(rendered.metadata["web_html"])
+    assert "README found" not in str(rendered.metadata["web_html"])
     assert delivery[0].metadata["recommended_count"] == 1
     assert recent == {"repo:org/high"}
 

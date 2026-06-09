@@ -121,8 +121,8 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
     if item.type == "repo":
         lines = [
             f"{index}. [{item.title}]({item.url}) - {score}/10",
-            f"   - Source: {item.source}",
-            f"   - Why: {_why_text(item)}",
+            f"   - {_repo_stats_text(item.metadata)}",
+            f"   - Value: {_why_text(item)}",
             f"   - Study: {_learning_text(item)}",
         ]
         lines.extend(_repo_signal_lines(item, indent="   "))
@@ -321,11 +321,8 @@ def _repo_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
     if item.type != "repo":
         return []
     metadata = item.metadata
-    evidence = _metadata_text_list(metadata.get("recommendation_evidence"))
     warnings = _metadata_text_list(metadata.get("quality_warnings"))
     lines: list[str] = []
-    if evidence:
-        lines.append(f"{indent}- Evidence: {'; '.join(evidence[:6])}")
     if warnings:
         lines.append(f"{indent}- Watch: {'; '.join(warnings[:4])}")
     return lines
@@ -351,6 +348,27 @@ def _metadata_text_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _repo_stats_text(metadata: dict) -> str:
+    return " | ".join(
+        [
+            f"{_format_count(metadata.get('stars'))} stars",
+            f"{_format_count(metadata.get('forks'))} forks",
+            f"{_format_count(metadata.get('open_issues'))} open issues",
+        ]
+    )
+
+
+def _format_count(value: object) -> str:
+    try:
+        number = int(value or 0)
+    except (TypeError, ValueError):
+        return "0"
+    if number < 1000:
+        return str(number)
+    compact = f"{number / 1000:.1f}".rstrip("0").rstrip(".")
+    return f"{compact}k"
 
 
 def _why_text(item: SignalItem) -> str:

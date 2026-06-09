@@ -125,26 +125,11 @@ def render_stat_band(stats: Sequence[tuple[str, str]]) -> str:
 def render_repo_card(item: SignalItem) -> str:
     metadata = item.metadata
     title = str(metadata.get("full_name") or item.title)
-    language = str(metadata.get("language") or "").strip()
-    topics = _text_list(metadata.get("topics"))[:4]
-    evidence = _text_list(metadata.get("recommendation_evidence"))[:6]
     warnings = _text_list(metadata.get("quality_warnings"))[:4]
-    files = _text_list(metadata.get("package_files"))[:5]
     stats = _repo_stats(metadata)
-    badges = []
-    if language:
-        badges.append(_badge(language))
-    badges.extend(_badge(topic) for topic in topics)
-    badge_html = "".join(badges)
-    evidence_html = "".join(_badge(value, good=True) for value in evidence)
     warning_html = (
         f'<div class="aurora-warning"><b>Watch:</b> {escape("; ".join(warnings))}</div>'
         if warnings
-        else ""
-    )
-    files_html = (
-        f'<p><b>Files:</b> {escape(", ".join(files))}</p>'
-        if files
         else ""
     )
     actions_html = "".join(f"<li>{escape(action)}</li>" for action in item.action_items[:3])
@@ -153,11 +138,8 @@ def render_repo_card(item: SignalItem) -> str:
         f'<h3><a href="{safe_url(str(item.url))}">{escape(title)}</a> '
         f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
         f'<p class="aurora-meta">{escape(stats)}</p>'
-        f"<div>{badge_html}</div>"
-        f"<p><b>Why:</b> {escape(item.why_it_matters or item.summary or item.raw_content)}</p>"
+        f"<p><b>Value:</b> {escape(item.why_it_matters or item.summary or item.raw_content)}</p>"
         f"<p><b>Study:</b> {escape(item.learning_value or 'Inspect the repository structure and README.')}</p>"
-        f"{files_html}"
-        f'<div><b>Evidence:</b> {evidence_html or escape("not enriched")}</div>'
         f"{warning_html}"
         f'<ul class="aurora-actions">{actions_html}</ul>'
         "</article>"
@@ -294,21 +276,13 @@ def _diagnostics_html(context: StageContext) -> str:
 
 
 def _repo_stats(metadata: dict[str, Any]) -> str:
-    parts = [
-        f"{format_count(metadata.get('stars'))} stars",
-        f"{format_count(metadata.get('forks'))} forks",
-        f"{format_count(metadata.get('open_issues'))} open issues",
-    ]
-    if metadata.get("license"):
-        parts.append(f"{metadata['license']} license")
-    if metadata.get("homepage"):
-        parts.append("homepage")
-    return " | ".join(parts)
-
-
-def _badge(value: str, *, good: bool = False) -> str:
-    class_name = "aurora-badge aurora-badge-good" if good else "aurora-badge"
-    return f'<span class="{class_name}">{escape(value)}</span>'
+    return " | ".join(
+        [
+            f"{format_count(metadata.get('stars'))} stars",
+            f"{format_count(metadata.get('forks'))} forks",
+            f"{format_count(metadata.get('open_issues'))} open issues",
+        ]
+    )
 
 
 def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:

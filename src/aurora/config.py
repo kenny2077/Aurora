@@ -329,6 +329,7 @@ class SemanticScholarSourceConfig(BaseModel):
     api_key_env: str = "SEMANTIC_SCHOLAR_API_KEY"
     cache_ttl_hours: int = Field(default=168, ge=1)
     max_requests_per_run: int = Field(default=40, ge=0)
+    rate_limit_interval_sec: float = Field(default=1.1, ge=0.0)
 
     @field_validator("api_key_env")
     @classmethod

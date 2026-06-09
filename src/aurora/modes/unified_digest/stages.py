@@ -39,7 +39,13 @@ class UnifiedFetchStage:
                 if builder is None:
                     raise ValueError(f"unified_digest included unsupported mode: {mode}")
                 pipeline = _without_delivery(builder(self.config))
-                sub_context = context.model_copy(update={"mode": mode, "config": self.config})
+                sub_context = context.model_copy(
+                    update={
+                        "mode": mode,
+                        "config": self.config,
+                        "metadata": _child_metadata(context.metadata),
+                    }
+                )
                 result = await runner.run(pipeline, sub_context)
             except Exception as exc:
                 failures.append({"mode": mode, "error": str(exc)})
@@ -235,6 +241,14 @@ def _without_delivery(pipeline: ModePipeline) -> ModePipeline:
         render_stage=pipeline.render_stage,
         deliver_stage=_NoDeliveryStage(),
     )
+
+
+def _child_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: metadata[key]
+        for key in ("skip_llm", "skip_delivery", "strict_delivery")
+        if key in metadata
+    }
 
 
 def _prefer_item(first: SignalItem, second: SignalItem) -> SignalItem:

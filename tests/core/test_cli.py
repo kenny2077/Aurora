@@ -471,7 +471,7 @@ def test_run_prints_run_summary_warnings(tmp_path: Path, monkeypatch, capsys) ->
     assert exit_code == 0
     assert (
         "unified_digest: warning scholar: Semantic Scholar enrichment rate-limited; "
-        "deterministic scholar scoring used."
+        "scoring continued with available metadata and AI analysis when configured."
     ) in output
 
 
@@ -524,7 +524,7 @@ class _WarningEnrich:
             {
                 "mode": "scholar",
                 "warnings": [
-                    "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+                    "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured."
                 ],
             }
         ]

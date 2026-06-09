@@ -188,7 +188,7 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Tech News" in str(rendered.metadata["web_html"])
 
 
-def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
+def test_unified_rendering_shows_simplified_repo_cards_without_evidence_blocks() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,
         max_total_items=20,
@@ -201,6 +201,14 @@ def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
         9.0,
         url="https://github.com/org/noisy",
         metadata={
+            "stars": 6000,
+            "forks": 420,
+            "open_issues": 12,
+            "license": "MIT",
+            "homepage": "https://noisy.example.com",
+            "language": "Python",
+            "topics": ["agents", "mcp"],
+            "package_files": ["pyproject.toml", "examples/quickstart.py"],
             "recommendation_evidence": [
                 "6k stars",
                 "README found",
@@ -224,12 +232,26 @@ def test_unified_rendering_shows_repo_evidence_and_warnings() -> None:
 
     assert "### Repo to Study" not in summary
     assert "## GitHub Repos" in summary
-    assert "   - Evidence: 6k stars; README found; examples/quickstart.py" in summary
+    assert "   - 6k stars | 420 forks | 12 open issues" in summary
+    assert "   - Value: org/noisy is worth studying because it has concrete learning evidence." in summary
+    assert "   - Why:" not in summary
+    assert "license" not in summary
+    assert "homepage" not in summary
+    assert "   - Evidence:" not in summary
+    assert "   - Files:" not in summary
+    assert "Python" not in summary
+    assert "agents" not in summary
     assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
-    assert "Evidence-backed" not in str(rendered.metadata["web_html"])
-    assert "Evidence:" in str(rendered.metadata["web_html"])
+    assert "Evidence:" not in str(rendered.metadata["web_html"])
+    assert "Files:" not in str(rendered.metadata["web_html"])
+    assert "MIT license" not in str(rendered.metadata["web_html"])
+    assert "homepage" not in str(rendered.metadata["web_html"])
+    assert "Python" not in str(rendered.metadata["web_html"])
+    assert "agents" not in str(rendered.metadata["web_html"])
+    assert "<b>Value:</b>" in str(rendered.metadata["web_html"])
+    assert "<b>Why:</b>" not in str(rendered.metadata["web_html"])
     assert "Watch:" in str(rendered.metadata["web_html"])
 
 
@@ -334,7 +356,7 @@ def test_unified_summary_hides_run_summary_and_source_health_from_visible_digest
                     "counts": {"enriched": 0},
                     "source_health": {"ok": 0, "failed": 1, "rate_limited": 1},
                     "warnings": [
-                        "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+                        "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured."
                     ],
                 },
             ],
@@ -921,8 +943,50 @@ def test_unified_fetch_keeps_scholar_papers_when_semantic_scholar_rate_limits(
     assert "unified_mode_failures" not in context.metadata
     child_summary = context.metadata["unified_child_run_summaries"][0]
     assert child_summary["warnings"] == [
-        "Semantic Scholar enrichment rate-limited; deterministic scholar scoring used."
+        "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured."
     ]
+
+
+def test_unified_fetch_does_not_leak_scholar_warnings_into_later_modes(
+    tmp_path: Path,
+) -> None:
+    config = AuroraConfig(
+        run=RunConfig(output_dir=tmp_path),
+        modes={
+            "unified_digest": {
+                "include_modes": ["scholar", "repo_learning"],
+                "section_order": ["paper", "repo", "news"],
+            }
+        },
+    )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
+
+    collected = asyncio.run(
+        UnifiedFetchStage(
+            config,
+            {
+                "scholar": lambda config: _warning_pipeline(
+                    "scholar",
+                    [_item("paper:1", "paper", "Paper", 8.0)],
+                    "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured.",
+                ),
+                "repo_learning": lambda config: _static_pipeline(
+                    "repo_learning",
+                    [_item("repo:1", "repo", "Repo", 7.0)],
+                    [],
+                ),
+            },
+        ).fetch(context)
+    )
+
+    assert [item.id for item in collected] == ["paper:1", "repo:1"]
+    child_summaries = context.metadata["unified_child_run_summaries"]
+    assert child_summaries[0]["mode"] == "scholar"
+    assert child_summaries[0]["warnings"] == [
+        "Semantic Scholar enrichment rate-limited; scoring continued with available metadata and AI analysis when configured."
+    ]
+    assert child_summaries[1]["mode"] == "repo_learning"
+    assert "warnings" not in child_summaries[1]
 
 
 def _item(
@@ -989,6 +1053,20 @@ def _cached_pipeline(mode: str, item: SignalItem) -> ModePipeline:
     )
 
 
+def _warning_pipeline(mode: str, items: list[SignalItem], warning: str) -> ModePipeline:
+    return ModePipeline(
+        mode=mode,
+        fetch_stages=[_Fetch(items)],
+        normalize_stage=_Normalize(),
+        deduplicate_stage=_Dedup(),
+        score_stage=_Score(),
+        enrich_stage=_WarningEnrich(warning),
+        summarize_stage=_Summarize(),
+        render_stage=_Render(),
+        deliver_stage=_Deliver([]),
+    )
+
+
 def _semantic_scholar_pipeline(config: AuroraConfig, client: httpx.AsyncClient) -> ModePipeline:
     paper = _item(
         "paper:semantic",
@@ -1049,6 +1127,15 @@ class _CachedEnrich:
 
     async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
         return [self.item]
+
+
+class _WarningEnrich:
+    def __init__(self, warning: str) -> None:
+        self.warning = warning
+
+    async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
+        context.metadata.setdefault("semantic_scholar_warnings", []).append(self.warning)
+        return list(items)
 
 
 class _Summarize:
