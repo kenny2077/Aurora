@@ -103,8 +103,9 @@ Optional:
 
 ## Delivery
 
-By default Aurora writes Markdown/HTML reports to `reports/` and Pages-ready
-artifacts to `site/`. Generated runtime paths are ignored by git.
+By default Aurora writes Markdown/HTML reports to `reports/` and Astro content
+posts to `web/src/content/posts/`. GitHub Actions builds the Astro site into
+`web/dist/` for Pages publishing.
 
 Use deterministic-only mode:
 
@@ -123,10 +124,11 @@ field preset list.
 
 ## GitHub Pages Setup
 
-Aurora publishes a static site to the `gh-pages` branch. In GitHub repository
-settings, configure Pages to deploy from `gh-pages` at the branch root. The
-workflow writes real Jekyll content under `site/`, verifies that digest posts
-exist, then pushes that generated site to `gh-pages`.
+Aurora publishes an Astro static site to the `gh-pages` branch. In GitHub
+repository settings, configure Pages to deploy from `gh-pages` at the branch
+root. The workflow restores prior generated digest content from
+`.aurora/content/posts`, writes the latest digest into `web/src/content/posts/`,
+builds `web/dist/`, then pushes that generated site to `gh-pages`.
 
 Useful local checks:
 
@@ -149,7 +151,7 @@ content, source failures, rate limits, or delivery issues.
 - Empty tech news usually means Hacker News/RSS candidates did not meet score,
   recency, or keyword filters.
 - Empty Pages output should fail the workflow instead of publishing a placeholder.
-  Inspect `run_summary.json`, workflow logs, and `site/_posts/`.
+  Inspect `run_summary.json`, workflow logs, and `web/src/content/posts/`.
 
 ## What Aurora Is Not
 

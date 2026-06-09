@@ -166,7 +166,7 @@ class GitHubPagesDeliveryConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     enabled: bool = True
-    publish_dir: Path = Path("site")
+    publish_dir: Path = Path("web/src/content/posts")
 
 
 class DeliveryConfig(BaseModel):

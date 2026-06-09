@@ -21,7 +21,7 @@
     },
     "github_pages": {
       "enabled": true,
-      "publish_dir": "site"
+      "publish_dir": "web/src/content/posts"
     },
     "filesystem": {
       "enabled": true,

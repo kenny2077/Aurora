@@ -188,7 +188,7 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Tech News" in str(rendered.metadata["web_html"])
 
 
-def test_unified_rendering_shows_simplified_repo_cards_without_evidence_blocks() -> None:
+def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,
         max_total_items=20,
@@ -244,14 +244,14 @@ def test_unified_rendering_shows_simplified_repo_cards_without_evidence_blocks()
     assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
-    assert "Evidence:" not in str(rendered.metadata["web_html"])
+    assert "Evidence:" in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
     assert "MIT license" not in str(rendered.metadata["web_html"])
     assert "homepage" not in str(rendered.metadata["web_html"])
-    assert "Python" not in str(rendered.metadata["web_html"])
-    assert "agents" not in str(rendered.metadata["web_html"])
-    assert "<b>Value:</b>" in str(rendered.metadata["web_html"])
-    assert "<b>Why:</b>" not in str(rendered.metadata["web_html"])
+    assert "Python" in str(rendered.metadata["web_html"])
+    assert "agents" in str(rendered.metadata["web_html"])
+    assert "<b>Why:</b>" in str(rendered.metadata["web_html"])
+    assert "<b>Value:</b>" not in str(rendered.metadata["web_html"])
     assert "Watch:" in str(rendered.metadata["web_html"])
 
 

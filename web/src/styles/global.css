@@ -1,0 +1,110 @@
+@import "tailwindcss";
+@import "./theme.css";
+@import "./typography.css";
+@import "rehype-callouts/theme/obsidian";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+@layer base {
+  * {
+    @apply border-border outline-accent/75;
+    scrollbar-width: auto;
+    scrollbar-color: var(--color-muted) transparent;
+  }
+  a,
+  button {
+    @apply outline-accent outline-offset-1 focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-dashed;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
+@utility max-w-app {
+  @apply max-w-3xl;
+}
+
+@utility app-layout {
+  @apply max-w-app mx-auto w-full px-4;
+}
+
+@utility active-nav {
+  @apply underline decoration-wavy decoration-2 underline-offset-8;
+}
+
+:target {
+  scroll-margin-block: 1rem;
+}
+
+@layer components {
+  .aurora-digest-prose h2 {
+    @apply border-border mt-10 border-b pb-2 not-italic;
+  }
+
+  .aurora-digest-prose blockquote {
+    @apply border-accent bg-muted/40 rounded-md border border-s-4 px-4 py-3 opacity-100;
+  }
+
+  .aurora-digest-prose blockquote p {
+    @apply my-0;
+  }
+
+  .aurora-digest-prose a[target="_blank"] {
+    @apply decoration-dashed underline-offset-4 hover:text-accent;
+  }
+
+  .aurora-section {
+    @apply my-8;
+  }
+
+  .aurora-section h2 {
+    @apply border-border mb-4 border-b pb-2 text-xl font-semibold;
+  }
+
+  .aurora-card,
+  .aurora-row {
+    @apply border-border bg-background rounded-lg border p-4 shadow-sm;
+  }
+
+  .aurora-card {
+    @apply mb-4;
+  }
+
+  .aurora-row {
+    @apply mb-3;
+  }
+
+  .aurora-repo-card h3,
+  .aurora-row h3 {
+    @apply mb-2 flex flex-wrap items-center justify-between gap-2 text-base font-semibold;
+  }
+
+  .aurora-meta {
+    @apply text-muted-foreground my-2 text-sm;
+  }
+
+  .aurora-score {
+    @apply inline-block rounded-md border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-bold whitespace-nowrap text-blue-700 dark:border-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-200;
+  }
+
+  .aurora-badge {
+    @apply border-border bg-muted/50 text-foreground mb-1 mr-1 inline-block rounded-md border px-2 py-1 text-xs;
+  }
+
+  .aurora-callout {
+    @apply border-border bg-muted/35 my-3 rounded-lg border border-s-4 border-s-blue-600 px-4 py-3 text-sm;
+  }
+
+  .aurora-study {
+    @apply border-s-emerald-600;
+  }
+
+  .aurora-warning {
+    @apply my-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200;
+  }
+
+  .aurora-actions {
+    @apply mt-3;
+  }
+}

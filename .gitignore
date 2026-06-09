@@ -8,3 +8,6 @@ data/cache/
 data/aurora_state.json
 reports/
 site/
+web/.astro/
+web/dist/
+web/node_modules/

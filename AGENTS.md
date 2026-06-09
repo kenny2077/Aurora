@@ -31,7 +31,7 @@ Current polishing stage:
 - Async pipeline stages and source adapters
 - `httpx`, `feedparser`, `defusedxml`
 - Pytest test suite
-- GitHub Actions workflow publishing a Jekyll/static site to `gh-pages`
+- GitHub Actions workflow publishing an Astro static site to `gh-pages`
 
 ## Important Directories
 
@@ -189,9 +189,10 @@ Typecheck/lint:
   - `data/aurora_state.json`
   - `reports/`
   - `site/`
+  - `web/dist/`
   - `dist/`
-- Do not modify generated `gh-pages` output in `site/` by hand; it is produced
-  by Aurora and published by CI.
+- Do not modify generated `gh-pages` output in `web/dist/` by hand; it is
+  produced by the Astro build and published by CI.
 - Treat external reference material outside this repo, such as `references/`,
   `new references/`, and `planning/`, as read-only unless the user explicitly
   asks for planning/doc work there.

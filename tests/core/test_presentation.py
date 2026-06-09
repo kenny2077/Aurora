@@ -34,15 +34,15 @@ def test_repo_card_shows_compact_stats_value_guidance_and_actions() -> None:
     assert "5.2k stars" in html
     assert "420 forks" in html
     assert "high issue load" in html
-    assert "<b>Value:</b> Valuable repository." in html
-    assert "<b>Why:</b>" not in html
-    assert "MIT license" not in html
+    assert '<a href="https://github.com/org/product" target="_blank" rel="noopener noreferrer">' in html
+    assert "<b>Why:</b> Valuable repository." in html
+    assert "<b>Study:</b> Study pyproject.toml and examples/run.py." in html
+    assert "<b>Evidence:</b> 5.2k stars; README found; examples/run.py" in html
     assert "homepage" not in html
-    assert "Python" not in html
-    assert "agents" not in html
+    assert "Python" in html
+    assert "agents" in html
     assert "Files:" not in html
-    assert "Evidence:" not in html
-    assert "README found" not in html
+    assert "MIT license" not in html
     assert "Study pyproject.toml and examples/run.py." in html
     assert "Trace examples/run.py." in html
 
@@ -66,9 +66,9 @@ def test_repo_card_escapes_text_and_rejects_unsafe_urls() -> None:
 
     assert "<script>" not in html
     assert "&lt;script&gt;" in html
-    assert "&lt;Python&gt;" not in html
-    assert "agent&lt;script&gt;" not in html
-    assert "README &lt;found&gt;" not in html
+    assert "&lt;Python&gt;" in html
+    assert "agent&lt;script&gt;" in html
+    assert "README &lt;found&gt;" in html
     assert "<bad>" not in html
     assert "x=&lt;bad&gt;" in safe_url("https://example.com/?x=<bad>")
     assert safe_url("javascript:alert(1)") == "#"
@@ -97,6 +97,7 @@ def test_repo_digest_html_handles_missing_optional_metadata() -> None:
     assert "aurora-kpi" in web_html
     assert "org/minimal" in web_html
     assert "Evidence:" not in web_html
+    assert "<b>Why:</b> Relevant for learning." in web_html
     assert "None" not in web_html
 
 

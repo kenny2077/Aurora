@@ -79,6 +79,8 @@ class UnifiedDigestRenderer:
             metadata={
                 "selected_item_ids": [item.id for item in selected],
                 "recommended_repo_ids": [item.id for item in selected if item.type == "repo"],
+                "featured_repo": _featured_title(selected, "repo"),
+                "featured_paper": _featured_title(selected, "paper"),
                 "item_counts": {
                     item_type: sum(1 for item in selected if item.type == item_type)
                     for item_type in self.config.section_order
@@ -107,6 +109,15 @@ def select_items(
 def _section_limit(config: UnifiedDigestModeConfig, item_type: str) -> int:
     limit = config.section_limits.get(item_type) if hasattr(config, "section_limits") else None
     return limit if limit is not None else config.max_items_per_type
+
+
+def _featured_title(items: Sequence[SignalItem], item_type: str) -> str:
+    candidates = [item for item in items if item.type == item_type]
+    candidates.sort(key=_item_score, reverse=True)
+    if not candidates:
+        return ""
+    item = candidates[0]
+    return str(item.metadata.get("full_name") or item.title)
 
 
 def _excerpt(value: str, limit: int) -> str:

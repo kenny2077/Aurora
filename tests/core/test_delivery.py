@@ -24,7 +24,7 @@ def test_configured_delivery_writes_filesystem_and_pages_artifacts(tmp_path: Pat
     config = AuroraConfig(
         delivery=DeliveryConfig(
             filesystem=FilesystemDeliveryConfig(reports_dir=tmp_path / "reports"),
-            github_pages=GitHubPagesDeliveryConfig(publish_dir=tmp_path / "site"),
+            github_pages=GitHubPagesDeliveryConfig(publish_dir=tmp_path / "web" / "src" / "content" / "posts"),
         )
     )
     rendered = RenderedDigest(mode="tech_news", title="Tech", markdown="# Tech\n\nBody")
@@ -44,10 +44,7 @@ def test_configured_delivery_writes_filesystem_and_pages_artifacts(tmp_path: Pat
     assert [result.channel for result in results] == ["filesystem", "github_pages"]
     assert (tmp_path / "reports" / "run-1" / "tech_news.md").read_text(encoding="utf-8") == "# Tech\n\nBody"
     assert (tmp_path / "reports" / "run-1" / "tech_news.html").exists()
-    assert (tmp_path / "site" / "_config.yml").exists()
-    assert (tmp_path / "site" / "index.md").exists()
-    assert (tmp_path / "site" / "_posts" / "2026-05-25-tech-news.md").exists()
-    assert (tmp_path / "site" / "tech_news" / "index.md").exists()
+    assert (tmp_path / "web" / "src" / "content" / "posts" / "2026-05-25-tech-news.md").exists()
 
 
 def test_filesystem_delivery_appends_source_health_when_run_summary_exists(tmp_path: Path) -> None:

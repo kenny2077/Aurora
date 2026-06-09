@@ -109,4 +109,4 @@ Generated files are useful for debugging but should not be committed:
 - `data/aurora_state.json`
 - `reports/`
 - `site/`
-
+- `web/dist/`

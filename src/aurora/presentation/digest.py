@@ -14,16 +14,16 @@ from aurora.pipeline import StageContext
 
 
 EMAIL_CSS = """
-body{margin:0;background:#f6f8fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
-a{color:#0f6bff;text-decoration:none;}
-.aurora-email{max-width:720px;margin:0 auto;padding:24px 16px;}
-.aurora-shell{background:#ffffff;border:1px solid #dce4ee;border-radius:8px;overflow:hidden;}
-.aurora-hero{background:#0f172a;color:#ffffff;padding:24px;}
+body{margin:0;background:#f5f7fb;color:#172033;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
+a{color:#0b63ce;text-decoration:none;}
+.aurora-email{max-width:760px;margin:0 auto;padding:24px 16px;}
+.aurora-shell{background:#ffffff;border:1px solid #d9e2ee;border-radius:8px;overflow:hidden;}
+.aurora-hero{background:#111827;color:#ffffff;padding:26px;}
 .aurora-hero h1{font-size:24px;line-height:1.2;margin:0 0 8px;}
 .aurora-hero p{color:#cbd5e1;margin:0;}
 .aurora-body{padding:22px;}
-.aurora-section{margin:0 0 24px;}
-.aurora-section h2{font-size:17px;color:#172033;margin:0 0 12px;}
+.aurora-section{margin:0 0 26px;}
+.aurora-section h2{font-size:17px;color:#172033;margin:0 0 12px;padding-bottom:8px;border-bottom:1px solid #e5edf6;}
 .aurora-kpis{display:block;margin:0 0 20px;}
 .aurora-kpi{display:inline-block;vertical-align:top;width:22%;min-width:118px;margin:0 8px 8px 0;padding:12px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;}
 .aurora-kpi b{display:block;color:#172033;font-size:18px;}
@@ -31,13 +31,16 @@ a{color:#0f6bff;text-decoration:none;}
 .aurora-card{border:1px solid #dce4ee;border-radius:8px;background:#ffffff;margin:0 0 14px;padding:16px;}
 .aurora-card h3{font-size:16px;line-height:1.3;margin:0 0 8px;}
 .aurora-meta{color:#64748b;font-size:12px;margin:0 0 10px;}
-.aurora-score{display:inline-block;background:#e8f2ff;color:#0b5bd3;border-radius:6px;padding:3px 7px;font-weight:700;font-size:12px;}
+.aurora-score{display:inline-block;background:#e8f2ff;color:#0b5bd3;border:1px solid #bfdbfe;border-radius:6px;padding:3px 7px;font-weight:700;font-size:12px;white-space:nowrap;}
 .aurora-badge{display:inline-block;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;margin:0 4px 4px 0;font-size:12px;}
 .aurora-badge-good{background:#ecfdf5;color:#047857;border-color:#bbf7d0;}
 .aurora-warning{background:#fffbeb;color:#92400e;border:1px solid #fde68a;border-radius:8px;padding:9px 10px;margin:10px 0;font-size:13px;}
+.aurora-callout{background:#f8fafc;color:#334155;border:1px solid #dce4ee;border-left:4px solid #0b63ce;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5;}
+.aurora-callout b{color:#172033;}
+.aurora-study{background:#f7fbf6;border-left-color:#16803c;}
 .aurora-card p{line-height:1.5;margin:8px 0;color:#334155;}
 .aurora-actions{margin:10px 0 0;padding-left:18px;color:#334155;}
-.aurora-row{border-top:1px solid #e2e8f0;padding:12px 0;}
+.aurora-row{border:1px solid #e2e8f0;border-radius:8px;background:#ffffff;margin:0 0 12px;padding:14px;}
 .aurora-row h3{font-size:15px;margin:0 0 4px;}
 """
 
@@ -125,23 +128,30 @@ def render_stat_band(stats: Sequence[tuple[str, str]]) -> str:
 def render_repo_card(item: SignalItem) -> str:
     metadata = item.metadata
     title = str(metadata.get("full_name") or item.title)
+    evidence = _text_list(metadata.get("recommendation_evidence"))[:4]
     warnings = _text_list(metadata.get("quality_warnings"))[:4]
     stats = _repo_stats(metadata)
+    badges = _repo_badges(metadata)
+    badge_html = "".join(f'<span class="aurora-badge">{escape(badge)}</span>' for badge in badges)
+    evidence_html = _callout("Evidence", "; ".join(evidence), "aurora-callout") if evidence else ""
     warning_html = (
         f'<div class="aurora-warning"><b>Watch:</b> {escape("; ".join(warnings))}</div>'
         if warnings
         else ""
     )
     actions_html = "".join(f"<li>{escape(action)}</li>" for action in item.action_items[:3])
+    actions_block = f'<ul class="aurora-actions">{actions_html}</ul>' if actions_html else ""
     return (
         '<article class="aurora-card aurora-repo-card">'
-        f'<h3><a href="{safe_url(str(item.url))}">{escape(title)}</a> '
+        f'<h3><a {link_attrs(str(item.url))}>{escape(title)}</a> '
         f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
         f'<p class="aurora-meta">{escape(stats)}</p>'
-        f"<p><b>Value:</b> {escape(item.why_it_matters or item.summary or item.raw_content)}</p>"
-        f"<p><b>Study:</b> {escape(item.learning_value or 'Inspect the repository structure and README.')}</p>"
+        f"{badge_html}"
+        f"{evidence_html}"
+        f'{_callout("Why", item.why_it_matters or item.summary or item.raw_content, "aurora-callout")}'
+        f'{_callout("Study", item.learning_value or "Inspect the repository structure and README.", "aurora-callout aurora-study")}'
         f"{warning_html}"
-        f'<ul class="aurora-actions">{actions_html}</ul>'
+        f"{actions_block}"
         "</article>"
     )
 
@@ -162,7 +172,7 @@ def render_item_row(item: SignalItem) -> str:
         meta = item.source
     return (
         '<article class="aurora-row">'
-        f'<h3><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '
+        f'<h3><a {link_attrs(str(item.url))}>{escape(item.title)}</a> '
         f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
         f'<p class="aurora-meta">{escape(str(meta))}</p>'
         f"<p>{escape(body)}</p>"
@@ -176,6 +186,13 @@ def safe_url(value: str) -> str:
     if parsed.scheme in {"http", "https"} and parsed.netloc:
         return escape(value, quote=True)
     return "#"
+
+
+def link_attrs(value: str) -> str:
+    href = safe_url(value)
+    if href == "#":
+        return 'href="#"'
+    return f'href="{href}" target="_blank" rel="noopener noreferrer"'
 
 
 def format_count(value: object) -> str:
@@ -283,6 +300,27 @@ def _repo_stats(metadata: dict[str, Any]) -> str:
             f"{format_count(metadata.get('open_issues'))} open issues",
         ]
     )
+
+
+def _repo_badges(metadata: dict[str, Any]) -> list[str]:
+    badges: list[str] = []
+    language = str(metadata.get("language") or "").strip()
+    if language:
+        badges.append(language)
+    for topic in metadata.get("topics") or []:
+        topic_text = str(topic).strip()
+        if topic_text and topic_text not in badges:
+            badges.append(topic_text)
+        if len(badges) >= 4:
+            break
+    return badges
+
+
+def _callout(label: str, value: str, class_name: str) -> str:
+    text = value.strip()
+    if not text:
+        return ""
+    return f'<div class="{class_name}"><b>{escape(label)}:</b> {escape(text)}</div>'
 
 
 def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:

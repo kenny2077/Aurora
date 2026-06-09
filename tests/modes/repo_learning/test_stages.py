@@ -430,7 +430,9 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert rendered.metadata["web_html"]
     assert "org/high" in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
-    assert "README found" not in str(rendered.metadata["web_html"])
+    assert "<b>Evidence:</b> README found" in str(rendered.metadata["web_html"])
+    assert "MIT license" not in str(rendered.metadata["web_html"])
+    assert "homepage" not in str(rendered.metadata["web_html"])
     assert delivery[0].metadata["recommended_count"] == 1
     assert recent == {"repo:org/high"}
 

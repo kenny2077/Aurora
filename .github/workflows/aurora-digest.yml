@@ -55,8 +55,15 @@ jobs:
         run: |
           python -m pip install --user "uv==0.11.15"
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
       - name: Install
-        run: uv sync --dev
+        run: |
+          uv sync --dev
+          npm --prefix web ci
       - name: Restore Aurora state
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
@@ -68,6 +75,10 @@ jobs:
             if [ -f "$STATE_DIR/.aurora/aurora_state.json" ]; then
               mkdir -p data
               cp "$STATE_DIR/.aurora/aurora_state.json" data/aurora_state.json
+            fi
+            if [ -d "$STATE_DIR/.aurora/content/posts" ]; then
+              mkdir -p web/src/content/posts
+              cp -R "$STATE_DIR/.aurora/content/posts/." web/src/content/posts/
             fi
           fi
       - name: Validate config
@@ -119,30 +130,31 @@ jobs:
           else
             uv run aurora run "${ARGS[@]}" --strict-delivery
           fi
+      - name: Build Astro Pages site
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: npm --prefix web run build
       - name: Verify generated Pages site
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
-          test -s site/index.md
-          test -s site/_config.yml
-          test -s site/feed.xml
-          test -s site/unified_digest/index.md
-          test -s site/scholar/index.md
-          test -s site/repo_learning/index.md
-          test -s site/tech_news/index.md
-          test -d site/_posts
-          POST_COUNT="$(find site/_posts -type f -name '*.md' | wc -l)"
+          test -s web/dist/index.html
+          test -s web/dist/rss.xml
+          test -d web/src/content/posts
+          POST_COUNT="$(find web/src/content/posts -type f -name '*.md' | wc -l)"
           if [ "$POST_COUNT" -lt 1 ]; then
-            echo "No digest posts were generated under site/_posts."
+            echo "No digest posts were generated under web/src/content/posts."
             exit 1
           fi
-          if grep -R "No items were available for the unified digest." site/_posts/*.md; then
+          if grep -R "No items were available for the unified digest." web/src/content/posts/*.md; then
             echo "Generated digest is empty; refusing to publish an empty Pages update."
             exit 1
           fi
+          mkdir -p web/dist/.aurora/content/posts
+          cp -R web/src/content/posts/. web/dist/.aurora/content/posts/
           if [ -f data/aurora_state.json ]; then
-            mkdir -p site/.aurora
-            cp data/aurora_state.json site/.aurora/aurora_state.json
+            mkdir -p web/dist/.aurora
+            cp data/aurora_state.json web/dist/.aurora/aurora_state.json
           fi
+          touch web/dist/.nojekyll
       - name: Publish gh-pages branch
         if: ${{ github.event.inputs.dry_run != 'true' }}
         env:
@@ -158,10 +170,7 @@ jobs:
           else
             git -C "$PUBLISH_DIR" checkout --orphan gh-pages
           fi
-          cp -R site/. "$PUBLISH_DIR"/
-          if [ -f "$PUBLISH_DIR/.nojekyll" ]; then
-            rm "$PUBLISH_DIR/.nojekyll"
-          fi
+          cp -R web/dist/. "$PUBLISH_DIR"/
           git -C "$PUBLISH_DIR" add .
           if git -C "$PUBLISH_DIR" diff --cached --quiet; then
             echo "No Pages changes to publish."
