@@ -286,6 +286,7 @@ def test_unified_rendering_prefers_polished_news_notes() -> None:
     assert "This is a clean reason for the digest." in summary
     assert "Use it to calibrate a practical product decision." not in summary
     assert "[raw]:" not in summary
+    assert "Credibility:" not in summary
 
 
 def test_unified_summary_hides_run_summary_and_source_health_from_visible_digest() -> None:

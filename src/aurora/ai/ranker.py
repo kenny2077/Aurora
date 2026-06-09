@@ -28,7 +28,6 @@ class LLMAnalysis(BaseModel):
     action_items: list[str] = Field(default_factory=list)
     suggested_learning_path: str = ""
     tags: list[str] = Field(default_factory=list)
-    source_credibility: str = ""
 
 
 PromptBuilder = Callable[[SignalItem], tuple[str, str]]

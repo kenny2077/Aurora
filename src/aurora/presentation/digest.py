@@ -9,7 +9,6 @@ from html import escape
 from typing import Any
 from urllib.parse import urlparse
 
-from aurora.modes.tech_news.notes import display_tech_news_credibility
 from aurora.models import SignalItem
 from aurora.pipeline import StageContext
 
@@ -178,7 +177,7 @@ def render_item_row(item: SignalItem) -> str:
         if learning:
             extra_html = f"<p><b>Learn:</b> {escape(learning)}</p>"
     elif item.type == "news":
-        meta = f"{item.source} | {display_tech_news_credibility(item)}"
+        meta = item.source
     return (
         '<article class="aurora-row">'
         f'<h3><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '

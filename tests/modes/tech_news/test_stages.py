@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from aurora.ai.ranker import LLMRanker
 from aurora.config import AIConfig, FinalScoreWeights
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
-from aurora.modes.tech_news.notes import display_tech_news_credibility
+from aurora.modes.tech_news.prompts import TECH_NEWS_ANALYSIS_SYSTEM
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
 from aurora.modes.tech_news.scoring import TechNewsEnricher, TechNewsScorer
 from aurora.modes.tech_news.stages import TechNewsDeduplicateStage, TechNewsNormalizeStage
@@ -161,27 +161,13 @@ def test_enricher_generates_polished_hackernews_learning_notes() -> None:
         assert "[augstein]:" not in value
 
 
-def test_deterministic_tech_news_credibility_fallback_is_source_based() -> None:
-    hn_item = _item(
-        "news:hn",
-        "Important HN Story",
-        "https://example.com/story",
-        source="hackernews",
-        metadata={"score": 500, "descendants": 80},
-    )
-    rss_item = _item(
-        "news:rss",
-        "RSS Story",
-        "https://example.com/rss",
-        source="rss",
-        metadata={"feed_name": "Official Blog"},
-    )
-
-    assert display_tech_news_credibility(hn_item) == "Hacker News discussion; community signal, not independently verified."
-    assert display_tech_news_credibility(rss_item) == "Official Blog source; verify against the original article."
+def test_tech_news_prompt_does_not_request_credibility_prediction() -> None:
+    assert "source_credibility" not in TECH_NEWS_ANALYSIS_SYSTEM
+    assert "Likely true" not in TECH_NEWS_ANALYSIS_SYSTEM
+    assert "Unverified" not in TECH_NEWS_ANALYSIS_SYSTEM
 
 
-def test_enricher_records_llm_source_credibility_when_available() -> None:
+def test_enricher_ignores_llm_source_credibility_when_returned() -> None:
     item = _item(
         "news:llm",
         "OpenAI ships a new model",
@@ -201,8 +187,7 @@ def test_enricher_records_llm_source_credibility_when_available() -> None:
     enriched = asyncio.run(TechNewsEnricher(ranker).enrich([item], [score], _context()))[0]
 
     assert enriched.summary == "A concise LLM summary."
-    assert enriched.metadata["source_credibility"] == "Likely true: primary source announcement."
-    assert display_tech_news_credibility(enriched) == "Likely true: primary source announcement."
+    assert "source_credibility" not in enriched.metadata
 
 
 def test_enricher_generates_clean_rss_learning_notes() -> None:

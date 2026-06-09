@@ -165,9 +165,9 @@ Typecheck/lint:
   - `Run diagnostics`
 - Keep connection-building code and metadata unless the user explicitly asks to
   remove it; it is just not rendered in the current product surface.
-- Tech news should show linked headline, source/credibility, and concise
-  summary. LLM credibility is optional; deterministic fallback must not claim
-  full fact-checking.
+- Tech news should show linked headline, source, and concise summary. Do not add
+  AI-generated "true/fake", plausibility, or credibility prediction; readers can
+  judge from the source link.
 - Repo cards should stay evidence-backed and product-like: repo link, stats,
   topic/language chips, evidence, warning signals, why, and what to study.
 - Paper rows should stay concise: paper link, venue/status, summary, and what to
