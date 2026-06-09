@@ -44,6 +44,9 @@ Current polishing stage:
 - `src/aurora/ai/`: optional LLM client/ranking helpers.
 - `src/aurora/delivery/`: filesystem, email, webhook, and GitHub Pages delivery.
 - `src/aurora/storage/`: JSONL snapshots, config loading, source quality state.
+- `web/`: AstroPaper-based Aurora Digest web frontend.
+- `web/src/content/posts/`: Astro digest content. Aurora writes generated
+  digest posts here for local and CI builds.
 - `tests/`: unit and integration-style tests; network tests use mocks.
 - `data/config.example.json`: local example config.
 - `data/actions.config.json`: GitHub Actions config.
@@ -58,6 +61,7 @@ Install dependencies:
 
 ```bash
 rtk uv sync --dev
+npm --prefix web ci
 ```
 
 Validate config and environment:
@@ -93,6 +97,18 @@ rtk uv run pytest -q
 rtk uv run pytest -q tests/modes/scholar/test_stages.py
 ```
 
+Build the web frontend:
+
+```bash
+npm --prefix web run build
+```
+
+Run a local web preview:
+
+```bash
+npm --prefix web run dev -- --host 127.0.0.1 --port 4321
+```
+
 Security scan:
 
 ```bash
@@ -119,10 +135,12 @@ Typecheck/lint:
   - `rtk uv run pytest -q`
   - `rtk uv run aurora config validate --config data/actions.config.json`
   - `rtk uvx --from bandit bandit -q -r src`
+- For web frontend changes, also run:
+  - `npm --prefix web run build`
 - For mode-specific changes, also run the relevant focused tests under
   `tests/modes/<mode>/`.
 - For workflow or Pages changes, run `tests/core/test_github_actions.py` and
-  `tests/core/test_github_pages.py`.
+  `tests/core/test_github_pages.py`, then run `npm --prefix web run build`.
 - For final digest polish, run focused tests for the touched surfaces, usually:
   - `rtk uv run pytest -q tests/modes/unified_digest tests/modes/tech_news`
   - `rtk uv run pytest -q tests/core/test_presentation.py tests/core/test_cli.py tests/core/test_github_actions.py`
@@ -188,11 +206,16 @@ Typecheck/lint:
   - `data/cache/`
   - `data/aurora_state.json`
   - `reports/`
-  - `site/`
+  - `site/` (legacy/generated local output only)
   - `web/dist/`
+  - `web/.astro/`
+  - `web/node_modules/`
   - `dist/`
 - Do not modify generated `gh-pages` output in `web/dist/` by hand; it is
   produced by the Astro build and published by CI.
+- Do not manually edit CI-restored generated digest history under
+  `.aurora/content/posts` on the published branch; source posts are generated
+  from Aurora runs and restored by the workflow.
 - Treat external reference material outside this repo, such as `references/`,
   `new references/`, and `planning/`, as read-only unless the user explicitly
   asks for planning/doc work there.

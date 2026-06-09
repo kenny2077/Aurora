@@ -20,14 +20,13 @@ The unified digest is designed around a compact daily loop:
 - Scan timely AI news with high engagement.
 - Follow concrete action items that turn reading into experiments.
 
-## Quick Start
-
 ## 10-Minute Setup
 
 Local setup:
 
 ```bash
 rtk uv sync --dev
+npm --prefix web ci
 rtk uv run aurora config validate --config data/config.example.json
 rtk uv run aurora doctor --config data/config.example.json
 ```
@@ -119,6 +118,18 @@ Preview without delivery:
 rtk uv run aurora run --mode unified_digest --skip-delivery
 ```
 
+Build the Aurora Digest web frontend:
+
+```bash
+npm --prefix web run build
+```
+
+Run the web frontend locally:
+
+```bash
+npm --prefix web run dev -- --host 127.0.0.1 --port 4321
+```
+
 See [docs/interests.md](docs/interests.md) for the full interest and research
 field preset list.
 
@@ -130,11 +141,17 @@ root. The workflow restores prior generated digest content from
 `.aurora/content/posts`, writes the latest digest into `web/src/content/posts/`,
 builds `web/dist/`, then pushes that generated site to `gh-pages`.
 
+The web UI is built from the AstroPaper-based app in `web/`. The homepage
+features the latest digest as "Today's Digest" and groups earlier generated
+posts by month. Individual digest pages use score badges, evidence callouts,
+warning boxes, and study/why sections.
+
 Useful local checks:
 
 ```bash
 rtk uv run aurora doctor --config data/actions.config.json
 rtk uv run aurora run --dry-run --mode all --output-dir /tmp/aurora-actions-smoke
+npm --prefix web run build
 ```
 
 Every run writes JSONL snapshots and a `run_summary.json` file under
