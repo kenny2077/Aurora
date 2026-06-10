@@ -1,15 +1,44 @@
-# Aurora
+<div align="center">
+
+<img src="docs/assets/readme/aurora-mark.png" width="180" alt="Aurora mark" />
+
+# Aurora Digest
+
+**A self-hosted, high-signal daily learning radar for AI builders, researchers, and students.**
+
+Aurora turns timely tech news, GitHub repositories, and research papers into a
+clean daily digest for email and GitHub Pages, so builders can spend less time
+scanning feeds and more time learning what is worth acting on.
+
+[![status](https://img.shields.io/badge/status-active-18c964?style=flat-square)](#)
+[![python](https://img.shields.io/badge/python-3.11%2B-3776ab?style=flat-square&logo=python&logoColor=white)](pyproject.toml)
+[![uv](https://img.shields.io/badge/uv-managed-654ff0?style=flat-square)](https://github.com/astral-sh/uv)
+[![workflow](https://img.shields.io/github/actions/workflow/status/kenny2077/Aurora/aurora-digest.yml?branch=main&style=flat-square&label=aurora-digest)](.github/workflows/aurora-digest.yml)
+[![pages](https://img.shields.io/badge/GitHub%20Pages-gh--pages-0ea5e9?style=flat-square)](https://kenny2077.github.io/Aurora/)
+
+<br>
+
+<img src="docs/assets/readme/aurora-digest-overview.png" width="92%" alt="Aurora Digest overview" />
+
+</div>
+
+## Why Aurora
 
 Aurora is a daily learning radar for AI builders, researchers, and students.
-It turns current papers, GitHub repositories, and timely AI/technology news into
-one practical learning path you can run locally or on GitHub Actions.
+It is built for the daily question that broad feeds do not answer well: what is
+worth reading, studying, and experimenting with today?
 
-Aurora tracks:
+Aurora focuses on a small, evidence-backed set of useful items:
 
-- `tech_news`: timely, high-engagement technology news.
-- `scholar`: research papers by selected research fields.
-- `repo_learning`: GitHub repositories by selected learning interests.
-- `unified_digest`: one combined digest across papers, repos, and news.
+| Signal | What Aurora looks for | What the digest gives you |
+| --- | --- | --- |
+| Tech News | Timely AI and technology stories with strong source signals | Linked headline, source, and concise summary |
+| GitHub Repos | Projects with real activity, adoption, and learning value | Repo stats, evidence, warnings, why it matters, and what to study |
+| Research Papers | Papers selected by research fields and enrichment signals | Paper link, venue/status, summary, and what to learn |
+
+The default unified digest stays intentionally compact: 5 tech news items, 3
+GitHub repositories, and 3 research papers. Aurora favors a high-signal daily
+brief over complete coverage.
 
 ## Today's Learning Workflow
 
@@ -19,6 +48,54 @@ The unified digest is designed around a compact daily loop:
 - Pick one repo to study.
 - Scan timely AI news with high engagement.
 - Follow concrete action items that turn reading into experiments.
+
+Aurora tracks:
+
+- `tech_news`: timely, high-engagement technology news.
+- `scholar`: research papers by selected research fields.
+- `repo_learning`: GitHub repositories by selected learning interests.
+- `unified_digest`: one combined digest across news, repos, and papers.
+
+## How It Works
+
+<p align="center">
+  <img src="docs/assets/readme/aurora-digest-workflow.png" width="92%" alt="Aurora Digest workflow" />
+</p>
+
+Aurora keeps one shared pipeline shape across modes:
+
+```text
+fetch -> normalize -> deduplicate -> score -> enrich -> summarize -> render -> deliver
+```
+
+Each source adapter normalizes into a shared item model, then mode-specific
+scoring and enrichment decide which items are worth showing. The visible unified
+digest is ordered as:
+
+1. Tech News
+2. GitHub Repos
+3. Research Papers
+
+Diagnostics stay in CLI output, GitHub Actions logs, and `run_summary.json`;
+the email and Pages output stay focused on the digest itself.
+
+## Product Surface
+
+<p align="center">
+  <img src="docs/assets/readme/aurora-digest-dashboard.png" width="92%" alt="Aurora Digest web surface" />
+</p>
+
+Aurora publishes the same product-quality digest through practical self-hosted
+channels:
+
+- Email delivery through SMTP when recipients are configured.
+- GitHub Pages publishing from the generated Astro site.
+- Local Markdown and HTML reports for debugging and review.
+- JSONL snapshots plus `run_summary.json` for source failures, rate limits, and
+  delivery diagnostics.
+
+The screenshot shows the intended digest surface. Aurora is not a hosted SaaS
+dashboard; it is a repository you run locally or on GitHub Actions.
 
 ## 10-Minute Setup
 
@@ -41,6 +118,12 @@ Run the unified daily digest locally:
 
 ```bash
 rtk uv run aurora run --mode unified_digest --config data/config.example.json
+```
+
+Run a topic-focused digest using the GitHub Actions config:
+
+```bash
+rtk uv run aurora run --mode unified_digest --config data/actions.config.json --topic agents_harness
 ```
 
 GitHub Actions setup:
@@ -87,6 +170,21 @@ ML plus agents:
 rtk uv run aurora run --mode scholar --research-field ml --research-field agents
 ```
 
+## Topic Presets
+
+For the unified digest, `--topic` applies one preset to both repository and
+research selection:
+
+| Topic | Repo interest | Scholar field |
+| --- | --- | --- |
+| `machine_learning` | `ml` | `ml` |
+| `agents_harness` | `agents` | `agents` |
+| `computer_vision` | `cv` | `cv` |
+
+Use topic presets when you want the daily digest to stay coherent across hands-on
+repositories and papers. See [docs/interests.md](docs/interests.md) for the full
+interest and research field preset list.
+
 ## Secrets
 
 Required only when email delivery is enabled:
@@ -129,9 +227,6 @@ Run the web frontend locally:
 ```bash
 npm --prefix web run dev -- --host 127.0.0.1 --port 4321
 ```
-
-See [docs/interests.md](docs/interests.md) for the full interest and research
-field preset list.
 
 ## GitHub Pages Setup
 
