@@ -56,7 +56,7 @@ def _write_digest_post(
         {
             "title": rendered.title,
             "author": "Aurora System",
-            "pubDatetime": digest_time.isoformat(),
+            "pubDatetime": digest_time,
             "digest_date": digest_time.strftime("%Y-%m-%d"),
             "featured_repo": rendered.metadata.get("featured_repo") or "",
             "featured_paper": rendered.metadata.get("featured_paper") or "",
@@ -111,6 +111,8 @@ def _front_matter(fields: dict[str, object]) -> str:
 def _yaml_scalar(value: object) -> str:
     if isinstance(value, list):
         return json.dumps([str(item) for item in value])
+    if isinstance(value, datetime):
+        return value.isoformat()
     if value is None:
         return "null"
     if isinstance(value, bool):

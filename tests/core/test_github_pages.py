@@ -45,6 +45,8 @@ def test_github_pages_delivery_writes_astro_content_post(tmp_path: Path) -> None
     post = post_path.read_text(encoding="utf-8")
     assert 'title: "Aurora Unified Digest"' in post
     assert 'author: "Aurora System"' in post
+    assert "pubDatetime: 2026-05-26T11:35:47+08:00" in post
+    assert 'pubDatetime: "2026-05-26T11:35:47+08:00"' not in post
     assert 'digest_date: "2026-05-26"' in post
     assert 'featured_repo: "org/example"' in post
     assert 'featured_paper: "Useful Paper"' in post
