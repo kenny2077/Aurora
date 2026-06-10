@@ -15,6 +15,7 @@ scanning feeds and more time learning what is worth acting on.
 [![uv](https://img.shields.io/badge/uv-managed-654ff0?style=flat-square)](https://github.com/astral-sh/uv)
 [![workflow](https://img.shields.io/github/actions/workflow/status/kenny2077/Aurora/aurora-digest.yml?branch=main&style=flat-square&label=aurora-digest)](.github/workflows/aurora-digest.yml)
 [![pages](https://img.shields.io/badge/GitHub%20Pages-gh--pages-0ea5e9?style=flat-square)](https://kenny2077.github.io/Aurora/)
+[![license](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
 
 <br>
 
@@ -270,3 +271,8 @@ content, source failures, rate limits, or delivery issues.
 Aurora is not a realtime alerting system, an exhaustive literature review, a
 SaaS dashboard, or a GitHub Trending clone. It is a self-hosted daily learning
 radar that favors a small set of useful items over complete coverage.
+
+## License
+
+Aurora is released under the [MIT License](LICENSE). See [NOTICE](NOTICE) for
+upstream Horizon-family attribution.

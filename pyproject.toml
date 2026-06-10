@@ -3,6 +3,7 @@ name = "aurora"
 version = "0.1.0"
 description = "Aurora personal intelligence radar core contracts"
 readme = "README.md"
+license = { file = "LICENSE" }
 requires-python = ">=3.11"
 dependencies = [
     "defusedxml>=0.7.1",
