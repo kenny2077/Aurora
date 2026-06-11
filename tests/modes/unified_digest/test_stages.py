@@ -196,6 +196,75 @@ def test_unified_paper_selection_prefers_two_top_venues_and_one_arxiv_preprint()
     ]
 
 
+def test_unified_repo_selection_prefers_two_established_and_one_high_potential_repo() -> None:
+    config = UnifiedDigestModeConfig(
+        max_total_items=10,
+        section_limits={"news": 1, "repo": 3, "paper": 1},
+    )
+    outside_preferred_band = _item(
+        "repo:huge",
+        "repo",
+        "Huge Repo",
+        10.0,
+        metadata={"stars": 180000, "updated_at": datetime(2026, 5, 25, tzinfo=timezone.utc)},
+    )
+    established_one = _item(
+        "repo:80k",
+        "repo",
+        "80k Repo",
+        9.8,
+        metadata={"stars": 80000, "updated_at": datetime(2026, 5, 25, tzinfo=timezone.utc)},
+    )
+    established_two = _item(
+        "repo:50k",
+        "repo",
+        "50k Repo",
+        9.7,
+        metadata={"stars": 50000, "updated_at": datetime(2026, 5, 25, tzinfo=timezone.utc)},
+    )
+    high_potential = _item(
+        "repo:1k",
+        "repo",
+        "1k Repo",
+        8.0,
+        metadata={
+            "stars": 1200,
+            "created_at": datetime(2026, 1, 10, tzinfo=timezone.utc),
+            "updated_at": datetime(2026, 5, 25, tzinfo=timezone.utc),
+        },
+    )
+    old_small_repo = _item(
+        "repo:old-1k",
+        "repo",
+        "Old 1k Repo",
+        9.9,
+        metadata={
+            "stars": 1100,
+            "created_at": datetime(2022, 1, 10, tzinfo=timezone.utc),
+            "updated_at": datetime(2026, 5, 25, tzinfo=timezone.utc),
+        },
+    )
+
+    selected = select_items(
+        [
+            _item("news:1", "news", "News", 7.0),
+            _item("paper:1", "paper", "Paper", 7.0),
+            outside_preferred_band,
+            old_small_repo,
+            high_potential,
+            established_two,
+            established_one,
+        ],
+        config,
+    )
+
+    assert [item.id for item in selected if item.type == "repo"] == [
+        "repo:80k",
+        "repo:50k",
+        "repo:1k",
+    ]
+
+
 def test_unified_section_limit_falls_back_to_max_items_per_type_when_missing() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=2,

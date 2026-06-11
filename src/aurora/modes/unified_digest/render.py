@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from datetime import datetime
 
 from aurora.config import UnifiedDigestModeConfig
 from aurora.modes.tech_news.notes import (
@@ -45,6 +46,14 @@ TOP_VENUE_STATUSES = {
     "published",
     "spotlight",
 }
+ESTABLISHED_REPO_MIN_STARS = 10_000
+ESTABLISHED_REPO_PREFERRED_MIN_STARS = 50_000
+ESTABLISHED_REPO_PREFERRED_MAX_STARS = 100_000
+HIGH_POTENTIAL_REPO_MIN_STARS = 500
+HIGH_POTENTIAL_REPO_MAX_STARS = 5_000
+HIGH_POTENTIAL_REPO_PREFERRED_MIN_STARS = 750
+HIGH_POTENTIAL_REPO_PREFERRED_MAX_STARS = 3_000
+CURRENT_REPO_MIN_YEAR = 2025
 
 
 class UnifiedDigestSummarizer:
@@ -133,9 +142,14 @@ def select_items(
 def _select_section_items(
     section_items: Sequence[SignalItem], item_type: str, limit: int
 ) -> list[SignalItem]:
+    if item_type == "repo" and limit >= 3:
+        return _select_repo_items(section_items, limit)
     if item_type != "paper" or limit < 3:
         return list(section_items[:limit])
+    return _select_paper_items(section_items, limit)
 
+
+def _select_paper_items(section_items: Sequence[SignalItem], limit: int) -> list[SignalItem]:
     selected: list[SignalItem] = []
     selected_ids: set[str] = set()
 
@@ -150,6 +164,42 @@ def _select_section_items(
             selected.append(item)
             selected_ids.add(item.id)
             break
+
+    for item in section_items:
+        if len(selected) >= limit:
+            break
+        if item.id in selected_ids:
+            continue
+        selected.append(item)
+        selected_ids.add(item.id)
+
+    return selected
+
+
+def _select_repo_items(section_items: Sequence[SignalItem], limit: int) -> list[SignalItem]:
+    selected: list[SignalItem] = []
+    selected_ids: set[str] = set()
+
+    established = sorted(
+        [item for item in section_items if _is_established_current_repo(item)],
+        key=_established_repo_key,
+    )
+    for item in established[: min(2, limit)]:
+        selected.append(item)
+        selected_ids.add(item.id)
+
+    if len(selected) < limit:
+        high_potential = sorted(
+            [
+                item
+                for item in section_items
+                if item.id not in selected_ids and _is_high_potential_repo(item)
+            ],
+            key=_high_potential_repo_key,
+        )
+        if high_potential:
+            selected.append(high_potential[0])
+            selected_ids.add(high_potential[0].id)
 
     for item in section_items:
         if len(selected) >= limit:
@@ -405,6 +455,72 @@ def _metadata_text_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _is_established_current_repo(item: SignalItem) -> bool:
+    return _repo_stars(item) >= ESTABLISHED_REPO_MIN_STARS and _is_current_repo(item)
+
+
+def _is_high_potential_repo(item: SignalItem) -> bool:
+    stars = _repo_stars(item)
+    return (
+        HIGH_POTENTIAL_REPO_MIN_STARS <= stars <= HIGH_POTENTIAL_REPO_MAX_STARS
+        and _is_current_repo(item)
+        and _is_new_repo(item)
+    )
+
+
+def _established_repo_key(item: SignalItem) -> tuple[int, float]:
+    stars = _repo_stars(item)
+    preferred_band = not (
+        ESTABLISHED_REPO_PREFERRED_MIN_STARS
+        <= stars
+        <= ESTABLISHED_REPO_PREFERRED_MAX_STARS
+    )
+    return (int(preferred_band), -_item_score(item))
+
+
+def _high_potential_repo_key(item: SignalItem) -> tuple[int, float]:
+    stars = _repo_stars(item)
+    preferred_band = not (
+        HIGH_POTENTIAL_REPO_PREFERRED_MIN_STARS
+        <= stars
+        <= HIGH_POTENTIAL_REPO_PREFERRED_MAX_STARS
+    )
+    return (int(preferred_band), -_item_score(item))
+
+
+def _repo_stars(item: SignalItem) -> int:
+    try:
+        return int(item.metadata.get("stars") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def _is_current_repo(item: SignalItem) -> bool:
+    years = [
+        _year_from_datetime_like(item.updated_at),
+        _year_from_datetime_like(item.metadata.get("updated_at")),
+        _year_from_datetime_like(item.metadata.get("pushed_at")),
+    ]
+    years = [year for year in years if year is not None]
+    return not years or max(years) >= CURRENT_REPO_MIN_YEAR
+
+
+def _is_new_repo(item: SignalItem) -> bool:
+    created_year = _year_from_datetime_like(item.metadata.get("created_at"))
+    return created_year is None or created_year >= CURRENT_REPO_MIN_YEAR
+
+
+def _year_from_datetime_like(value: object) -> int | None:
+    if isinstance(value, datetime):
+        return value.year
+    if isinstance(value, str) and value.strip():
+        try:
+            return datetime.fromisoformat(value.replace("Z", "+00:00")).year
+        except ValueError:
+            return None
+    return None
 
 
 def _is_current_top_venue_paper(item: SignalItem) -> bool:
