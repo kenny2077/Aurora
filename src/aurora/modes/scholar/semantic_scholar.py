@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import os
-import time
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
@@ -69,7 +68,6 @@ class SemanticScholarClient:
         self._cache: dict[str, Any] = {"version": 1, "entries": {}}
         self._cache_loaded = False
         self._cache_dirty = False
-        self._last_request_at: float | None = None
 
     def is_configured(self) -> bool:
         return self.config.enabled and bool(os.getenv(self.config.api_key_env))
@@ -124,10 +122,13 @@ class SemanticScholarClient:
         return enriched
 
     async def _find_metadata(self, item: SignalItem) -> dict[str, Any] | None:
-        for paper_id in _lookup_ids(item):
+        lookup_ids = _lookup_ids(item)
+        for paper_id in lookup_ids:
             payload = await self._fetch_metadata(paper_id)
             if payload and _payload_matches_identifier(item, payload):
                 return payload
+        if lookup_ids:
+            return None
         return await self._search_by_title(item)
 
     async def _fetch_metadata(self, paper_id: str) -> dict[str, Any] | None:
@@ -155,29 +156,36 @@ class SemanticScholarClient:
     ) -> dict[str, Any] | None:
         if self.stats.requests_made >= self.config.max_requests_per_run:
             return None
-        await self._pace_request()
-        self.stats.requests_made += 1
-        response = await self.http_client.get(
-            f"{self.base_url}{path}",
-            params=params,
-            headers={
-                "User-Agent": "Aurora-Scholar/0.1",
-                "x-api-key": os.environ[self.config.api_key_env],
-            },
-        )
-        if response.status_code == 404 and not_found_ok:
-            return None
-        response.raise_for_status()
-        payload = response.json()
-        return payload if isinstance(payload, dict) else None
+        response: httpx.Response | None = None
+        for attempt in range(self.config.max_retries):
+            await self._wait_for_request_slot()
+            if self.stats.requests_made >= self.config.max_requests_per_run:
+                return None
+            self.stats.requests_made += 1
+            response = await self.http_client.get(
+                f"{self.base_url}{path}",
+                params=params,
+                headers={
+                    "User-Agent": "Aurora-Scholar/0.1",
+                    "x-api-key": os.environ[self.config.api_key_env],
+                },
+            )
+            if response.status_code == 404 and not_found_ok:
+                return None
+            if response.status_code == 429 and attempt < self.config.max_retries - 1:
+                await asyncio.sleep(_retry_after_seconds(response, self.config.retry_delay_sec))
+                continue
+            response.raise_for_status()
+            payload = response.json()
+            return payload if isinstance(payload, dict) else None
+        if response is not None:
+            response.raise_for_status()
+        return None
 
-    async def _pace_request(self) -> None:
+    async def _wait_for_request_slot(self) -> None:
         interval = max(0.0, float(self.config.rate_limit_interval_sec))
-        if interval and self._last_request_at is not None:
-            elapsed = time.monotonic() - self._last_request_at
-            if elapsed < interval:
-                await asyncio.sleep(interval - elapsed)
-        self._last_request_at = time.monotonic()
+        if interval and self.stats.requests_made > 0:
+            await asyncio.sleep(interval)
 
     def _configure_cache(self, context: StageContext | None) -> None:
         self._cache_path = (
@@ -332,6 +340,16 @@ def _raw_metadata(payload: dict[str, Any]) -> dict[str, Any]:
 
 def _is_rate_limit_error(exc: Exception) -> bool:
     return isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429
+
+
+def _retry_after_seconds(response: httpx.Response, fallback: float) -> float:
+    raw_value = response.headers.get("Retry-After")
+    if raw_value:
+        try:
+            return max(0.0, float(raw_value))
+        except ValueError:
+            pass
+    return max(0.0, float(fallback))
 
 
 def _record_failure(

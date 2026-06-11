@@ -917,6 +917,12 @@ def test_unified_fetch_keeps_scholar_papers_when_semantic_scholar_rate_limits(
 ) -> None:
     monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
     requests: list[httpx.Request] = []
+    sleep_calls: list[float] = []
+
+    async def fake_sleep(delay: float) -> None:
+        sleep_calls.append(delay)
+
+    monkeypatch.setattr("aurora.modes.scholar.semantic_scholar.asyncio.sleep", fake_sleep)
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
@@ -940,7 +946,8 @@ def test_unified_fetch_keeps_scholar_papers_when_semantic_scholar_rate_limits(
 
     collected = asyncio.run(exercise())
 
-    assert len(requests) == 1
+    assert len(requests) == 3
+    assert sleep_calls == [1.0, 1.25, 1.0, 1.25]
     assert [item.id for item in collected] == ["paper:semantic"]
     assert "unified_mode_failures" not in context.metadata
     child_summary = context.metadata["unified_child_run_summaries"][0]

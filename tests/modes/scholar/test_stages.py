@@ -499,6 +499,12 @@ def test_semantic_scholar_rate_limit_does_not_kill_scholar_enrichment(
 ) -> None:
     monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
     requests: list[httpx.Request] = []
+    sleep_calls: list[float] = []
+
+    async def fake_sleep(delay: float) -> None:
+        sleep_calls.append(delay)
+
+    monkeypatch.setattr("aurora.modes.scholar.semantic_scholar.asyncio.sleep", fake_sleep)
 
     def handler(request: httpx.Request) -> httpx.Response:
         requests.append(request)
@@ -520,13 +526,15 @@ def test_semantic_scholar_rate_limit_does_not_kill_scholar_enrichment(
 
     enriched = asyncio.run(exercise())
 
-    assert len(requests) == 1
+    assert len(requests) == 3
+    assert sleep_calls == [1.0, 1.25, 1.0, 1.25]
     assert [item.id for item in enriched] == ["first", "second"]
     assert all(item.final_score is not None for item in enriched)
     assert all(item.why_it_matters for item in enriched)
     assert all(item.learning_value for item in enriched)
     assert context.metadata["semantic_scholar_rate_limited"] is True
     assert context.metadata["semantic_scholar_enrichment_failed_count"] == 1
+    assert context.metadata["semantic_scholar_requests_made"] == 3
     assert "Semantic Scholar enrichment rate-limited" in context.metadata["semantic_scholar_warnings"][0]
     assert (tmp_path / "cache" / CACHE_RELATIVE_PATH).exists()
 
@@ -585,8 +593,90 @@ def test_semantic_scholar_enrichment_waits_between_live_requests(
         "S2-First",
         "S2-Second",
     ]
-    assert len(sleep_calls) == 1
-    assert 0.99 <= sleep_calls[0] <= 1.0
+    assert sleep_calls == [1.0]
+
+
+def test_semantic_scholar_does_not_title_search_after_identifier_miss(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    requests: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(404, json={"message": "not found"})
+
+    config = ScholarModeConfig(sources={"semantic_scholar": {"max_requests_per_run": 4}})
+    item = _paper("first", "First", {"source_ids": {"arxiv": "2606.1"}})
+    score = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+    context = _cached_context(tmp_path)
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                [item], [score], context
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert enriched[0].metadata.get("semantic_scholar_paper_id") is None
+    assert len(requests) == 1
+    assert requests[0].url.path.endswith("/paper/ARXIV:2606.1")
+    assert context.metadata["semantic_scholar_requests_made"] == 1
+
+
+def test_semantic_scholar_retries_rate_limit_with_retry_after(
+    monkeypatch, tmp_path: Path
+) -> None:
+    monkeypatch.setenv("SEMANTIC_SCHOLAR_API_KEY", "test-key")
+    sleep_calls: list[float] = []
+    responses = [
+        httpx.Response(429, headers={"Retry-After": "2"}, json={"message": "Too Many Requests"}),
+        httpx.Response(
+            200,
+            json={
+                "paperId": "S2-retry",
+                "title": "Retry Paper",
+                "citationCount": 12,
+                "externalIds": {"ArXiv": "2606.1"},
+            },
+        ),
+    ]
+
+    async def fake_sleep(delay: float) -> None:
+        sleep_calls.append(delay)
+
+    monkeypatch.setattr("aurora.modes.scholar.semantic_scholar.asyncio.sleep", fake_sleep)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return responses.pop(0)
+
+    config = ScholarModeConfig(
+        sources={
+            "semantic_scholar": {
+                "max_retries": 2,
+                "retry_delay_sec": 0.5,
+                "rate_limit_interval_sec": 1.25,
+                "max_requests_per_run": 4,
+            }
+        }
+    )
+    item = _paper("retry", "Retry Paper", {"source_ids": {"arxiv": "2606.1"}})
+    score = asyncio.run(ScholarScorer(config).score([item], _context()))[0]
+    context = _cached_context(tmp_path)
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await ScholarEnricher(config, http_client=client).enrich(
+                [item], [score], context
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert enriched[0].metadata["semantic_scholar_paper_id"] == "S2-retry"
+    assert context.metadata["semantic_scholar_requests_made"] == 2
+    assert context.metadata.get("semantic_scholar_rate_limited") is None
+    assert sleep_calls == [2.0, 1.25]
 
 
 def test_semantic_scholar_failures_do_not_kill_scholar_enrichment(monkeypatch) -> None:

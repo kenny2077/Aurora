@@ -431,7 +431,9 @@ reference repos and avoids adding a YAML dependency.
           "api_key_env": "SEMANTIC_SCHOLAR_API_KEY",
           "cache_ttl_hours": 168,
           "max_requests_per_run": 40,
-          "rate_limit_interval_sec": 1.1
+          "rate_limit_interval_sec": 1.25,
+          "max_retries": 3,
+          "retry_delay_sec": 1.0
         },
         "paperswithcode": {"enabled": true},
         "firecrawl": {"enabled": false, "api_key_env": "FIRECRAWL_API_KEY", "top_n": 10}

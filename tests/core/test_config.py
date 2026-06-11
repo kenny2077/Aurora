@@ -39,7 +39,9 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
     assert config.modes.scholar.sources.semantic_scholar.cache_ttl_hours == 168
     assert config.modes.scholar.sources.semantic_scholar.max_requests_per_run == 40
-    assert config.modes.scholar.sources.semantic_scholar.rate_limit_interval_sec == 1.1
+    assert config.modes.scholar.sources.semantic_scholar.rate_limit_interval_sec == 1.25
+    assert config.modes.scholar.sources.semantic_scholar.max_retries == 3
+    assert config.modes.scholar.sources.semantic_scholar.retry_delay_sec == 1.0
     assert config.modes.repo_learning.enabled is True
     assert config.modes.repo_learning.item_type == "repo"
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
