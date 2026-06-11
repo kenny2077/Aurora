@@ -186,8 +186,9 @@ Typecheck/lint:
 - Tech news should show linked headline, source, and concise summary. Do not add
   AI-generated "true/fake", plausibility, or credibility prediction; readers can
   judge from the source link.
-- Repo cards should stay evidence-backed and product-like: repo link, stats,
-  topic/language chips, evidence, warning signals, why, and what to study.
+- Repo cards should stay compact and product-like: repo link, score, stats,
+  topic/language chips, and a single `Value` section. Do not render Evidence,
+  Study, Watch, or action-plan blocks in user-facing repo cards.
 - Paper rows should stay concise: paper link, venue/status, summary, and what to
   learn.
 - `--topic` applies the same preset to repo and scholar modes:

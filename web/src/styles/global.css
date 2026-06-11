@@ -96,15 +96,4 @@
     @apply border-border bg-muted/35 my-3 rounded-lg border border-s-4 border-s-blue-600 px-4 py-3 text-sm;
   }
 
-  .aurora-study {
-    @apply border-s-emerald-600;
-  }
-
-  .aurora-warning {
-    @apply my-3 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200;
-  }
-
-  .aurora-actions {
-    @apply mt-3;
-  }
 }

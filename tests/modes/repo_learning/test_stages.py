@@ -422,6 +422,10 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert "- Language:" not in summary
     assert "- Evidence:" not in summary
     assert "- Files:" not in summary
+    assert "- Study:" not in summary
+    assert "- Watch:" not in summary
+    assert "- Actions:" not in summary
+    assert "Read files." not in summary
     assert "MIT license" not in summary
     assert "homepage" not in summary
     assert rendered.metadata["recommended_repo_ids"] == ["repo:org/high"]
@@ -430,7 +434,11 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert rendered.metadata["web_html"]
     assert "org/high" in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
-    assert "<b>Evidence:</b> README found" in str(rendered.metadata["web_html"])
+    assert "<b>Evidence:</b>" not in str(rendered.metadata["web_html"])
+    assert "<b>Study:</b>" not in str(rendered.metadata["web_html"])
+    assert "Watch:" not in str(rendered.metadata["web_html"])
+    assert "Read files." not in str(rendered.metadata["web_html"])
+    assert "<b>Value:</b> High signal." in str(rendered.metadata["web_html"])
     assert "MIT license" not in str(rendered.metadata["web_html"])
     assert "homepage" not in str(rendered.metadata["web_html"])
     assert delivery[0].metadata["recommended_count"] == 1

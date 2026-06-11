@@ -130,14 +130,11 @@ def _excerpt(value: str, limit: int) -> str:
 def _section_item_lines(index: int, item: SignalItem) -> list[str]:
     score = item.final_score or 0.0
     if item.type == "repo":
-        lines = [
+        return [
             f"{index}. [{item.title}]({item.url}) - {score}/10",
             f"   - {_repo_stats_text(item.metadata)}",
             f"   - Value: {_why_text(item)}",
-            f"   - Study: {_learning_text(item)}",
         ]
-        lines.extend(_repo_signal_lines(item, indent="   "))
-        return lines
     if item.type == "paper":
         metadata = item.metadata
         venue = metadata.get("venue") or item.source
@@ -329,14 +326,7 @@ def _learning_item_lines(item: SignalItem) -> list[str]:
 
 
 def _repo_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
-    if item.type != "repo":
-        return []
-    metadata = item.metadata
-    warnings = _metadata_text_list(metadata.get("quality_warnings"))
-    lines: list[str] = []
-    if warnings:
-        lines.append(f"{indent}- Watch: {'; '.join(warnings[:4])}")
-    return lines
+    return []
 
 
 def _paper_signal_lines(item: SignalItem, *, indent: str) -> list[str]:

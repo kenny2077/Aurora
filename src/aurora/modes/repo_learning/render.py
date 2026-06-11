@@ -24,17 +24,12 @@ class RepoLearningSummarizer:
             return "\n".join(lines)
         for index, item in enumerate(selected, start=1):
             metadata = item.metadata
-            warnings = "; ".join((metadata.get("quality_warnings") or [])[:4])
             lines.extend(
                 [
                     f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
                     "",
                     f"- {_repo_stats_text(metadata)}",
                     f"- Value: {item.why_it_matters}",
-                    *([f"- Watch: {warnings}"] if warnings else []),
-                    f"- Study: {item.learning_value}",
-                    "- Actions:",
-                    *[f"  - {action}" for action in item.action_items],
                     "",
                 ]
             )

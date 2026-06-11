@@ -29,12 +29,12 @@ Aurora is a daily learning radar for AI builders, researchers, and students.
 It is built for the daily question that broad feeds do not answer well: what is
 worth reading, studying, and experimenting with today?
 
-Aurora focuses on a small, evidence-backed set of useful items:
+Aurora focuses on a small, high-signal set of useful items:
 
 | Signal | What Aurora looks for | What the digest gives you |
 | --- | --- | --- |
 | Tech News | Timely AI and technology stories with strong source signals | Linked headline, source, and concise summary |
-| GitHub Repos | Projects with real activity, adoption, and learning value | Repo stats, evidence, warnings, why it matters, and what to study |
+| GitHub Repos | Projects with real activity, adoption, and learning value | Repo link, score, stats, topic/language chips, and value |
 | Research Papers | Papers selected by research fields and enrichment signals | Paper link, venue/status, summary, and what to learn |
 
 The default unified digest stays intentionally compact: 5 tech news items, 3
@@ -48,7 +48,7 @@ The unified digest is designed around a compact daily loop:
 - Pick one paper to understand.
 - Pick one repo to study.
 - Scan timely AI news with high engagement.
-- Follow concrete action items that turn reading into experiments.
+- Use the value notes to decide what deserves deeper follow-up.
 
 Aurora tracks:
 
@@ -239,8 +239,8 @@ builds `web/dist/`, then pushes that generated site to `gh-pages`.
 
 The web UI is built from the AstroPaper-based app in `web/`. The homepage
 features the latest digest as "Today's Digest" and groups earlier generated
-posts by month. Individual digest pages use score badges, evidence callouts,
-warning boxes, and study/why sections.
+posts by month. Individual digest pages keep repo cards compact with score
+badges, stats, topic/language chips, and a single Value section.
 
 Useful local checks:
 

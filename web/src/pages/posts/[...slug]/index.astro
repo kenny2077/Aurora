@@ -69,9 +69,6 @@ const {
   timezone,
   tags,
   hideEditPost,
-  digest_date: digestDate,
-  featured_repo: featuredRepo,
-  featured_paper: featuredPaper,
 } = post.data;
 
 const { Content } = await render(post);
@@ -134,31 +131,6 @@ const ogImage = ogImageUrl
       </span>
       <EditPost {hideEditPost} {post} class="max-sm:hidden" />
     </div>
-
-    {
-      (digestDate || featuredRepo || featuredPaper) && (
-        <dl class="border-border bg-muted/25 my-5 grid gap-3 rounded-lg border p-4 text-sm sm:grid-cols-3">
-          {digestDate && (
-            <div>
-              <dt class="text-muted-foreground">Digest date</dt>
-              <dd class="font-semibold">{digestDate}</dd>
-            </div>
-          )}
-          {featuredRepo && (
-            <div>
-              <dt class="text-muted-foreground">Featured repo</dt>
-              <dd class="font-semibold">{featuredRepo}</dd>
-            </div>
-          )}
-          {featuredPaper && (
-            <div>
-              <dt class="text-muted-foreground">Featured paper</dt>
-              <dd class="font-semibold">{featuredPaper}</dd>
-            </div>
-          )}
-        </dl>
-      )
-    }
 
     <article
       id="article"

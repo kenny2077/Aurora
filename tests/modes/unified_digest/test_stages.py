@@ -235,24 +235,26 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "   - 6k stars | 420 forks | 12 open issues" in summary
     assert "   - Value: org/noisy is worth studying because it has concrete learning evidence." in summary
     assert "   - Why:" not in summary
+    assert "   - Study:" not in summary
     assert "license" not in summary
     assert "homepage" not in summary
     assert "   - Evidence:" not in summary
     assert "   - Files:" not in summary
     assert "Python" not in summary
     assert "agents" not in summary
-    assert "   - Watch: very high open issue count; README or package files were not found during enrichment" in summary
+    assert "   - Watch:" not in summary
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
-    assert "Evidence:" in str(rendered.metadata["web_html"])
+    assert "Evidence:" not in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
     assert "MIT license" not in str(rendered.metadata["web_html"])
     assert "homepage" not in str(rendered.metadata["web_html"])
     assert "Python" in str(rendered.metadata["web_html"])
     assert "agents" in str(rendered.metadata["web_html"])
-    assert "<b>Why:</b>" in str(rendered.metadata["web_html"])
-    assert "<b>Value:</b>" not in str(rendered.metadata["web_html"])
-    assert "Watch:" in str(rendered.metadata["web_html"])
+    assert "<b>Why:</b>" not in str(rendered.metadata["web_html"])
+    assert "<b>Value:</b>" in str(rendered.metadata["web_html"])
+    assert "<b>Study:</b>" not in str(rendered.metadata["web_html"])
+    assert "Watch:" not in str(rendered.metadata["web_html"])
 
 
 def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
