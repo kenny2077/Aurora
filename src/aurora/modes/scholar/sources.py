@@ -150,8 +150,6 @@ class OpenReviewFetchStage:
                 record = _parse_openreview_note(note, venue_id)
                 if record is None or record["id"] in seen_ids:
                     continue
-                if _is_before_since(record["published_at"], context):
-                    continue
                 seen_ids.add(record["id"])
                 records.append(record)
         return records

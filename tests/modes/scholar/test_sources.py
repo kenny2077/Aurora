@@ -156,6 +156,53 @@ def test_openreview_fetch_parses_notes_and_skips_invalid() -> None:
     assert records[0]["metadata"]["pdf_url"] == "https://openreview.net/pdf?id=abc123"
 
 
+def test_openreview_fetch_keeps_current_venue_papers_outside_digest_window() -> None:
+    old_submission = int(datetime(2025, 10, 1, tzinfo=timezone.utc).timestamp() * 1000)
+    payload = {
+        "notes": [
+            {
+                "id": "accepted-old",
+                "forum": "forum-old",
+                "cdate": old_submission,
+                "mdate": old_submission,
+                "content": {
+                    "title": {"value": "Accepted Current Venue Paper"},
+                    "abstract": {"value": "A strong method with benchmark evaluation."},
+                    "venueid": {"value": "ICLR.cc/2026/Conference"},
+                    "venue": {"value": "ICLR 2026 Conference Paper"},
+                },
+            }
+        ]
+    }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=payload)
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await OpenReviewFetchStage(
+                ScholarModeConfig(
+                    sources=ScholarSourcesConfig(
+                        openreview=OpenReviewSourceConfig(venue_ids=["ICLR.cc/2026/Conference"])
+                    )
+                ),
+                http_client=client,
+            ).fetch(
+                StageContext(
+                    mode="scholar",
+                    run_id="test",
+                    since=datetime(2026, 6, 1, tzinfo=timezone.utc),
+                )
+            )
+
+    records = asyncio.run(exercise())
+
+    assert [record["id"] for record in records] == ["openreview:accepted-old"]
+    assert records[0]["source"] == "openreview"
+    assert records[0]["metadata"]["venue"] == "ICLR"
+    assert records[0]["metadata"]["status"] == "accepted"
+
+
 def test_openreview_fetch_records_venue_failures_and_continues() -> None:
     cdate = int(datetime(2026, 5, 26, tzinfo=timezone.utc).timestamp() * 1000)
     requests: list[httpx.Request] = []
