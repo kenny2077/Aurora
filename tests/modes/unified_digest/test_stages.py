@@ -139,6 +139,63 @@ def test_unified_default_section_limits_select_five_news_three_repos_and_three_p
     ]
 
 
+def test_unified_paper_selection_prefers_two_top_venues_and_one_arxiv_preprint() -> None:
+    config = UnifiedDigestModeConfig(
+        max_total_items=10,
+        section_limits={"news": 1, "repo": 1, "paper": 3},
+    )
+    top_venue_one = _item(
+        "paper:iclr",
+        "paper",
+        "ICLR Paper",
+        9.9,
+        source="openreview",
+        metadata={"venue": "ICLR", "venue_year": 2026, "status": "accepted"},
+    )
+    top_venue_two = _item(
+        "paper:neurips",
+        "paper",
+        "NeurIPS Paper",
+        9.8,
+        source="openreview",
+        metadata={"venue": "NeurIPS", "venue_year": 2025, "status": "spotlight"},
+    )
+    extra_top_venue = _item(
+        "paper:icml",
+        "paper",
+        "ICML Paper",
+        9.7,
+        source="openreview",
+        metadata={"venue": "ICML", "venue_year": 2025, "status": "oral"},
+    )
+    arxiv_preprint = _item(
+        "paper:arxiv",
+        "paper",
+        "High Potential Preprint",
+        8.0,
+        source="arxiv",
+        metadata={"status": "preprint"},
+    )
+
+    selected = select_items(
+        [
+            _item("news:1", "news", "News", 7.0),
+            _item("repo:1", "repo", "Repo", 7.0),
+            extra_top_venue,
+            top_venue_one,
+            arxiv_preprint,
+            top_venue_two,
+        ],
+        config,
+    )
+
+    assert [item.id for item in selected if item.type == "paper"] == [
+        "paper:iclr",
+        "paper:neurips",
+        "paper:arxiv",
+    ]
+
+
 def test_unified_section_limit_falls_back_to_max_items_per_type_when_missing() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=2,
@@ -1005,6 +1062,7 @@ def _item(
     score: float,
     *,
     url: str | None = None,
+    source: str = "test",
     metadata: dict | None = None,
     why_it_matters: str | None = None,
     learning_value: str | None = None,
@@ -1016,7 +1074,7 @@ def _item(
         type=item_type,
         title=title,
         url=url or f"https://example.com/{item_id.replace(':', '-')}",
-        source="test",
+        source=source,
         published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
         raw_content=raw_content if raw_content is not None else f"{title} content",
         metadata=metadata or {},

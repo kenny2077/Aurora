@@ -21,6 +21,30 @@ SECTION_TITLES = {
     "repo": "GitHub Repos",
     "news": "Tech News",
 }
+TOP_VENUES = {
+    "aistats",
+    "acl",
+    "colm",
+    "colt",
+    "cvpr",
+    "emnlp",
+    "iclr",
+    "icml",
+    "mlsys",
+    "neurips",
+    "nips",
+    "tmlr",
+    "uai",
+}
+TOP_VENUE_STATUSES = {
+    "accept",
+    "accepted",
+    "conference paper",
+    "oral",
+    "poster",
+    "published",
+    "spotlight",
+}
 
 
 class UnifiedDigestSummarizer:
@@ -99,10 +123,42 @@ def select_items(
         section_items = [item for item in items if item.type == item_type]
         section_items.sort(key=_item_score, reverse=True)
         limit = _section_limit(config, item_type)
-        for item in section_items[:limit]:
+        for item in _select_section_items(section_items, item_type, limit):
             if len(selected) >= config.max_total_items:
                 return selected
             selected.append(item)
+    return selected
+
+
+def _select_section_items(
+    section_items: Sequence[SignalItem], item_type: str, limit: int
+) -> list[SignalItem]:
+    if item_type != "paper" or limit < 3:
+        return list(section_items[:limit])
+
+    selected: list[SignalItem] = []
+    selected_ids: set[str] = set()
+
+    for item in [item for item in section_items if _is_current_top_venue_paper(item)][: min(2, limit)]:
+        selected.append(item)
+        selected_ids.add(item.id)
+
+    if len(selected) < limit:
+        for item in section_items:
+            if item.id in selected_ids or not _is_arxiv_preprint(item):
+                continue
+            selected.append(item)
+            selected_ids.add(item.id)
+            break
+
+    for item in section_items:
+        if len(selected) >= limit:
+            break
+        if item.id in selected_ids:
+            continue
+        selected.append(item)
+        selected_ids.add(item.id)
+
     return selected
 
 
@@ -349,6 +405,30 @@ def _metadata_text_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _is_current_top_venue_paper(item: SignalItem) -> bool:
+    metadata = item.metadata
+    venue = _normalized_text(metadata.get("venue") or "")
+    if not any(top_venue in venue for top_venue in TOP_VENUES):
+        return False
+    try:
+        year = int(metadata.get("venue_year") or 0)
+    except (TypeError, ValueError):
+        year = 0
+    if year < 2025:
+        return False
+    status = _normalized_text(metadata.get("status") or "")
+    return any(top_status in status for top_status in TOP_VENUE_STATUSES)
+
+
+def _is_arxiv_preprint(item: SignalItem) -> bool:
+    status = _normalized_text(item.metadata.get("status") or "")
+    return item.source == "arxiv" or "preprint" in status
+
+
+def _normalized_text(value: object) -> str:
+    return str(value or "").strip().lower()
 
 
 def _repo_stats_text(metadata: dict) -> str:
