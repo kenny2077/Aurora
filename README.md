@@ -272,6 +272,14 @@ Aurora is not a realtime alerting system, an exhaustive literature review, a
 SaaS dashboard, or a GitHub Trending clone. It is a self-hosted daily learning
 radar that favors a small set of useful items over complete coverage.
 
+## Project Governance
+
+- [Code of Conduct](CODE_OF_CONDUCT.md) defines community standards.
+- [Contributing](CONTRIBUTING.md) covers setup, tests, code style, and pull
+  request expectations.
+- [Security](SECURITY.md) explains supported versions, security properties, and
+  vulnerability reporting.
+
 ## License
 
 Aurora is released under the [MIT License](LICENSE). See [NOTICE](NOTICE) for
