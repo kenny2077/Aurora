@@ -152,6 +152,11 @@ def test_example_config_validates() -> None:
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.scholar.fields == ["ml", "agents"]
     assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
+    assert {source.name for source in config.modes.tech_news.sources.rss} >= {
+        "Simon Willison",
+        "OpenAI News",
+        "Google DeepMind Blog",
+    }
 
 
 def test_actions_config_enables_email_and_content_window() -> None:
@@ -165,6 +170,11 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
+    assert {source.name for source in config.modes.tech_news.sources.rss} >= {
+        "Simon Willison",
+        "OpenAI News",
+        "Google DeepMind Blog",
+    }
     assert config.modes.scholar.score_threshold == 5.5
     assert config.modes.repo_learning.sources.github_search.min_stars == 100
     assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]

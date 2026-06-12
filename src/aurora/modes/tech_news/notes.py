@@ -55,6 +55,16 @@ def display_tech_news_learning(item: SignalItem) -> str:
     return build_tech_news_notes(item).learning_value
 
 
+def display_tech_news_source(item: SignalItem) -> str:
+    if item.source == "hackernews":
+        return "Hacker News"
+    if item.source == "rss":
+        feed_name = clean_note_text(str(item.metadata.get("feed_name") or ""))
+        if feed_name:
+            return feed_name
+    return item.source
+
+
 def clean_note_text(value: str) -> str:
     """Decode and remove markup, raw URLs, and HN author prefixes."""
     text = html.unescape(value or "")

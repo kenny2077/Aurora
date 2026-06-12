@@ -9,6 +9,7 @@ from aurora.config import UnifiedDigestModeConfig
 from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
     display_tech_news_learning,
+    display_tech_news_source,
     display_tech_news_why,
 )
 from aurora.modes.unified_digest.connections import build_connections
@@ -142,11 +143,39 @@ def select_items(
 def _select_section_items(
     section_items: Sequence[SignalItem], item_type: str, limit: int
 ) -> list[SignalItem]:
+    if item_type == "news" and limit >= 3:
+        return _select_news_items(section_items, limit)
     if item_type == "repo" and limit >= 3:
         return _select_repo_items(section_items, limit)
     if item_type != "paper" or limit < 3:
         return list(section_items[:limit])
     return _select_paper_items(section_items, limit)
+
+
+def _select_news_items(section_items: Sequence[SignalItem], limit: int) -> list[SignalItem]:
+    selected: list[SignalItem] = []
+    selected_ids: set[str] = set()
+    seen_sources: set[str] = set()
+
+    for item in section_items:
+        if len(selected) >= limit:
+            break
+        source = _news_source_key(item)
+        if source in seen_sources or _item_score(item) <= 0:
+            continue
+        selected.append(item)
+        selected_ids.add(item.id)
+        seen_sources.add(source)
+
+    for item in section_items:
+        if len(selected) >= limit:
+            break
+        if item.id in selected_ids:
+            continue
+        selected.append(item)
+        selected_ids.add(item.id)
+
+    return selected
 
 
 def _select_paper_items(section_items: Sequence[SignalItem], limit: int) -> list[SignalItem]:
@@ -253,7 +282,7 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
         ]
     return [
         f"{index}. [{item.title}]({item.url}) - {score}/10",
-        f"   - Source: {item.source}",
+        f"   - Source: {display_tech_news_source(item)}",
         f"   - Summary: {_summary_text(item)}",
     ]
 
@@ -455,6 +484,10 @@ def _metadata_text_list(value: object) -> list[str]:
     if not isinstance(value, list):
         return []
     return [str(item).strip() for item in value if str(item).strip()]
+
+
+def _news_source_key(item: SignalItem) -> str:
+    return display_tech_news_source(item).strip().lower() or item.source
 
 
 def _is_established_current_repo(item: SignalItem) -> bool:

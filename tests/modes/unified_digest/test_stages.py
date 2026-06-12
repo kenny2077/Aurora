@@ -139,6 +139,48 @@ def test_unified_default_section_limits_select_five_news_three_repos_and_three_p
     ]
 
 
+def test_unified_news_selection_prefers_source_variety_before_repeat_sources() -> None:
+    config = UnifiedDigestModeConfig(
+        max_total_items=10,
+        section_limits={"news": 5, "repo": 1, "paper": 1},
+    )
+
+    selected = select_items(
+        [
+            _item("repo:1", "repo", "Repo", 7.0),
+            _item("paper:1", "paper", "Paper", 7.0),
+            _item("news:hn-1", "news", "HN 1", 9.9, source="hackernews"),
+            _item("news:hn-2", "news", "HN 2", 9.8, source="hackernews"),
+            _item("news:hn-3", "news", "HN 3", 9.7, source="hackernews"),
+            _item(
+                "news:openai",
+                "news",
+                "OpenAI",
+                7.0,
+                source="rss",
+                metadata={"feed_name": "OpenAI News"},
+            ),
+            _item(
+                "news:simon",
+                "news",
+                "Simon",
+                6.9,
+                source="rss",
+                metadata={"feed_name": "Simon Willison"},
+            ),
+        ],
+        config,
+    )
+
+    assert [item.id for item in selected if item.type == "news"] == [
+        "news:hn-1",
+        "news:openai",
+        "news:simon",
+        "news:hn-2",
+        "news:hn-3",
+    ]
+
+
 def test_unified_paper_selection_prefers_two_top_venues_and_one_arxiv_preprint() -> None:
     config = UnifiedDigestModeConfig(
         max_total_items=10,

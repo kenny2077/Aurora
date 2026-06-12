@@ -240,7 +240,7 @@ def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> 
 
 def test_markdown_rendering_is_stable_and_score_ordered() -> None:
     low = _item("news:low", "Low", "https://example.com/low").model_copy(
-        update={"final_score": 3.0}
+        update={"final_score": 3.0, "metadata": {"feed_name": "OpenAI News"}}
     )
     high = _item("news:high", "High", "https://example.com/high").model_copy(
         update={"final_score": 8.0}
@@ -251,6 +251,7 @@ def test_markdown_rendering_is_stable_and_score_ordered() -> None:
 
     assert summary.index("High") < summary.index("Low")
     assert "Selected 2 tech news item(s)." in summary
+    assert "OpenAI News" in summary
     assert rendered.mode == "tech_news"
     assert rendered.markdown == summary
 

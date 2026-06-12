@@ -161,7 +161,7 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "Important News" in web_html
     assert "Likely true" not in web_html
     assert "Credibility" not in web_html
-    assert "hackernews" in web_html
+    assert "Hacker News" in web_html
     assert "org/product" in web_html
     assert "Useful Paper" in web_html
 

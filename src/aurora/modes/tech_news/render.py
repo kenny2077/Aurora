@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 
+from aurora.modes.tech_news.notes import display_tech_news_source
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
 
@@ -25,7 +26,10 @@ class TechNewsSummarizer:
 
         for index, item in enumerate(sorted_items, start=1):
             score = item.final_score if item.final_score is not None else "?"
-            lines.append(f"{index}. [{item.title}]({item.url}) - {score}/10 - {item.source}")
+            lines.append(
+                f"{index}. [{item.title}]({item.url}) - {score}/10 - "
+                f"{display_tech_news_source(item)}"
+            )
         return "\n".join(lines)
 
 
@@ -40,4 +44,3 @@ class TechNewsRenderer:
             title="Aurora Tech News",
             markdown=summary,
         )
-

@@ -38,7 +38,50 @@
           "min_score": 30,
           "top_comments_limit": 3
         },
-        "rss": []
+        "rss": [
+          {
+            "name": "Simon Willison",
+            "url": "https://simonwillison.net/atom/everything/",
+            "enabled": true,
+            "category": "ai-tools"
+          },
+          {
+            "name": "OpenAI News",
+            "url": "https://openai.com/news/rss.xml",
+            "enabled": true,
+            "category": "ai-labs"
+          },
+          {
+            "name": "Google AI Blog",
+            "url": "https://blog.google/innovation-and-ai/technology/ai/rss/",
+            "enabled": true,
+            "category": "ai-labs"
+          },
+          {
+            "name": "Google DeepMind Blog",
+            "url": "https://deepmind.google/blog/rss.xml",
+            "enabled": true,
+            "category": "ai-research"
+          },
+          {
+            "name": "AWS Machine Learning Blog",
+            "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+            "enabled": true,
+            "category": "ai-infrastructure"
+          },
+          {
+            "name": "Hugging Face Blog",
+            "url": "https://huggingface.co/blog/feed.xml",
+            "enabled": true,
+            "category": "ai-tools"
+          },
+          {
+            "name": "NVIDIA AI Blog",
+            "url": "https://developer.nvidia.com/blog/category/generative-ai/feed/",
+            "enabled": true,
+            "category": "ai-infrastructure"
+          }
+        ]
       }
     },
     "scholar": {
