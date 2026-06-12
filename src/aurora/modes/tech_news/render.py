@@ -25,10 +25,8 @@ class TechNewsSummarizer:
             return "\n".join(lines)
 
         for index, item in enumerate(sorted_items, start=1):
-            score = item.final_score if item.final_score is not None else "?"
             lines.append(
-                f"{index}. [{item.title}]({item.url}) - {score}/10 - "
-                f"{display_tech_news_source(item)}"
+                f"{index}. [{item.title}]({item.url}) - {display_tech_news_source(item)}"
             )
         return "\n".join(lines)
 

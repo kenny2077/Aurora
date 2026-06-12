@@ -265,21 +265,20 @@ def _excerpt(value: str, limit: int) -> str:
 
 
 def _section_item_lines(index: int, item: SignalItem) -> list[str]:
-    score = item.final_score or 0.0
     if item.type == "repo":
         return [
-            f"{index}. [{item.title}]({item.url}) - {score}/10",
+            f"{index}. [{item.title}]({item.url})",
             f"   - {_repo_stats_text(item.metadata)}",
             f"   - Value: {_why_text(item)}",
         ]
     if item.type == "paper":
         return [
-            f"{index}. [{item.title}]({item.url}) - {score}/10",
+            f"{index}. [{item.title}]({item.url})",
             f"   - Source: {format_paper_source_status(item)}",
             f"   - Description: {format_paper_description(item)}",
         ]
     return [
-        f"{index}. [{item.title}]({item.url}) - {score}/10",
+        f"{index}. [{item.title}]({item.url})",
         f"   - Source: {display_tech_news_source(item)}",
         f"   - Summary: {_summary_text(item)}",
     ]
@@ -444,7 +443,7 @@ def _top_items(items: Sequence[SignalItem], item_type: str, *, limit: int) -> li
 def _learning_item_lines(item: SignalItem) -> list[str]:
     why = _why_text(item)
     lines = [
-        f"- [{item.title}]({item.url}) - {_item_score(item):.1f}/10",
+        f"- [{item.title}]({item.url})",
         f"  - Source: {item.source}",
         f"  - Why: {why}",
     ]

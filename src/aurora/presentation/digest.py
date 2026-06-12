@@ -33,7 +33,6 @@ a{color:#0b63ce;text-decoration:none;}
 .aurora-card{border:1px solid #dce4ee;border-radius:8px;background:#ffffff;margin:0 0 14px;padding:16px;}
 .aurora-card h3{font-size:16px;line-height:1.3;margin:0 0 8px;}
 .aurora-meta{color:#64748b;font-size:12px;margin:0 0 10px;}
-.aurora-score{display:inline-block;background:#e8f2ff;color:#0b5bd3;border:1px solid #bfdbfe;border-radius:6px;padding:3px 7px;font-weight:700;font-size:12px;white-space:nowrap;}
 .aurora-badge{display:inline-block;background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;border-radius:6px;padding:3px 7px;margin:0 4px 4px 0;font-size:12px;}
 .aurora-badge-good{background:#ecfdf5;color:#047857;border-color:#bbf7d0;}
 .aurora-callout{background:#f8fafc;color:#334155;border:1px solid #dce4ee;border-left:4px solid #0b63ce;border-radius:8px;padding:10px 12px;margin:10px 0;font-size:13px;line-height:1.5;}
@@ -65,13 +64,11 @@ def render_repo_digest_html(
     context: StageContext,
 ) -> tuple[str, str]:
     """Return full email HTML and Pages-safe fragment for a repo digest."""
-    top_score = max((_score(item) for item in items), default=0.0)
     warnings = sum(1 for item in items if _text_list(item.metadata.get("quality_warnings")))
     languages = _top_terms(item.metadata.get("language") for item in items)
     topics = _top_terms(topic for item in items for topic in item.metadata.get("topics") or [])
     stats = [
         ("Repos", str(len(items))),
-        ("Top score", f"{top_score:.1f}/10"),
         ("Warnings", str(warnings)),
         ("Top signal", languages[0] if languages else (topics[0] if topics else "none")),
     ]
@@ -132,8 +129,7 @@ def render_repo_card(item: SignalItem) -> str:
     badge_html = "".join(f'<span class="aurora-badge">{escape(badge)}</span>' for badge in badges)
     return (
         '<article class="aurora-card aurora-repo-card">'
-        f'<h3><a {link_attrs(str(item.url))}>{escape(title)}</a> '
-        f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
+        f'<h3><a {link_attrs(str(item.url))}>{escape(title)}</a></h3>'
         f'<p class="aurora-meta">{escape(stats)}</p>'
         f"{badge_html}"
         f'{_callout("Value", item.why_it_matters or item.summary or item.raw_content, "aurora-callout")}'
@@ -152,8 +148,7 @@ def render_item_row(item: SignalItem) -> str:
         meta = display_tech_news_source(item)
     return (
         '<article class="aurora-row">'
-        f'<h3><a {link_attrs(str(item.url))}>{escape(item.title)}</a> '
-        f'<span class="aurora-score">{_score(item):.1f}/10</span></h3>'
+        f'<h3><a {link_attrs(str(item.url))}>{escape(item.title)}</a></h3>'
         f'<p class="aurora-meta">{escape(str(meta))}</p>'
         f"<p>{escape(body)}</p>"
         f"{extra_html}"
@@ -215,8 +210,7 @@ def _learning_path_html(items: Sequence[SignalItem]) -> str:
             cards.append(
                 '<article class="aurora-card">'
                 f'<h3>{escape(label)}</h3>'
-                f'<p><a href="{safe_url(str(item.url))}">{escape(item.title)}</a> '
-                f'<span class="aurora-score">{_score(item):.1f}/10</span></p>'
+                f'<p><a href="{safe_url(str(item.url))}">{escape(item.title)}</a></p>'
                 f"<p>{escape(description)}</p>"
                 "</article>"
             )
@@ -282,9 +276,9 @@ def _repo_stats(metadata: dict[str, Any]) -> str:
 
 
 def _repo_badges(metadata: dict[str, Any]) -> list[str]:
-    badges: list[str] = []
+    badges: list[str] = [_repo_quality_label(metadata)]
     language = str(metadata.get("language") or "").strip()
-    if language:
+    if language and language not in badges:
         badges.append(language)
     for topic in metadata.get("topics") or []:
         topic_text = str(topic).strip()
@@ -293,6 +287,25 @@ def _repo_badges(metadata: dict[str, Any]) -> list[str]:
         if len(badges) >= 4:
             break
     return badges
+
+
+def _repo_quality_label(metadata: dict[str, Any]) -> str:
+    configured = str(metadata.get("quality_label") or "").strip()
+    if configured:
+        return configured.replace("_", " ").title()
+    stars = _int_metadata(metadata, "stars")
+    if stars >= 10_000:
+        return "Classic"
+    if 500 <= stars <= 5_000:
+        return "High potential"
+    return "Learning pick"
+
+
+def _int_metadata(metadata: dict[str, Any], key: str) -> int:
+    try:
+        return int(metadata.get(key) or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 def _callout(label: str, value: str, class_name: str) -> str:

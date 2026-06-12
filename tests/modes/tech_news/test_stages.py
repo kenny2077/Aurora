@@ -307,6 +307,7 @@ def test_markdown_rendering_is_stable_and_score_ordered() -> None:
     assert summary.index("High") < summary.index("Low")
     assert "Selected 2 tech news item(s)." in summary
     assert "OpenAI News" in summary
+    assert "/10" not in summary
     assert rendered.mode == "tech_news"
     assert rendered.markdown == summary
 

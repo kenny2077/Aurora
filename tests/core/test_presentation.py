@@ -11,7 +11,7 @@ def test_repo_card_shows_compact_stats_value_guidance_and_actions() -> None:
     item = _repo(
         "org/product",
         metadata={
-            "stars": 5200,
+            "stars": 3200,
             "forks": 420,
             "open_issues": 12,
             "language": "Python",
@@ -30,9 +30,11 @@ def test_repo_card_shows_compact_stats_value_guidance_and_actions() -> None:
     html = render_repo_card(item)
 
     assert "org/product" in html
-    assert "9.2/10" in html
-    assert "5.2k stars" in html
+    assert "9.2/10" not in html
+    assert "aurora-score" not in html
+    assert "3.2k stars" in html
     assert "420 forks" in html
+    assert "High potential" in html
     assert "high issue load" not in html
     assert '<a href="https://github.com/org/product" target="_blank" rel="noopener noreferrer">' in html
     assert "<b>Value:</b> Valuable repository." in html
@@ -98,6 +100,8 @@ def test_repo_digest_html_handles_missing_optional_metadata() -> None:
     assert "<!doctype html>" in email_html
     assert "aurora-kpi" in web_html
     assert "org/minimal" in web_html
+    assert "Top score" not in web_html
+    assert "/10" not in web_html
     assert "Evidence:" not in web_html
     assert "<b>Value:</b> Relevant for learning." in web_html
     assert "<b>Study:</b>" not in web_html
@@ -157,6 +161,8 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "Connections" not in web_html
     assert "Run diagnostics" not in web_html
     assert "Semantic Scholar rate-limited" not in web_html
+    assert "aurora-score" not in web_html
+    assert "/10" not in web_html
     assert web_html.index("Tech News") < web_html.index("GitHub Repos") < web_html.index("Research Papers")
     assert "Important News" in web_html
     assert "Likely true" not in web_html

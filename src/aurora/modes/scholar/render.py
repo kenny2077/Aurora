@@ -35,7 +35,7 @@ class ScholarSummarizer:
             actions = item.action_items or _fallback_actions(item)
             lines.extend(
                 [
-                    f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
+                    f"## {index}. [{item.title}]({item.url})",
                     "",
                     f"- Source: {format_paper_source_status(item)}",
                     f"- Authors: {authors}",

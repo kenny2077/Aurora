@@ -34,7 +34,7 @@ Aurora focuses on a small, high-signal set of useful items:
 | Signal | What Aurora looks for | What the digest gives you |
 | --- | --- | --- |
 | Tech News | Timely AI and technology stories with strong source signals | Linked headline, source, and concise summary |
-| GitHub Repos | Projects with real activity, adoption, and learning value | Repo link, score, stats, topic/language chips, and value |
+| GitHub Repos | Projects with real activity, adoption, and learning value | Repo link, stats, quality label, topic/language chips, and value |
 | Research Papers | Papers selected by research fields and enrichment signals | Paper link, venue/status, summary, and what to learn |
 
 The default unified digest stays intentionally compact: 5 tech news items, 3
@@ -239,8 +239,8 @@ builds `web/dist/`, then pushes that generated site to `gh-pages`.
 
 The web UI is built from the AstroPaper-based app in `web/`. The homepage
 features the latest digest as "Today's Digest" and groups earlier generated
-posts by month. Individual digest pages keep repo cards compact with score
-badges, stats, topic/language chips, and a single Value section.
+posts by month. Individual digest pages keep repo cards compact with stats,
+quality labels, topic/language chips, and a single Value section.
 
 Useful local checks:
 

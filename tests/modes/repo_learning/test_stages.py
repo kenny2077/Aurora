@@ -446,6 +446,7 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert "Selected 1 GitHub repo(s)." in summary
     assert "org/high" in summary
     assert "org/low" not in summary
+    assert "/10" not in summary
     assert "100 stars | 7 forks | 2 open issues" in summary
     assert "- Value: High signal." in summary
     assert "- Why:" not in summary
@@ -463,6 +464,8 @@ def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: 
     assert "aurora-repo-card" in rendered.html
     assert rendered.metadata["web_html"]
     assert "org/high" in str(rendered.metadata["web_html"])
+    assert "/10" not in str(rendered.metadata["web_html"])
+    assert "aurora-score" not in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
     assert "<b>Evidence:</b>" not in str(rendered.metadata["web_html"])
     assert "<b>Study:</b>" not in str(rendered.metadata["web_html"])

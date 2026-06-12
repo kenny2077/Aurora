@@ -471,6 +471,7 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
 
     assert "### Repo to Study" not in summary
     assert "## GitHub Repos" in summary
+    assert "/10" not in summary
     assert "   - 6k stars | 420 forks | 12 open issues" in summary
     assert "   - Value: org/noisy is worth studying because it has concrete learning evidence." in summary
     assert "   - Why:" not in summary
@@ -485,6 +486,8 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
     assert "Evidence:" not in str(rendered.metadata["web_html"])
+    assert "/10" not in str(rendered.metadata["web_html"])
+    assert "aurora-score" not in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
     assert "MIT license" not in str(rendered.metadata["web_html"])
     assert "homepage" not in str(rendered.metadata["web_html"])

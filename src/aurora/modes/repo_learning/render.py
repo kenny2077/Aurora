@@ -26,7 +26,7 @@ class RepoLearningSummarizer:
             metadata = item.metadata
             lines.extend(
                 [
-                    f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
+                    f"## {index}. [{item.title}]({item.url})",
                     "",
                     f"- {_repo_stats_text(metadata)}",
                     f"- Value: {item.why_it_matters}",

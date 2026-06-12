@@ -762,6 +762,7 @@ def test_markdown_rendering_is_stable_score_ordered_and_capped() -> None:
     assert "Selected 1 research paper(s)." in summary
     assert "High Paper" in summary
     assert "Low Paper" not in summary
+    assert "/10" not in summary
     assert rendered.mode == "scholar"
     assert rendered.markdown == summary
 
@@ -807,6 +808,7 @@ def test_scholar_rendering_includes_enrichment_analysis_links_and_status() -> No
     assert "## Source Status" in summary
     assert "Semantic Scholar: 1 enriched" in summary
     assert "LLM analysis: 1 succeeded" in summary
+    assert "/10" not in summary
     assert "- Source: ICLR 2026 (Accepted)" in summary
     assert "- Venue/status:" not in summary
     assert "- Description: LLM summary." in summary
