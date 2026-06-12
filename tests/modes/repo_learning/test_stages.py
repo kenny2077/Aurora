@@ -122,8 +122,10 @@ def test_scoring_rewards_relevant_active_repos_and_suppresses_recent_state(tmp_p
         "novelty",
         "documentation_quality",
         "community_signal",
+        "practical_adoption",
         "recently_recommended_penalty",
     }
+    assert strong_score.score_breakdown["practical_adoption"] > 5.0
 
 
 def test_scoring_state_changes_next_run_order(tmp_path: Path) -> None:

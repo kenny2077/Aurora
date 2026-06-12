@@ -56,6 +56,7 @@ HIGH_POTENTIAL_REPO_MAX_STARS = 5_000
 HIGH_POTENTIAL_REPO_PREFERRED_MIN_STARS = 750
 HIGH_POTENTIAL_REPO_PREFERRED_MAX_STARS = 3_000
 CURRENT_REPO_MIN_YEAR = 2025
+NEWS_DIVERSE_MIN_SCORE = 5.5
 
 
 class UnifiedDigestSummarizer:
@@ -162,7 +163,7 @@ def _select_news_items(section_items: Sequence[SignalItem], limit: int) -> list[
         if len(selected) >= limit:
             break
         source = _news_source_key(item)
-        if source in seen_sources or _item_score(item) <= 0:
+        if source in seen_sources or _item_score(item) < NEWS_DIVERSE_MIN_SCORE:
             continue
         selected.append(item)
         selected_ids.add(item.id)

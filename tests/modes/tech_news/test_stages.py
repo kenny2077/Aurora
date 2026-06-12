@@ -117,6 +117,37 @@ def test_default_scoring_prioritizes_timely_high_engagement_news() -> None:
     assert TechNewsScoringConfig().recency_weight > TechNewsScoringConfig().topic_relevance_weight
 
 
+def test_scoring_rewards_authoritative_rss_and_avoids_short_keyword_false_matches() -> None:
+    scorer = TechNewsScorer(
+        TechNewsFiltersConfig(include_keywords=["ai"]),
+        TechNewsScoringConfig(),
+    )
+    authoritative = _item(
+        "news:openai",
+        "OpenAI releases an AI inference benchmark",
+        "https://example.com/openai",
+        source="rss",
+        metadata={"feed_name": "OpenAI News"},
+        raw_content="The release includes a benchmark, developer tooling, and production guidance.",
+    )
+    generic = _item(
+        "news:generic",
+        "Maintainers explain their chain of command",
+        "https://example.com/generic",
+        source="rss",
+        metadata={"feed_name": "Generic Feed"},
+        raw_content="This update is mainly an internal maintainer note.",
+    )
+
+    authoritative_score, generic_score = asyncio.run(
+        scorer.score([authoritative, generic], _context())
+    )
+
+    assert authoritative_score.final_score > generic_score.final_score
+    assert authoritative_score.tags == ["rss", "ai"]
+    assert generic_score.tags == ["rss"]
+
+
 def test_enricher_applies_score_results_to_items() -> None:
     item = _item("news:1", "AI", "https://example.com/ai")
     scorer = TechNewsScorer(TechNewsFiltersConfig(include_keywords=["ai"]), TechNewsScoringConfig())

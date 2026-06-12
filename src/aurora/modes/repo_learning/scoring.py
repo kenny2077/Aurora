@@ -38,13 +38,14 @@ KEYWORDS = {
     "orchestration",
 }
 WEIGHTS = {
-    "relevance": 0.25,
-    "learning_value": 0.20,
-    "architecture_clarity": 0.15,
-    "recent_activity": 0.15,
-    "novelty": 0.10,
-    "documentation_quality": 0.10,
-    "community_signal": 0.05,
+    "relevance": 0.22,
+    "learning_value": 0.17,
+    "architecture_clarity": 0.14,
+    "recent_activity": 0.13,
+    "novelty": 0.06,
+    "documentation_quality": 0.12,
+    "community_signal": 0.08,
+    "practical_adoption": 0.08,
 }
 PACKAGE_BASENAMES = {
     "package.json",
@@ -92,6 +93,7 @@ class RepoLearningScorer:
             "novelty": _novelty(item, context, self.config),
             "documentation_quality": _documentation_quality(item),
             "community_signal": _community_signal(item),
+            "practical_adoption": _practical_adoption(item),
         }
         base_score = sum(breakdown[key] * WEIGHTS[key] for key in WEIGHTS)
         recently_recommended = item.id in recent_ids
@@ -455,6 +457,42 @@ def _community_signal(item: SignalItem) -> float:
     score = 2.0 + math.log10(stars + 1) * 1.7 + math.log10(forks + 1) * 0.8
     if open_issues > 500:
         score -= 1.0
+    return _clamp(score)
+
+
+def _practical_adoption(item: SignalItem) -> float:
+    metadata = item.metadata
+    stars = int(metadata.get("stars") or 0)
+    forks = int(metadata.get("forks") or 0)
+    open_issues = int(metadata.get("open_issues") or 0)
+    groups = _study_file_groups(metadata)
+    score = 2.0
+    if stars >= 50_000:
+        score += 2.0
+    elif stars >= 10_000:
+        score += 1.5
+    elif stars >= 1_000:
+        score += 1.0
+    if forks >= 1_000:
+        score += 1.2
+    elif forks >= 100:
+        score += 0.8
+    if stars and open_issues / max(stars, 1) <= 0.03:
+        score += 1.0
+    elif open_issues > 500:
+        score -= 1.0
+    if metadata.get("homepage"):
+        score += 0.7
+    if metadata.get("license"):
+        score += 0.5
+    if groups["examples"]:
+        score += 1.0
+    if groups["docs"]:
+        score += 0.8
+    if groups["manifests"]:
+        score += 0.8
+    if metadata.get("readme_excerpt"):
+        score += 1.0
     return _clamp(score)
 
 

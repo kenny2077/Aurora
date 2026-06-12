@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import re
 from collections.abc import Sequence
 from datetime import datetime, timezone
 
@@ -15,6 +16,34 @@ from aurora.modes.tech_news.notes import (
 from aurora.modes.tech_news.prompts import build_tech_news_prompt
 from aurora.models import ScoreResult, SignalItem
 from aurora.pipeline import StageContext
+
+
+HIGH_AUTHORITY_RSS_FEEDS = {
+    "aws machine learning blog": 7.4,
+    "google ai blog": 7.6,
+    "google deepmind blog": 8.0,
+    "hugging face blog": 7.4,
+    "nvidia ai blog": 7.3,
+    "openai news": 8.0,
+    "simon willison": 7.5,
+}
+HIGH_IMPACT_TERMS = {
+    "benchmark",
+    "dataset",
+    "deployment",
+    "developer",
+    "evaluation",
+    "framework",
+    "inference",
+    "open source",
+    "production",
+    "reasoning",
+    "release",
+    "research",
+    "safety",
+    "security",
+    "tool",
+}
 
 
 class TechNewsScorer:
@@ -116,7 +145,8 @@ def _source_authority(item: SignalItem) -> float:
     if item.source == "hackernews":
         return 8.0
     if item.source == "rss":
-        return 6.5
+        feed_name = str(item.metadata.get("feed_name") or "").strip().lower()
+        return HIGH_AUTHORITY_RSS_FEEDS.get(feed_name, 6.5)
     return 5.0
 
 
@@ -125,7 +155,11 @@ def _engagement(item: SignalItem) -> float:
         score = float(item.metadata.get("score") or 0)
         comments = float(item.metadata.get("descendants") or 0)
         return min(10.0, 2.0 + math.log10(score + 1) * 2.2 + math.log10(comments + 1) * 1.2)
-    return 4.0
+    text = f"{item.title} {item.raw_content}".lower()
+    content_signal = 0.8 if len(item.raw_content.split()) >= 40 else 0.0
+    impact_signal = min(1.5, sum(1 for term in HIGH_IMPACT_TERMS if term in text) * 0.3)
+    source_signal = max(0.0, (_source_authority(item) - 6.5) * 0.6)
+    return min(7.0, 4.0 + content_signal + impact_signal + source_signal)
 
 
 def _recency(item: SignalItem, context: StageContext) -> float:
@@ -151,4 +185,12 @@ def _topic_relevance(matches: list[str]) -> float:
 
 def _matched_keywords(item: SignalItem, keywords: list[str]) -> list[str]:
     text = f"{item.title} {item.raw_content}".lower()
-    return [keyword for keyword in keywords if keyword in text]
+    matches: list[str] = []
+    for keyword in keywords:
+        if " " in keyword or len(keyword) > 3:
+            matched = keyword in text
+        else:
+            matched = re.search(rf"\b{re.escape(keyword)}\b", text) is not None
+        if matched:
+            matches.append(keyword)
+    return matches
