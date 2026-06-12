@@ -97,8 +97,9 @@ class TechNewsScorer:
 class TechNewsEnricher:
     """Apply score results to SignalItem fields."""
 
-    def __init__(self, llm_ranker: LLMRanker | None = None) -> None:
+    def __init__(self, llm_ranker: LLMRanker | None = None, *, llm_analysis_top_n: int = 12) -> None:
         self.llm_ranker = llm_ranker
+        self.llm_analysis_top_n = max(0, llm_analysis_top_n)
 
     async def enrich(
         self,
@@ -130,9 +131,11 @@ class TechNewsEnricher:
                     }
                 )
             )
-        if self.llm_ranker is None:
+        if self.llm_ranker is None or self.llm_analysis_top_n == 0:
             return enriched
-        analyses = await self.llm_ranker.analyze_items(enriched, build_tech_news_prompt, context)
+        context.metadata["llm_analysis_candidate_pool_count"] = len(enriched)
+        candidates = sorted(enriched, key=_item_score, reverse=True)[: self.llm_analysis_top_n]
+        analyses = await self.llm_ranker.analyze_items(candidates, build_tech_news_prompt, context)
         analyzed: list[SignalItem] = []
         for item in enriched:
             analysis = analyses.get(item.id)
@@ -194,3 +197,7 @@ def _matched_keywords(item: SignalItem, keywords: list[str]) -> list[str]:
         if matched:
             matches.append(keyword)
     return matches
+
+
+def _item_score(item: SignalItem) -> float:
+    return item.final_score if item.final_score is not None else item.deterministic_score or 0.0

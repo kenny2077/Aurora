@@ -31,6 +31,7 @@
   },
   "modes": {
     "tech_news": {
+      "llm_analysis_top_n": 12,
       "sources": {
         "hackernews": {
           "enabled": true,
@@ -88,6 +89,7 @@
       "fields": ["ml", "agents"],
       "max_candidates": 200,
       "final_item_count": 10,
+      "llm_analysis_top_n": 12,
       "score_threshold": 5.5,
       "sources": {
         "arxiv": {
@@ -126,6 +128,7 @@
       "ranking": {
         "final_item_count": 6,
         "enrich_top_n": 12,
+        "llm_analysis_top_n": 12,
         "history_lookback_days": 14
       }
     },

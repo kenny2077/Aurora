@@ -35,7 +35,10 @@ def build_tech_news_pipeline(
         normalize_stage=TechNewsNormalizeStage(),
         deduplicate_stage=TechNewsDeduplicateStage(),
         score_stage=TechNewsScorer(tech_news.filters, tech_news.scoring),
-        enrich_stage=TechNewsEnricher(llm_ranker),
+        enrich_stage=TechNewsEnricher(
+            llm_ranker,
+            llm_analysis_top_n=tech_news.llm_analysis_top_n,
+        ),
         summarize_stage=TechNewsSummarizer(),
         render_stage=TechNewsRenderer(),
         deliver_stage=ConfiguredDeliveryStage(config),

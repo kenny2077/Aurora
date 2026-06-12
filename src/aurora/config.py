@@ -270,6 +270,7 @@ class TechNewsModeConfig(BaseModel):
 
     enabled: bool = True
     item_type: str = "news"
+    llm_analysis_top_n: int = Field(default=12, ge=0)
     sources: TechNewsSourcesConfig = Field(default_factory=TechNewsSourcesConfig)
     filters: TechNewsFiltersConfig = Field(default_factory=TechNewsFiltersConfig)
     scoring: TechNewsScoringConfig = Field(default_factory=TechNewsScoringConfig)
@@ -360,6 +361,7 @@ class ScholarModeConfig(BaseModel):
     item_type: str = "paper"
     max_candidates: int = Field(default=200, ge=1)
     final_item_count: int = Field(default=10, ge=1)
+    llm_analysis_top_n: int = Field(default=12, ge=0)
     min_year: int = Field(default=2025, ge=1900, le=2100)
     max_year: int = Field(default=2026, ge=1900, le=2100)
     score_threshold: float = Field(default=7.0, ge=0.0, le=10.0)
@@ -510,6 +512,7 @@ class RepoLearningRankingConfig(BaseModel):
 
     final_item_count: int = Field(default=6, ge=1)
     enrich_top_n: int = Field(default=12, ge=0)
+    llm_analysis_top_n: int = Field(default=12, ge=0)
     history_lookback_days: int = Field(default=14, ge=1)
 
 

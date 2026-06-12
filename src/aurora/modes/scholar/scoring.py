@@ -163,9 +163,12 @@ class ScholarEnricher:
             return items
         candidate_count = len(items)
         if self.config is not None:
-            candidate_count = min(len(items), max(self.config.final_item_count * 4, self.config.final_item_count))
+            candidate_count = min(len(items), self.config.llm_analysis_top_n)
+        if candidate_count == 0:
+            return items
         ordered = sorted(items, key=_item_score, reverse=True)
         candidates = ordered[:candidate_count]
+        context.metadata["llm_analysis_candidate_pool_count"] = len(items)
         analyses = await self.llm_ranker.analyze_items(candidates, build_scholar_prompt, context)
         analyzed_by_id = {
             item.id: self.llm_ranker.apply_analysis(item, analyses.get(item.id))

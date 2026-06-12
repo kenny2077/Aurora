@@ -221,6 +221,30 @@ def test_enricher_ignores_llm_source_credibility_when_returned() -> None:
     assert "source_credibility" not in enriched.metadata
 
 
+def test_enricher_limits_llm_analysis_to_top_ranked_news() -> None:
+    context = _context()
+    low = _item("news:low", "Low relevance update", "https://example.com/low", source="rss")
+    high = _item(
+        "news:high",
+        "AI Agent Launch",
+        "https://example.com/high",
+        source="hackernews",
+        metadata={"score": 1000, "descendants": 120},
+    )
+    scores = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([low, high], context)
+    )
+    ranker = _RecordingRanker()
+
+    enriched = asyncio.run(
+        TechNewsEnricher(ranker, llm_analysis_top_n=1).enrich([low, high], scores, context)
+    )
+
+    assert [item.id for item in enriched] == ["news:low", "news:high"]
+    assert ranker.item_ids == ["news:high"]
+    assert context.metadata["llm_analysis_candidate_pool_count"] == 2
+
+
 def test_enricher_generates_clean_rss_learning_notes() -> None:
     item = _item(
         "news:rss",
@@ -323,6 +347,18 @@ class _LowQualityRanker:
                 "action_items": ["Copy this raw thread."],
             }
         )
+
+
+class _RecordingRanker:
+    def __init__(self) -> None:
+        self.item_ids: list[str] = []
+
+    async def analyze_items(self, items, prompt_builder, context):
+        self.item_ids = [item.id for item in items]
+        return {}
+
+    def apply_analysis(self, item, analysis):
+        return item
 
 
 class _CredibilityClient:

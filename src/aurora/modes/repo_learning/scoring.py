@@ -192,10 +192,24 @@ class RepoLearningEnricher:
                     }
                 )
             )
-        if self.llm_ranker is None:
+        if self.llm_ranker is None or self.config.ranking.llm_analysis_top_n == 0:
             return enriched
-        analyses = await self.llm_ranker.analyze_items(enriched, build_repo_learning_prompt, context)
-        return [self.llm_ranker.apply_analysis(item, analyses.get(item.id)) for item in enriched]
+        context.metadata["llm_analysis_candidate_pool_count"] = len(enriched)
+        llm_top_ids = {
+            score.item_id
+            for score in sorted(
+                score_results,
+                key=lambda score: score.final_score or 0.0,
+                reverse=True,
+            )[: self.config.ranking.llm_analysis_top_n]
+        }
+        candidates = [item for item in enriched if item.id in llm_top_ids]
+        analyses = await self.llm_ranker.analyze_items(candidates, build_repo_learning_prompt, context)
+        analyzed_by_id = {
+            item.id: self.llm_ranker.apply_analysis(item, analyses.get(item.id))
+            for item in candidates
+        }
+        return [analyzed_by_id.get(item.id, item) for item in enriched]
 
 
 def extract_package_files(paths: Sequence[str], *, limit: int = 30) -> list[str]:

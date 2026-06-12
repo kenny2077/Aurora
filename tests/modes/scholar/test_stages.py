@@ -167,6 +167,42 @@ def test_enricher_applies_score_and_fallback_learning_text() -> None:
     assert "score_breakdown" in enriched[0].metadata
 
 
+def test_enricher_limits_llm_analysis_to_top_ranked_papers() -> None:
+    context = _context()
+    low = _paper("paper-low", "Low Value Paper", {"source_ids": {"arxiv": "1"}})
+    high = _paper(
+        "paper-high",
+        "High Value Paper",
+        {
+            "source_ids": {"arxiv": "2"},
+            "venue": "ICLR",
+            "venue_year": 2026,
+            "status": "spotlight",
+            "citation_count": 120,
+            "code_urls": ["https://github.com/org/repo"],
+        },
+        abstract=(
+            "A practical large language model agent method with code, evaluation, "
+            "benchmark results, and deployment evidence."
+        ),
+    )
+    scores = [
+        ScoreResult(item_id=low.id, deterministic_score=4.0, final_score=4.0),
+        ScoreResult(item_id=high.id, deterministic_score=9.0, final_score=9.0),
+    ]
+    config = ScholarModeConfig(
+        llm_analysis_top_n=1,
+        sources={"semantic_scholar": {"enabled": False}},
+    )
+    ranker = _RecordingRanker()
+
+    enriched = asyncio.run(ScholarEnricher(config, ranker).enrich([low, high], scores, context))
+
+    assert [item.id for item in enriched] == ["paper-low", "paper-high"]
+    assert ranker.item_ids == ["paper-high"]
+    assert context.metadata["llm_analysis_candidate_pool_count"] == 2
+
+
 def test_enricher_writes_successful_scholar_cache(tmp_path: Path) -> None:
     item = _paper("paper", "Reasoning", {"venue": "ICLR", "source_ids": {"arxiv": "1"}})
     config = ScholarModeConfig()
@@ -807,3 +843,15 @@ def _paper(
         raw_content=abstract,
         metadata=metadata,
     )
+
+
+class _RecordingRanker:
+    def __init__(self) -> None:
+        self.item_ids: list[str] = []
+
+    async def analyze_items(self, items, prompt_builder, context: StageContext) -> dict:
+        self.item_ids = [item.id for item in items]
+        return {}
+
+    def apply_analysis(self, item: SignalItem, analysis) -> SignalItem:
+        return item

@@ -24,12 +24,14 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 60
     assert config.modes.tech_news.sources.hackernews.min_score == 100
     assert config.modes.tech_news.sources.rss == []
+    assert config.modes.tech_news.llm_analysis_top_n == 12
     assert config.modes.tech_news.scoring.engagement_weight == 0.40
     assert config.modes.tech_news.scoring.recency_weight == 0.35
     assert config.modes.scholar.enabled is True
     assert config.modes.scholar.fields == ["ml"]
     assert config.modes.scholar.max_candidates == 200
     assert config.modes.scholar.final_item_count == 10
+    assert config.modes.scholar.llm_analysis_top_n == 12
     assert config.modes.scholar.score_threshold == 7.0
     assert config.modes.scholar.fallback_cache_enabled is True
     assert config.modes.scholar.fallback_cache_ttl_hours == 168
@@ -58,6 +60,7 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.repo_learning.sources.github_search.per_page == 20
     assert config.modes.repo_learning.ranking.final_item_count == 6
     assert config.modes.repo_learning.ranking.enrich_top_n == 12
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 12
     assert config.modes.repo_learning.ranking.history_lookback_days == 14
     assert config.modes.unified_digest.enabled is True
     assert config.modes.unified_digest.include_modes == ["tech_news", "scholar", "repo_learning"]
@@ -77,10 +80,12 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"ai": {"analysis_concurrency": 0}},
         {"delivery": {"email": {"smtp_port": 70000}}},
         {"modes": {"tech_news": {"item_type": "paper"}}},
+        {"modes": {"tech_news": {"llm_analysis_top_n": -1}}},
         {"modes": {"tech_news": {"sources": {"hackernews": {"fetch_top_stories": 0}}}}},
         {"modes": {"scholar": {"item_type": "news"}}},
         {"modes": {"scholar": {"fields": ["unknown-field"]}}},
         {"modes": {"scholar": {"max_candidates": 0}}},
+        {"modes": {"scholar": {"llm_analysis_top_n": -1}}},
         {"modes": {"scholar": {"sources": {"openreview": {"venue_ids": []}}}}},
         {"modes": {"scholar": {"sources": {"semantic_scholar": {"api_key_env": ""}}}}},
         {"modes": {"scholar": {"sources": {"semantic_scholar": {"cache_ttl_hours": 0}}}}},
@@ -90,6 +95,7 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"modes": {"repo_learning": {"sources": {"github_search": {"domains": []}}}}},
         {"modes": {"repo_learning": {"sources": {"github_search": {"per_page": 0}}}}},
         {"modes": {"repo_learning": {"ranking": {"final_item_count": 0}}}},
+        {"modes": {"repo_learning": {"ranking": {"llm_analysis_top_n": -1}}}},
         {"modes": {"unified_digest": {"include_modes": []}}},
         {"modes": {"unified_digest": {"include_modes": ["tech_news", "tech_news"]}}},
         {"modes": {"unified_digest": {"section_order": ["paper", "repo"]}}},

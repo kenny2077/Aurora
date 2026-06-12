@@ -385,6 +385,34 @@ def test_enricher_passes_stage_context_to_llm_ranker() -> None:
     assert ranker.context is context
 
 
+def test_enricher_limits_llm_analysis_to_top_ranked_repos() -> None:
+    context = _context()
+    low = _repo("repo:org/low", "org/low", {"stars": 100})
+    high = _repo("repo:org/high", "org/high", {"stars": 10000})
+    scores = [
+        ScoreResult(item_id=low.id, deterministic_score=4.0, final_score=4.0),
+        ScoreResult(item_id=high.id, deterministic_score=9.0, final_score=9.0),
+    ]
+    ranker = _RecordingRanker()
+
+    async def exercise() -> list[SignalItem]:
+        transport = httpx.MockTransport(lambda request: httpx.Response(404))
+        async with httpx.AsyncClient(transport=transport) as client:
+            return await RepoLearningEnricher(
+                RepoLearningModeConfig(
+                    ranking=RepoLearningRankingConfig(enrich_top_n=0, llm_analysis_top_n=1)
+                ),
+                http_client=client,
+                llm_ranker=ranker,
+            ).enrich([low, high], scores, context)
+
+    enriched = asyncio.run(exercise())
+
+    assert [item.id for item in enriched] == ["repo:org/low", "repo:org/high"]
+    assert ranker.item_ids == ["repo:org/high"]
+    assert context.metadata["llm_analysis_candidate_pool_count"] == 2
+
+
 def test_rendering_is_score_ordered_capped_and_delivery_updates_state(tmp_path: Path) -> None:
     config = RepoLearningModeConfig(ranking=RepoLearningRankingConfig(final_item_count=1))
     state_store = RepoLearningStateStore(tmp_path / "state.json")
@@ -518,9 +546,11 @@ def _repo(
 class _RecordingRanker:
     def __init__(self) -> None:
         self.context: StageContext | None = None
+        self.item_ids: list[str] = []
 
     async def analyze_items(self, items, prompt_builder, context: StageContext) -> dict:
         self.context = context
+        self.item_ids = [item.id for item in items]
         return {}
 
     def apply_analysis(self, item: SignalItem, analysis) -> SignalItem:
