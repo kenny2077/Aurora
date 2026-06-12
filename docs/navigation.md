@@ -46,8 +46,19 @@ Read:
 
 1. `src/aurora/cli.py`
 2. `tests/core/test_cli.py`
-3. `README.md`
-4. `docs/interests.md` for interest/research-field flags
+3. `tests/core/test_eval.py` for `aurora eval` behavior
+4. `README.md`
+5. `docs/interests.md` for interest/research-field flags
+
+### Change Digest Quality Evaluation
+
+Read:
+
+1. `src/aurora/evaluation.py`
+2. `src/aurora/cli.py`
+3. `tests/core/test_eval.py`
+4. `tests/fixtures/digest_quality/`
+5. `src/aurora/modes/unified_digest/render.py`
 
 ### Change Config Schema
 

@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from aurora.config import AuroraConfig, ModeName
+from aurora.evaluation import compare_reports, replay_fixture, write_eval_report
 from aurora.modes.repo_learning import build_repo_learning_pipeline
 from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
@@ -99,6 +100,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_doctor(args)
         if args.command == "run":
             return _handle_run(args)
+        if args.command == "eval":
+            return _handle_eval(args)
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -132,6 +135,17 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--skip-delivery", action="store_true")
     run_parser.add_argument("--strict-delivery", action="store_true")
     run_parser.add_argument("--dry-run", action="store_true")
+
+    eval_parser = subparsers.add_parser("eval", help="Evaluate digest quality from saved fixtures")
+    eval_subparsers = eval_parser.add_subparsers(dest="eval_command", required=True)
+    replay_parser = eval_subparsers.add_parser("replay", help="Replay SignalItem JSONL fixtures")
+    replay_parser.add_argument("--config", type=Path, default=None)
+    replay_parser.add_argument("--fixture", type=Path, required=True)
+    replay_parser.add_argument("--output", type=Path, default=None)
+    compare_parser = eval_subparsers.add_parser("compare", help="Compare two evaluation reports")
+    compare_parser.add_argument("--before", type=Path, required=True)
+    compare_parser.add_argument("--after", type=Path, required=True)
+    compare_parser.add_argument("--output", type=Path, default=None)
 
     return parser
 
@@ -217,6 +231,32 @@ def _handle_run(args: argparse.Namespace) -> int:
             suffix = f" - {delivery_result.error}" if delivery_result.error else ""
             print(f"{result.mode}: delivery {delivery_result.channel}: {status}{suffix}")
     return 0
+
+
+def _handle_eval(args: argparse.Namespace) -> int:
+    if args.eval_command == "replay":
+        config = AuroraConfig() if args.config is None else load_config(args.config)
+        report = replay_fixture(config, args.fixture)
+        if args.output is not None:
+            write_eval_report(args.output, report)
+        print("eval replay: ok")
+        print(f"selected: {_format_list(report['selected_item_ids'])}")
+        print(f"missing sections: {_format_list(report['missing_sections'])}")
+        if args.output is not None:
+            print(f"report: {args.output}")
+        return 0
+    if args.eval_command == "compare":
+        comparison = compare_reports(args.before, args.after)
+        if args.output is not None:
+            write_eval_report(args.output, comparison)
+        print("eval compare: ok")
+        print(f"added: {_format_list(comparison['added'])}")
+        print(f"removed: {_format_list(comparison['removed'])}")
+        print(f"unchanged: {comparison['unchanged_count']}")
+        if args.output is not None:
+            print(f"report: {args.output}")
+        return 0
+    raise ValueError(f"unknown eval command: {args.eval_command}")
 
 
 def _select_modes(config: AuroraConfig, mode: str | None) -> list[ModeName]:
@@ -340,6 +380,12 @@ def _missing_optional_env_vars(config: AuroraConfig) -> list[str]:
 
 def _unique(values: Sequence[str]) -> list[str]:
     return list(dict.fromkeys(value for value in values if value))
+
+
+def _format_list(values: object) -> str:
+    if not isinstance(values, list) or not values:
+        return "none"
+    return ", ".join(str(value) for value in values)
 
 
 def _is_writable_target(path: Path) -> bool:

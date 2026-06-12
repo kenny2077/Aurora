@@ -1,0 +1,12 @@
+{
+  "item_counts": {
+    "news": 1,
+    "paper": 1,
+    "repo": 1
+  },
+  "selected_item_ids": [
+    "news:ml",
+    "repo:ml",
+    "paper:ml"
+  ]
+}

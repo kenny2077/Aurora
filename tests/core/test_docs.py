@@ -27,6 +27,8 @@ def test_readme_quickstart_commands_cover_core_modes() -> None:
     assert "aurora run --mode scholar --research-field ml" in readme
     assert "aurora run --mode scholar --research-field ml --research-field agents" in readme
     assert "aurora run --mode unified_digest --config data/config.example.json" in readme
+    assert "aurora eval replay --fixture tests/fixtures/digest_quality/agents.jsonl" in readme
+    assert "aurora eval compare --before" in readme
 
 
 def test_interest_docs_document_migration_and_presets() -> None:

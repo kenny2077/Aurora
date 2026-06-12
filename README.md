@@ -254,6 +254,23 @@ Every run writes JSONL snapshots and a `run_summary.json` file under
 `data/runs/<run_id>/<mode>/`. Use that file first when debugging missing
 content, source failures, rate limits, or delivery issues.
 
+## Quality Evaluation
+
+Aurora can replay saved `SignalItem` JSONL fixtures through unified digest
+selection and rendering without hitting live sources. Use this before changing
+ranking or digest presentation logic.
+
+```bash
+rtk uv run aurora eval replay --fixture tests/fixtures/digest_quality/agents.jsonl --output /tmp/aurora-agents-eval.json
+```
+
+Compare two replay reports to see selected item churn, count changes, missing
+sections, and source mix differences:
+
+```bash
+rtk uv run aurora eval compare --before /tmp/aurora-before.json --after /tmp/aurora-after.json
+```
+
 ## Troubleshooting Empty Sections
 
 - Empty research papers usually means arXiv/OpenReview returned no qualifying
