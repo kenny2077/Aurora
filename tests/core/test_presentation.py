@@ -164,6 +164,7 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "Hacker News" in web_html
     assert "org/product" in web_html
     assert "Useful Paper" in web_html
+    assert "NeurIPS 2025 (Spotlight)" in web_html
 
 
 def _repo(

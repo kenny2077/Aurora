@@ -10,6 +10,7 @@ from typing import Any
 from urllib.parse import urlparse
 
 from aurora.models import SignalItem
+from aurora.modes.scholar.display import format_paper_source_status
 from aurora.modes.tech_news.notes import display_tech_news_source
 from aurora.pipeline import StageContext
 
@@ -145,10 +146,7 @@ def render_item_row(item: SignalItem) -> str:
     meta = item.source
     extra_html = ""
     if item.type == "paper":
-        metadata = item.metadata
-        venue = metadata.get("venue") or item.source
-        status = metadata.get("status") or "unknown"
-        meta = f"{venue} / {status}"
+        meta = format_paper_source_status(item)
         learning = item.learning_value or item.summary
         if learning:
             extra_html = f"<p><b>Learn:</b> {escape(learning)}</p>"

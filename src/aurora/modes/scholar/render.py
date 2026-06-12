@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 from aurora.config import ScholarModeConfig
+from aurora.modes.scholar.display import format_paper_source_status
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
 
@@ -29,8 +30,6 @@ class ScholarSummarizer:
         for index, item in enumerate(selected, start=1):
             meta = item.metadata
             authors = ", ".join(meta.get("authors") or []) or "unknown authors"
-            venue = meta.get("venue") or item.source
-            status = meta.get("status") or "unknown"
             summary = item.summary or meta.get("semantic_scholar_tldr") or _excerpt(item.raw_content)
             links = _paper_links(item)
             actions = item.action_items or _fallback_actions(item)
@@ -38,8 +37,7 @@ class ScholarSummarizer:
                 [
                     f"## {index}. [{item.title}]({item.url}) - {item.final_score}/10",
                     "",
-                    f"- Source: {item.source}",
-                    f"- Venue/status: {venue} / {status}",
+                    f"- Source: {format_paper_source_status(item)}",
                     f"- Authors: {authors}",
                     f"- Summary: {summary}",
                     f"- Why: {item.why_it_matters or _excerpt(item.raw_content, 180)}",

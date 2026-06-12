@@ -736,6 +736,7 @@ def test_scholar_rendering_includes_enrichment_analysis_links_and_status() -> No
         {
             "authors": ["Ada"],
             "venue": "ICLR",
+            "venue_year": 2026,
             "status": "accepted",
             "pdf_url": "https://paper.example.com/paper.pdf",
             "semantic_scholar_url": "https://www.semanticscholar.org/paper/S2",
@@ -768,6 +769,8 @@ def test_scholar_rendering_includes_enrichment_analysis_links_and_status() -> No
     assert "## Source Status" in summary
     assert "Semantic Scholar: 1 enriched" in summary
     assert "LLM analysis: 1 succeeded" in summary
+    assert "- Source: ICLR 2026 (Accepted)" in summary
+    assert "- Venue/status:" not in summary
     assert "- Summary: LLM summary." in summary
     assert "- Why: LLM why." in summary
     assert "- Learn: LLM learning." in summary

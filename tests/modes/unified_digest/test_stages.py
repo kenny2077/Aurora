@@ -356,6 +356,31 @@ def test_unified_rendering_marks_cached_scholar_fallback_without_affecting_other
     assert "Tech News" in str(rendered.metadata["web_html"])
 
 
+def test_unified_rendering_formats_paper_source_with_year_and_status() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:icml",
+        "paper",
+        "Useful Paper",
+        8.0,
+        metadata={"venue": "ICML", "venue_year": 2026, "status": "oral"},
+    )
+    repo = _item("repo:1", "repo", "Repo", 7.0)
+    news = _item("news:1", "news", "News", 6.0)
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize([paper, repo, news], context))
+    rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, [paper, repo, news], context))
+
+    assert "   - Source: ICML 2026 (Oral)" in summary
+    assert "Venue/status:" not in summary
+    assert "ICML 2026 (Oral)" in str(rendered.metadata["web_html"])
+
+
 def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,

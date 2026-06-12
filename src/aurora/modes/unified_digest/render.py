@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from aurora.config import UnifiedDigestModeConfig
+from aurora.modes.scholar.display import format_paper_source_status
 from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
     display_tech_news_learning,
@@ -271,12 +272,9 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
             f"   - Value: {_why_text(item)}",
         ]
     if item.type == "paper":
-        metadata = item.metadata
-        venue = metadata.get("venue") or item.source
-        status = metadata.get("status") or "unknown"
         return [
             f"{index}. [{item.title}]({item.url}) - {score}/10",
-            f"   - Venue/status: {venue} / {status}",
+            f"   - Source: {format_paper_source_status(item)}",
             f"   - Summary: {_summary_text(item)}",
             f"   - Learn: {_learning_text(item)}",
         ]
