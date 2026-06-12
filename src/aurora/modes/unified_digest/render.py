@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from datetime import datetime
 
 from aurora.config import UnifiedDigestModeConfig
-from aurora.modes.scholar.display import format_paper_source_status
+from aurora.modes.scholar.display import format_paper_description, format_paper_source_status
 from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
     display_tech_news_learning,
@@ -275,8 +275,7 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
         return [
             f"{index}. [{item.title}]({item.url}) - {score}/10",
             f"   - Source: {format_paper_source_status(item)}",
-            f"   - Summary: {_summary_text(item)}",
-            f"   - Learn: {_learning_text(item)}",
+            f"   - Description: {format_paper_description(item)}",
         ]
     return [
         f"{index}. [{item.title}]({item.url}) - {score}/10",
@@ -443,13 +442,13 @@ def _top_items(items: Sequence[SignalItem], item_type: str, *, limit: int) -> li
 
 def _learning_item_lines(item: SignalItem) -> list[str]:
     why = _why_text(item)
-    learning = _learning_text(item)
     lines = [
         f"- [{item.title}]({item.url}) - {_item_score(item):.1f}/10",
         f"  - Source: {item.source}",
         f"  - Why: {why}",
-        f"  - Learn: {learning}",
     ]
+    if item.type != "paper":
+        lines.append(f"  - Learn: {_learning_text(item)}")
     lines.extend(_repo_signal_lines(item, indent="  "))
     action_items = _action_items(item)
     if action_items:
@@ -466,9 +465,6 @@ def _paper_signal_lines(item: SignalItem, *, indent: str) -> list[str]:
     if item.type != "paper":
         return []
     lines: list[str] = []
-    learning = _learning_text(item)
-    if learning:
-        lines.append(f"{indent}- Learn: {learning}")
     action_items = _action_items(item)
     if action_items:
         lines.append(f"{indent}- Action: {'; '.join(action_items)}")

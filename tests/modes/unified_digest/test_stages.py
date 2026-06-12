@@ -368,6 +368,14 @@ def test_unified_rendering_formats_paper_source_with_year_and_status() -> None:
         "Useful Paper",
         8.0,
         metadata={"venue": "ICML", "venue_year": 2026, "status": "oral"},
+    ).model_copy(
+        update={
+            "summary": (
+                "This paper shows a practical way to evaluate AI agents. "
+                "It helps students see why the benchmark could matter in real products. "
+                "This third sentence should not appear in the digest."
+            )
+        }
     )
     repo = _item("repo:1", "repo", "Repo", 7.0)
     news = _item("news:1", "news", "News", 6.0)
@@ -377,7 +385,13 @@ def test_unified_rendering_formats_paper_source_with_year_and_status() -> None:
     rendered = asyncio.run(UnifiedDigestRenderer(config).render(summary, [paper, repo, news], context))
 
     assert "   - Source: ICML 2026 (Oral)" in summary
+    assert (
+        "   - Description: This paper shows a practical way to evaluate AI agents. "
+        "It helps students see why the benchmark could matter in real products."
+    ) in summary
+    assert "This third sentence should not appear" not in summary
     assert "Venue/status:" not in summary
+    assert "Learn:" not in summary
     assert "ICML 2026 (Oral)" in str(rendered.metadata["web_html"])
 
 
@@ -870,13 +884,13 @@ def test_unified_summary_starts_with_tech_news_section_only() -> None:
     assert "### Repo to Study" not in summary
     assert "### News to Watch" not in summary
     assert "It explains a useful agent planning pattern." in summary
-    assert "Study the evaluation setup." in summary
+    assert "Study the evaluation setup." not in summary
     assert "Top News" in summary
     assert "Third News" in summary
     assert "Fourth News" in summary
 
 
-def test_unified_paper_section_includes_analysis_actions_and_semantic_scholar_link() -> None:
+def test_unified_paper_section_hides_learning_actions_and_semantic_scholar_link() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=2,
         max_total_items=6,
@@ -901,7 +915,7 @@ def test_unified_paper_section_includes_analysis_actions_and_semantic_scholar_li
     )
 
     section = summary.split("## Research Papers", maxsplit=1)[1]
-    assert "Learn: Study the benchmark design." in section
+    assert "Learn:" not in section
     assert "Action: Read the method.; Compare the experiments." not in section
     assert "Semantic Scholar: https://www.semanticscholar.org/paper/S2" not in section
 

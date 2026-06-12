@@ -131,7 +131,9 @@ def test_scoring_blocklists_and_rewards_top_venue_code_keyword_papers() -> None:
         "topic_relevance_signal",
         "learning_value_signal",
         "source_diversity_signal",
+        "practical_value_signal",
     }
+    assert strong_score.score_breakdown["practical_value_signal"] > 0.5
 
 
 def test_research_field_presets_expand_categories_keywords_venues_and_tags() -> None:
@@ -771,9 +773,9 @@ def test_scholar_rendering_includes_enrichment_analysis_links_and_status() -> No
     assert "LLM analysis: 1 succeeded" in summary
     assert "- Source: ICLR 2026 (Accepted)" in summary
     assert "- Venue/status:" not in summary
-    assert "- Summary: LLM summary." in summary
+    assert "- Description: LLM summary." in summary
     assert "- Why: LLM why." in summary
-    assert "- Learn: LLM learning." in summary
+    assert "- Learn:" not in summary
     assert "[Semantic Scholar](https://www.semanticscholar.org/paper/S2)" in summary
     assert "- Read the method." in summary
 
@@ -783,6 +785,7 @@ def test_scholar_prompt_constants_include_required_json_fields() -> None:
     assert '"why_it_matters"' in RESEARCH_ANALYSIS_SYSTEM
     assert '"action_items"' in RESEARCH_ANALYSIS_SYSTEM
     assert '"tags"' in RESEARCH_ANALYSIS_SYSTEM
+    assert "one or two short plain-language sentences" in RESEARCH_ANALYSIS_SYSTEM
     assert "{abstract}" in RESEARCH_ANALYSIS_USER
     assert "{deterministic_score}" in RESEARCH_ANALYSIS_USER
 

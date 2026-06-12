@@ -165,6 +165,7 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "org/product" in web_html
     assert "Useful Paper" in web_html
     assert "NeurIPS 2025 (Spotlight)" in web_html
+    assert "<b>Learn:</b> Learn the evaluation setup." not in web_html
 
 
 def _repo(

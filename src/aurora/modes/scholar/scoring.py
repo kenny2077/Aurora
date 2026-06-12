@@ -26,16 +26,38 @@ from aurora.pipeline import StageContext
 
 
 WEIGHTS = {
-    "venue_signal": 1.6,
-    "novelty_signal": 1.2,
-    "recency_signal": 1.4,
-    "code_signal": 1.0,
-    "citation_signal": 1.0,
-    "topic_relevance_signal": 1.8,
-    "learning_value_signal": 1.2,
-    "source_diversity_signal": 0.8,
+    "venue_signal": 1.4,
+    "novelty_signal": 0.9,
+    "recency_signal": 1.0,
+    "code_signal": 1.2,
+    "citation_signal": 1.6,
+    "topic_relevance_signal": 1.4,
+    "learning_value_signal": 0.9,
+    "source_diversity_signal": 0.5,
+    "practical_value_signal": 1.1,
 }
 EVIDENCE_TERMS = {"ablation", "baseline", "benchmark", "dataset", "evaluation", "experiment", "method", "result"}
+PRACTICAL_TERMS = {
+    "application",
+    "benchmark",
+    "code",
+    "dataset",
+    "deploy",
+    "deployment",
+    "efficient",
+    "framework",
+    "implementation",
+    "inference",
+    "open source",
+    "open-source",
+    "practical",
+    "production",
+    "real world",
+    "real-world",
+    "scalable",
+    "system",
+    "tool",
+}
 
 
 class ScholarScorer:
@@ -66,6 +88,7 @@ class ScholarScorer:
             "topic_relevance_signal": _topic_relevance_signal(item, self.config),
             "learning_value_signal": _learning_value_signal(item),
             "source_diversity_signal": _source_diversity_signal(item),
+            "practical_value_signal": _practical_value_signal(item),
         }
         score = round(max(0.0, min(10.0, sum(breakdown[key] * WEIGHTS[key] for key in WEIGHTS))), 2)
         return ScoreResult(
@@ -303,6 +326,25 @@ def _source_diversity_signal(item: SignalItem) -> float:
     if count == 1:
         return 0.3
     return 0.0
+
+
+def _practical_value_signal(item: SignalItem) -> float:
+    text = _scoring_text(item)
+    signal = 0.0
+    if item.metadata.get("code_urls"):
+        signal += 0.35
+    if item.metadata.get("project_urls"):
+        signal += 0.25
+    citations = max(0, int(item.metadata.get("citation_count") or 0))
+    influential = max(0, int(item.metadata.get("influential_citation_count") or 0))
+    if citations >= 100 or influential >= 20:
+        signal += 0.25
+    elif citations >= 25 or influential >= 5:
+        signal += 0.15
+    signal += min(0.35, sum(1 for term in PRACTICAL_TERMS if term in text) * 0.07)
+    if _is_top_venue_accepted(item):
+        signal += 0.1
+    return _clamp(signal)
 
 
 def _has_blocklisted_term(item: SignalItem, config: ScholarModeConfig) -> bool:
