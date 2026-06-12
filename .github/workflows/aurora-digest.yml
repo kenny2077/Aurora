@@ -41,6 +41,10 @@ on:
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
+concurrency:
+  group: aurora-digest-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   aurora:
     runs-on: ubuntu-latest
@@ -79,6 +83,10 @@ jobs:
             if [ -d "$STATE_DIR/.aurora/content/posts" ]; then
               mkdir -p web/src/content/posts
               cp -R "$STATE_DIR/.aurora/content/posts/." web/src/content/posts/
+            fi
+            if [ -d "$STATE_DIR/.aurora/cache" ]; then
+              mkdir -p data/cache
+              cp -R "$STATE_DIR/.aurora/cache/." data/cache/
             fi
           fi
       - name: Validate config
@@ -153,6 +161,10 @@ jobs:
           if [ -f data/aurora_state.json ]; then
             mkdir -p web/dist/.aurora
             cp data/aurora_state.json web/dist/.aurora/aurora_state.json
+          fi
+          if [ -d data/cache ]; then
+            mkdir -p web/dist/.aurora/cache
+            cp -R data/cache/. web/dist/.aurora/cache/
           fi
           touch web/dist/.nojekyll
       - name: Publish gh-pages branch

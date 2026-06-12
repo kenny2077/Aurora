@@ -32,9 +32,14 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "Missing required email secret" in workflow
     assert "Missing required LLM secret: DEEPSEEK_API_KEY" in workflow
     assert "Restore Aurora state" in workflow
+    assert "concurrency:" in workflow
+    assert "group: aurora-digest-${{ github.ref }}" in workflow
+    assert "cancel-in-progress: false" in workflow
     assert ".aurora/aurora_state.json" in workflow
     assert ".aurora/content/posts" in workflow
+    assert ".aurora/cache" in workflow
     assert "cp -R \"$STATE_DIR/.aurora/content/posts/.\" web/src/content/posts/" in workflow
+    assert "cp -R \"$STATE_DIR/.aurora/cache/.\" data/cache/" in workflow
     assert "CONFIG_PATH=\"data/actions.config.json\"" in workflow
     assert "TOPIC=\"${{ github.event.inputs.topic || 'agents_harness' }}\"" in workflow
     assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
@@ -52,6 +57,7 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "refusing to publish an empty Pages update" in workflow
     assert "cp -R web/src/content/posts/. web/dist/.aurora/content/posts/" in workflow
     assert "cp data/aurora_state.json web/dist/.aurora/aurora_state.json" in workflow
+    assert "cp -R data/cache/. web/dist/.aurora/cache/" in workflow
     assert "touch web/dist/.nojekyll" in workflow
     assert "git -C \"$PUBLISH_DIR\" fetch --depth=1 origin gh-pages" in workflow
     assert "cp -R web/dist/. \"$PUBLISH_DIR\"/" in workflow

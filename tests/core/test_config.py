@@ -176,6 +176,10 @@ def test_actions_config_enables_email_and_content_window() -> None:
         "Google DeepMind Blog",
     }
     assert config.modes.scholar.score_threshold == 5.5
+    assert config.modes.scholar.sources.semantic_scholar.max_requests_per_run == 20
+    assert config.modes.scholar.sources.semantic_scholar.rate_limit_interval_sec == 2.0
+    assert config.modes.scholar.sources.semantic_scholar.max_retries == 4
+    assert config.modes.scholar.sources.semantic_scholar.retry_delay_sec == 5.0
     assert config.modes.repo_learning.sources.github_search.min_stars == 100
     assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]
     assert config.modes.unified_digest.section_limits == {"news": 5, "repo": 3, "paper": 3}

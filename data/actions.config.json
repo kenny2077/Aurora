@@ -101,10 +101,10 @@
           "enabled": true,
           "api_key_env": "SEMANTIC_SCHOLAR_API_KEY",
           "cache_ttl_hours": 168,
-          "max_requests_per_run": 40,
-          "rate_limit_interval_sec": 1.25,
-          "max_retries": 3,
-          "retry_delay_sec": 1.0
+          "max_requests_per_run": 20,
+          "rate_limit_interval_sec": 2.0,
+          "max_retries": 4,
+          "retry_delay_sec": 5.0
         }
       }
     },
