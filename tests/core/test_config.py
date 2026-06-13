@@ -17,6 +17,9 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.ai.provider == "deepseek"
     assert config.ai.model == "deepseek-chat"
     assert config.ai.api_key_env == "DEEPSEEK_API_KEY"
+    assert config.ai.max_requests_per_run is None
+    assert config.ai.max_tokens_per_run is None
+    assert config.ai.fail_open_on_budget_exceeded is True
     assert config.pipeline.scoring.score_threshold == 7.0
     assert config.delivery.filesystem.enabled is True
     assert config.delivery.github_pages.enabled is True
@@ -24,6 +27,9 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 60
     assert config.modes.tech_news.sources.hackernews.min_score == 100
     assert config.modes.tech_news.sources.rss == []
+    assert config.modes.tech_news.sources.curated_rss_groups == []
+    assert config.modes.tech_news.sources.reddit.enabled is False
+    assert config.modes.tech_news.sources.github_releases.enabled is False
     assert config.modes.tech_news.llm_analysis_top_n == 12
     assert config.modes.tech_news.scoring.engagement_weight == 0.40
     assert config.modes.tech_news.scoring.recency_weight == 0.35
@@ -78,10 +84,15 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
         {"run": {"enabled_modes": []}},
         {"pipeline": {"scoring": {"score_threshold": 10.1}}},
         {"ai": {"analysis_concurrency": 0}},
+        {"ai": {"max_requests_per_run": -1}},
+        {"ai": {"max_tokens_per_run": -1}},
         {"delivery": {"email": {"smtp_port": 70000}}},
         {"modes": {"tech_news": {"item_type": "paper"}}},
         {"modes": {"tech_news": {"llm_analysis_top_n": -1}}},
         {"modes": {"tech_news": {"sources": {"hackernews": {"fetch_top_stories": 0}}}}},
+        {"modes": {"tech_news": {"sources": {"curated_rss_groups": ["unknown"]}}}},
+        {"modes": {"tech_news": {"sources": {"reddit": {"subreddits": []}}}}},
+        {"modes": {"tech_news": {"sources": {"github_releases": {"repositories": ["bad slug"]}}}}},
         {"modes": {"scholar": {"item_type": "news"}}},
         {"modes": {"scholar": {"fields": ["unknown-field"]}}},
         {"modes": {"scholar": {"max_candidates": 0}}},
@@ -158,6 +169,8 @@ def test_example_config_validates() -> None:
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.scholar.fields == ["ml", "agents"]
     assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
+    assert config.ai.max_requests_per_run == 24
+    assert config.ai.max_tokens_per_run == 120000
     assert {source.name for source in config.modes.tech_news.sources.rss} >= {
         "Simon Willison",
         "OpenAI News",
@@ -174,8 +187,15 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.smtp_username_env == "SMTP_USERNAME"
     assert config.delivery.email.password_env == "EMAIL_PASSWORD"
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
+    assert config.ai.max_requests_per_run == 24
+    assert config.ai.max_tokens_per_run == 120000
+    assert config.ai.fail_open_on_budget_exceeded is True
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
+    assert config.modes.tech_news.sources.reddit.enabled is True
+    assert config.modes.tech_news.sources.reddit.subreddits == ["MachineLearning", "LocalLLaMA"]
+    assert config.modes.tech_news.sources.github_releases.enabled is True
+    assert "openai/openai-python" in config.modes.tech_news.sources.github_releases.repositories
     assert {source.name for source in config.modes.tech_news.sources.rss} >= {
         "Simon Willison",
         "OpenAI News",

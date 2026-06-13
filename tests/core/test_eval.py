@@ -34,6 +34,14 @@ def test_eval_replay_writes_unified_digest_quality_report(tmp_path: Path, capsys
         "repo": {"github_search": 1},
         "paper": {"openreview": 1},
     }
+    assert report["selection_diagnostics"] == {
+        "news:1": {"quality_label": "news", "selection_reason": "source-diverse news item"},
+        "repo:1": {
+            "quality_label": "high_potential",
+            "selection_reason": "new high-potential repository",
+        },
+        "paper:1": {"quality_label": "top_venue", "selection_reason": "current top-venue paper"},
+    }
     assert "/10" not in report["markdown"]
 
 

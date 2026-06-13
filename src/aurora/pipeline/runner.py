@@ -247,6 +247,9 @@ def _run_summary(
         }
     if isinstance(source_quality, dict):
         summary["source_quality"] = source_quality
+    ai_usage = _ai_usage_summary(context_metadata)
+    if ai_usage:
+        summary["ai_usage"] = ai_usage
     warnings = _summary_warnings(context_metadata)
     if warnings:
         summary["warnings"] = warnings
@@ -302,6 +305,29 @@ def _summary_warnings(context_metadata: dict[str, Any] | None) -> list[str]:
                 if formatted and formatted not in warnings:
                     warnings.append(formatted)
     return warnings
+
+
+def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, int]:
+    if not isinstance(context_metadata, dict):
+        return {}
+    usage = context_metadata.get("ai_usage")
+    if not isinstance(usage, dict):
+        return {}
+    summary: dict[str, int] = {}
+    for key in (
+        "requested_calls",
+        "succeeded_calls",
+        "failed_calls",
+        "skipped_by_budget",
+        "approx_prompt_tokens",
+        "approx_completion_tokens",
+        "approx_total_tokens",
+    ):
+        try:
+            summary[key] = int(usage.get(key) or 0)
+        except (TypeError, ValueError):
+            summary[key] = 0
+    return summary
 
 
 def _write_json(path: Path, payload: dict[str, Any]) -> Path:

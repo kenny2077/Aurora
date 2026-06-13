@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import math
 from collections.abc import Callable, Sequence
 from typing import Any
 
@@ -65,6 +66,7 @@ class LLMRanker:
             )
             return {}
         semaphore = asyncio.Semaphore(self.config.analysis_concurrency)
+        budget_lock = asyncio.Lock()
         failed_count = 0
 
         async def analyze(item: SignalItem) -> tuple[str, LLMAnalysis | None]:
@@ -72,12 +74,20 @@ class LLMRanker:
             async with semaphore:
                 if self.config.throttle_sec:
                     await asyncio.sleep(self.config.throttle_sec)
+                system_prompt, user_prompt = prompt_builder(item)
+                prompt_tokens = _approx_tokens(system_prompt) + _approx_tokens(user_prompt)
+                async with budget_lock:
+                    if not _reserve_ai_budget(self.config, context, prompt_tokens):
+                        return item.id, None
                 try:
-                    system_prompt, user_prompt = prompt_builder(item)
                     payload = await self.client.complete_json(system_prompt, user_prompt)
+                    async with budget_lock:
+                        _record_ai_success(context, _approx_tokens(json.dumps(payload, default=str)))
                     return item.id, LLMAnalysis.model_validate(payload)
                 except Exception:
                     failed_count += 1
+                    async with budget_lock:
+                        _record_ai_failure(context)
                     return item.id, None
 
         results = await asyncio.gather(*(analyze(item) for item in items))
@@ -140,3 +150,82 @@ def _action_items_from_suggested_path(value: str) -> list[str]:
         return []
     parts = [part.strip(" .") for part in text.replace("\n", " ").split(".") if part.strip(" .")]
     return [part + "." for part in parts[:4]]
+
+
+def _reserve_ai_budget(config: AIConfig, context: StageContext, prompt_tokens: int) -> bool:
+    usage = _ai_usage(context)
+    usage["requested_calls"] += 1
+    request_limit = config.max_requests_per_run
+    token_limit = config.max_tokens_per_run
+    reserved_before_this_call = usage["requested_calls"] - usage["skipped_by_budget"] - 1
+    over_request_limit = request_limit is not None and reserved_before_this_call >= request_limit
+    over_token_limit = token_limit is not None and (
+        usage["approx_total_tokens"] + prompt_tokens
+    ) > token_limit
+    if over_request_limit or over_token_limit:
+        usage["skipped_by_budget"] += 1
+        _warn_budget_exhausted(context)
+        if config.fail_open_on_budget_exceeded:
+            return False
+        raise RuntimeError("AI budget exhausted")
+    usage["approx_prompt_tokens"] += prompt_tokens
+    usage["approx_total_tokens"] += prompt_tokens
+    return True
+
+
+def _record_ai_success(context: StageContext, completion_tokens: int) -> None:
+    usage = _ai_usage(context)
+    usage["succeeded_calls"] += 1
+    usage["approx_completion_tokens"] += completion_tokens
+    usage["approx_total_tokens"] += completion_tokens
+
+
+def _record_ai_failure(context: StageContext) -> None:
+    usage = _ai_usage(context)
+    usage["failed_calls"] += 1
+
+
+def _ai_usage(context: StageContext) -> dict[str, int]:
+    usage = context.metadata.setdefault(
+        "ai_usage",
+        {
+            "requested_calls": 0,
+            "succeeded_calls": 0,
+            "failed_calls": 0,
+            "skipped_by_budget": 0,
+            "approx_prompt_tokens": 0,
+            "approx_completion_tokens": 0,
+            "approx_total_tokens": 0,
+        },
+    )
+    if not isinstance(usage, dict):
+        usage = {}
+        context.metadata["ai_usage"] = usage
+    for key in (
+        "requested_calls",
+        "succeeded_calls",
+        "failed_calls",
+        "skipped_by_budget",
+        "approx_prompt_tokens",
+        "approx_completion_tokens",
+        "approx_total_tokens",
+    ):
+        try:
+            usage[key] = int(usage.get(key) or 0)
+        except (TypeError, ValueError):
+            usage[key] = 0
+    return usage
+
+
+def _warn_budget_exhausted(context: StageContext) -> None:
+    warning = "AI budget exhausted; remaining items use deterministic scoring."
+    warnings = context.metadata.setdefault("warnings", [])
+    if isinstance(warnings, list) and warning not in warnings:
+        warnings.append(warning)
+
+
+def _approx_tokens(value: str) -> int:
+    text = str(value or "")
+    if not text:
+        return 0
+    return max(1, math.ceil(len(text) / 4))

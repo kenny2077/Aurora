@@ -29,6 +29,11 @@
       "site_dir": "site"
     }
   },
+  "ai": {
+    "max_requests_per_run": 24,
+    "max_tokens_per_run": 120000,
+    "fail_open_on_budget_exceeded": true
+  },
   "modes": {
     "tech_news": {
       "llm_analysis_top_n": 12,
@@ -82,7 +87,25 @@
             "enabled": true,
             "category": "ai-infrastructure"
           }
-        ]
+        ],
+        "reddit": {
+          "enabled": true,
+          "subreddits": ["MachineLearning", "LocalLLaMA"],
+          "listing": "top",
+          "time_filter": "day",
+          "limit": 15,
+          "min_score": 150
+        },
+        "github_releases": {
+          "enabled": true,
+          "repositories": [
+            "openai/openai-python",
+            "huggingface/transformers",
+            "vllm-project/vllm",
+            "modelcontextprotocol/python-sdk"
+          ],
+          "per_repo_limit": 3
+        }
       }
     },
     "scholar": {

@@ -90,6 +90,20 @@ Read:
 4. mocked tests under `tests/modes/<mode>/`
 5. README/docs for setup or secret changes
 
+For tech news source packs, start with `src/aurora/modes/tech_news/sources.py`,
+`src/aurora/modes/tech_news/pipeline.py`, and
+`tests/modes/tech_news/test_sources.py`.
+
+### Change LLM Budgets
+
+Read:
+
+1. `src/aurora/config.py`
+2. `src/aurora/ai/ranker.py`
+3. `src/aurora/pipeline/runner.py`
+4. `tests/core/test_ai.py`
+5. `tests/core/test_pipeline_runner.py`
+
 ### Change Delivery, Pages, Or Email
 
 Read:

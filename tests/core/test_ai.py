@@ -70,6 +70,37 @@ def test_llm_ranker_isolates_failures_and_applies_analysis() -> None:
     assert fallback.final_score == 7.0
 
 
+def test_llm_ranker_skips_over_budget_items_without_failing() -> None:
+    first = _item("news:first")
+    second = _item("news:second")
+    context = StageContext(mode="test", run_id="budget")
+    ranker = LLMRanker(
+        AIConfig(api_key_env="AURORA_TEST_KEY", max_requests_per_run=1),
+        weights=FinalScoreWeights(),
+        client=_FakeClient(),
+    )
+
+    analyses = asyncio.run(ranker.analyze_items([first, second], _prompt, context))
+    enriched_first = ranker.apply_analysis(first, analyses.get(first.id))
+    enriched_second = ranker.apply_analysis(second, analyses.get(second.id))
+
+    assert set(analyses) == {"news:first"}
+    assert enriched_first.llm_score == 9.0
+    assert enriched_second.llm_score is None
+    assert enriched_second.final_score == 7.0
+    assert context.metadata["ai_usage"] == {
+        "requested_calls": 2,
+        "succeeded_calls": 1,
+        "failed_calls": 0,
+        "skipped_by_budget": 1,
+        "approx_prompt_tokens": context.metadata["ai_usage"]["approx_prompt_tokens"],
+        "approx_completion_tokens": context.metadata["ai_usage"]["approx_completion_tokens"],
+        "approx_total_tokens": context.metadata["ai_usage"]["approx_total_tokens"],
+    }
+    assert context.metadata["ai_usage"]["approx_total_tokens"] > 0
+    assert "AI budget exhausted" in context.metadata["warnings"][0]
+
+
 def test_llm_ranker_uses_suggested_learning_path_and_tags() -> None:
     item = _item("paper:1")
     ranker = LLMRanker(AIConfig(), weights=FinalScoreWeights())

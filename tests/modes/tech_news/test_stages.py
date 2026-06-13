@@ -4,8 +4,9 @@ import asyncio
 from datetime import datetime, timezone
 
 from aurora.ai.ranker import LLMRanker
-from aurora.config import AIConfig, FinalScoreWeights
+from aurora.config import AIConfig, AuroraConfig, FinalScoreWeights
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
+from aurora.modes.tech_news.pipeline import build_tech_news_pipeline
 from aurora.modes.tech_news.prompts import TECH_NEWS_ANALYSIS_SYSTEM
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
 from aurora.modes.tech_news.scoring import TechNewsEnricher, TechNewsScorer
@@ -63,6 +64,28 @@ def test_deduplicate_collapses_canonical_urls_and_titles() -> None:
     deduped = asyncio.run(TechNewsDeduplicateStage().deduplicate(items, _context()))
 
     assert [item.id for item in deduped] == ["news:1"]
+
+
+def test_deduplicate_collapses_hn_rss_reddit_and_github_release_overlap() -> None:
+    items = [
+        _item("hackernews:story:1", "Agent Release", "https://example.com/release/", source="hackernews"),
+        _item("rss:feed:1", "Different", "https://www.example.com/release", source="rss"),
+        _item("reddit:ml:1", "Agent Release", "https://reddit.com/r/MachineLearning/comments/1", source="reddit"),
+        _item(
+            "github_release:org/repo:1",
+            "org/repo Agent Release",
+            "https://github.com/org/repo/releases/tag/v1",
+            source="github_releases",
+            raw_content="longer release notes with practical agent tooling details",
+        ),
+    ]
+
+    deduped = asyncio.run(TechNewsDeduplicateStage().deduplicate(items, _context()))
+
+    assert [item.id for item in deduped] == [
+        "hackernews:story:1",
+        "github_release:org/repo:1",
+    ]
 
 
 def test_scoring_increases_with_engagement_recency_and_keywords() -> None:
@@ -146,6 +169,28 @@ def test_scoring_rewards_authoritative_rss_and_avoids_short_keyword_false_matche
     assert authoritative_score.final_score > generic_score.final_score
     assert authoritative_score.tags == ["rss", "ai"]
     assert generic_score.tags == ["rss"]
+
+
+def test_scoring_penalizes_flaky_source_quality() -> None:
+    item = _item(
+        "news:rss",
+        "AI Agent Release",
+        "https://example.com/story",
+        source="rss",
+        metadata={"feed_name": "OpenAI News"},
+        raw_content="A benchmark and developer tool release for production agent systems.",
+    )
+    scorer = TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig())
+
+    healthy = asyncio.run(scorer.score([item], _context()))[0]
+    flaky_context = _context()
+    flaky_context.metadata["source_quality"] = {
+        "tech_news:rss": {"quality_score": 2.0},
+    }
+    flaky = asyncio.run(scorer.score([item], flaky_context))[0]
+
+    assert flaky.final_score < healthy.final_score
+    assert flaky.score_breakdown["source_health"] == 2.0
 
 
 def test_enricher_applies_score_results_to_items() -> None:
@@ -243,6 +288,34 @@ def test_enricher_limits_llm_analysis_to_top_ranked_news() -> None:
     assert [item.id for item in enriched] == ["news:low", "news:high"]
     assert ranker.item_ids == ["news:high"]
     assert context.metadata["llm_analysis_candidate_pool_count"] == 2
+
+
+def test_tech_news_pipeline_adds_optional_source_packs_only_when_enabled() -> None:
+    default_pipeline = build_tech_news_pipeline(AuroraConfig())
+    expanded_pipeline = build_tech_news_pipeline(
+        AuroraConfig(
+            modes={
+                "tech_news": {
+                    "sources": {
+                        "curated_rss_groups": ["ai_labs"],
+                        "reddit": {"enabled": True, "subreddits": ["MachineLearning"]},
+                        "github_releases": {
+                            "enabled": True,
+                            "repositories": ["openai/openai-python"],
+                        },
+                    }
+                }
+            }
+        )
+    )
+
+    assert [stage.name for stage in default_pipeline.fetch_stages] == ["hackernews", "rss"]
+    assert [stage.name for stage in expanded_pipeline.fetch_stages] == [
+        "hackernews",
+        "rss",
+        "reddit",
+        "github_releases",
+    ]
 
 
 def test_enricher_generates_clean_rss_learning_notes() -> None:

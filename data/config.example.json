@@ -9,6 +9,11 @@
     "cache_dir": "data/cache",
     "output_dir": "data/runs"
   },
+  "ai": {
+    "max_requests_per_run": 24,
+    "max_tokens_per_run": 120000,
+    "fail_open_on_budget_exceeded": true
+  },
   "modes": {
     "tech_news": {
       "sources": {

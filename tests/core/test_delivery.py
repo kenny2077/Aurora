@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
+import httpx
 
 from aurora.config import (
     AuroraConfig,
@@ -16,6 +17,7 @@ from aurora.config import (
 )
 from aurora.delivery import ConfiguredDeliveryStage
 from aurora.delivery.email import send_email
+from aurora.delivery.webhook import send_webhooks
 from aurora.models import RenderedDigest
 from aurora.pipeline import StageContext
 
@@ -172,3 +174,49 @@ def test_strict_delivery_raises_when_channel_fails(tmp_path: Path) -> None:
                 ),
             )
         )
+
+
+def test_webhook_delivery_rejects_non_https_urls_by_default() -> None:
+    result = asyncio.run(
+        send_webhooks(
+            RenderedDigest(mode="tech_news", title="Tech", markdown="body"),
+            StageContext(mode="tech_news", run_id="run-1"),
+            [{"url": "http://example.com/webhook"}],
+        )
+    )[0]
+
+    assert result.ok is False
+    assert result.destination == "http://example.com/webhook"
+    assert result.error == "webhook url must use https"
+
+
+def test_webhook_delivery_redacts_secret_headers_from_errors() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        raise RuntimeError(
+            "Authorization: Bearer secret-token X-API-Key=secret-key password=hidden"
+        )
+
+    async def exercise():
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await send_webhooks(
+                RenderedDigest(mode="tech_news", title="Tech", markdown="body"),
+                StageContext(mode="tech_news", run_id="run-1"),
+                [
+                    {
+                        "url": "https://example.com/webhook",
+                        "headers": {
+                            "Authorization": "Bearer secret-token",
+                            "X-API-Key": "secret-key",
+                        },
+                    }
+                ],
+                http_client=client,
+            )
+
+    result = asyncio.run(exercise())[0]
+
+    assert result.ok is False
+    assert "secret-token" not in str(result.error)
+    assert "secret-key" not in str(result.error)
+    assert "hidden" not in str(result.error)
+    assert "[REDACTED]" in str(result.error)

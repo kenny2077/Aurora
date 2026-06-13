@@ -13,8 +13,59 @@ from typing import Any
 import feedparser
 import httpx
 
-from aurora.config import HackerNewsSourceConfig, RSSSourceConfig
+from aurora.config import (
+    GitHubReleasesSourceConfig,
+    HackerNewsSourceConfig,
+    RSSSourceConfig,
+    RedditSourceConfig,
+    TechNewsSourcesConfig,
+)
 from aurora.pipeline import StageContext
+
+
+CURATED_RSS_GROUPS = {
+    "ai_labs": [
+        {
+            "name": "OpenAI News",
+            "url": "https://openai.com/news/rss.xml",
+            "category": "ai-labs",
+        },
+        {
+            "name": "Google AI Blog",
+            "url": "https://blog.google/innovation-and-ai/technology/ai/rss/",
+            "category": "ai-labs",
+        },
+        {
+            "name": "Google DeepMind Blog",
+            "url": "https://deepmind.google/blog/rss.xml",
+            "category": "ai-research",
+        },
+    ],
+    "ai_infrastructure": [
+        {
+            "name": "AWS Machine Learning Blog",
+            "url": "https://aws.amazon.com/blogs/machine-learning/feed/",
+            "category": "ai-infrastructure",
+        },
+        {
+            "name": "NVIDIA AI Blog",
+            "url": "https://developer.nvidia.com/blog/category/generative-ai/feed/",
+            "category": "ai-infrastructure",
+        },
+    ],
+    "ai_tools": [
+        {
+            "name": "Simon Willison",
+            "url": "https://simonwillison.net/atom/everything/",
+            "category": "ai-tools",
+        },
+        {
+            "name": "Hugging Face Blog",
+            "url": "https://huggingface.co/blog/feed.xml",
+            "category": "ai-tools",
+        },
+    ],
+}
 
 
 class HackerNewsFetchStage:
@@ -140,6 +191,116 @@ class RSSFetchStage:
         return records
 
 
+class RedditFetchStage:
+    """Fetch configured subreddit listings from Reddit's public JSON endpoints."""
+
+    name = "reddit"
+
+    def __init__(
+        self,
+        config: RedditSourceConfig,
+        *,
+        http_client: httpx.AsyncClient | None = None,
+        base_url: str = "https://www.reddit.com",
+    ) -> None:
+        self.config = config
+        self.http_client = http_client
+        self.base_url = base_url.rstrip("/")
+
+    async def fetch(self, context: StageContext) -> list[dict[str, Any]]:
+        if not self.config.enabled:
+            return []
+        if self.http_client is not None:
+            return await self._fetch_with_client(self.http_client, context)
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+            return await self._fetch_with_client(client, context)
+
+    async def _fetch_with_client(
+        self, client: httpx.AsyncClient, context: StageContext
+    ) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for subreddit in self.config.subreddits:
+            response = await client.get(
+                f"{self.base_url}/r/{subreddit}/{self.config.listing}.json",
+                params={"t": self.config.time_filter, "limit": self.config.limit},
+                headers={"User-Agent": "AuroraDigest/1.0"},
+            )
+            response.raise_for_status()
+            for child in (((response.json() or {}).get("data") or {}).get("children") or []):
+                data = child.get("data") if isinstance(child, dict) else None
+                if not isinstance(data, dict):
+                    continue
+                score = int(data.get("score") or 0)
+                if score < self.config.min_score:
+                    continue
+                published_at = _timestamp_to_datetime(data.get("created_utc"))
+                if published_at is None or _is_before_since(published_at, context):
+                    continue
+                records.append(_build_reddit_record(data, published_at, self.base_url))
+        return records
+
+
+class GitHubReleasesFetchStage:
+    """Fetch recent GitHub releases for explicitly configured repositories."""
+
+    name = "github_releases"
+
+    def __init__(
+        self,
+        config: GitHubReleasesSourceConfig,
+        *,
+        http_client: httpx.AsyncClient | None = None,
+        base_url: str = "https://api.github.com",
+    ) -> None:
+        self.config = config
+        self.http_client = http_client
+        self.base_url = base_url.rstrip("/")
+
+    async def fetch(self, context: StageContext) -> list[dict[str, Any]]:
+        if not self.config.enabled:
+            return []
+        if self.http_client is not None:
+            return await self._fetch_with_client(self.http_client, context)
+        async with httpx.AsyncClient(timeout=20.0, follow_redirects=True) as client:
+            return await self._fetch_with_client(client, context)
+
+    async def _fetch_with_client(
+        self, client: httpx.AsyncClient, context: StageContext
+    ) -> list[dict[str, Any]]:
+        records: list[dict[str, Any]] = []
+        for repository in self.config.repositories:
+            response = await client.get(
+                f"{self.base_url}/repos/{repository}/releases",
+                params={"per_page": self.config.per_repo_limit},
+            )
+            response.raise_for_status()
+            for release in response.json() or []:
+                if not isinstance(release, dict):
+                    continue
+                published_at = _parse_iso_datetime(release.get("published_at"))
+                if published_at is None or _is_before_since(published_at, context):
+                    continue
+                records.append(_build_github_release_record(repository, release, published_at))
+        return records
+
+
+def expanded_rss_sources(config: TechNewsSourcesConfig) -> list[RSSSourceConfig]:
+    """Return explicit RSS sources plus enabled curated groups, deduplicated by URL."""
+    sources = list(config.rss)
+    for group in config.curated_rss_groups:
+        for raw_source in CURATED_RSS_GROUPS.get(group, []):
+            sources.append(RSSSourceConfig.model_validate(raw_source))
+    deduped: list[RSSSourceConfig] = []
+    seen_urls: set[str] = set()
+    for source in sources:
+        key = str(source.url).lower()
+        if key in seen_urls:
+            continue
+        deduped.append(source)
+        seen_urls.add(key)
+    return deduped
+
+
 def _build_hackernews_record(
     story: dict[str, Any], comments: list[dict[str, Any]], published_at: datetime
 ) -> dict[str, Any]:
@@ -196,6 +357,52 @@ def _build_rss_record(
     }
 
 
+def _build_reddit_record(
+    data: dict[str, Any], published_at: datetime, base_url: str
+) -> dict[str, Any]:
+    subreddit = str(data.get("subreddit") or "unknown")
+    reddit_id = str(data.get("id") or hashlib.sha256(str(data).encode("utf-8")).hexdigest()[:12])
+    permalink = str(data.get("permalink") or "")
+    discussion_url = f"{base_url}{permalink}" if permalink.startswith("/") else permalink
+    return {
+        "id": f"reddit:{subreddit}:{reddit_id}",
+        "source": "reddit",
+        "title": str(data.get("title") or "Untitled"),
+        "url": str(data.get("url") or discussion_url or base_url),
+        "published_at": published_at,
+        "raw_content": str(data.get("selftext") or ""),
+        "metadata": {
+            "subreddit": subreddit,
+            "author": data.get("author"),
+            "score": int(data.get("score") or 0),
+            "num_comments": int(data.get("num_comments") or 0),
+            "discussion_url": discussion_url,
+        },
+    }
+
+
+def _build_github_release_record(
+    repository: str, release: dict[str, Any], published_at: datetime
+) -> dict[str, Any]:
+    release_id = str(release.get("id") or release.get("tag_name") or "")
+    name = str(release.get("name") or release.get("tag_name") or "release").strip()
+    return {
+        "id": f"github_release:{repository}:{release_id}",
+        "source": "github_releases",
+        "title": f"{repository} {name}",
+        "url": str(release.get("html_url") or f"https://github.com/{repository}/releases"),
+        "published_at": published_at,
+        "raw_content": str(release.get("body") or ""),
+        "metadata": {
+            "repository": repository,
+            "tag_name": release.get("tag_name"),
+            "author": (release.get("author") or {}).get("login")
+            if isinstance(release.get("author"), dict)
+            else None,
+        },
+    }
+
+
 def _parse_feed_date(entry: dict[str, Any]) -> datetime | None:
     for field in ("published", "updated", "created"):
         parsed_field = f"{field}_parsed"
@@ -226,6 +433,16 @@ def _timestamp_to_datetime(value: Any) -> datetime | None:
         return datetime.fromtimestamp(int(value), tz=timezone.utc)
     except (TypeError, ValueError, OSError):
         return None
+
+
+def _parse_iso_datetime(value: Any) -> datetime | None:
+    if not value:
+        return None
+    try:
+        parsed = datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
 
 
 def _is_before_since(value: datetime, context: StageContext) -> bool:

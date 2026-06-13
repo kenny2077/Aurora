@@ -302,6 +302,38 @@ def test_pipeline_runner_writes_final_run_summary_json_with_delivery_results(tmp
     }
 
 
+def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
+    calls: list[str] = []
+    context = StageContext(
+        mode="tech_news",
+        run_id="ai-usage",
+        metadata={
+            "ai_usage": {
+                "requested_calls": 3,
+                "succeeded_calls": 1,
+                "failed_calls": 1,
+                "skipped_by_budget": 1,
+                "approx_prompt_tokens": 120,
+                "approx_completion_tokens": 40,
+                "approx_total_tokens": 160,
+            }
+        },
+    )
+
+    result = asyncio.run(PipelineRunner(tmp_path).run(_pipeline(calls), context))
+
+    run_summary = result.rendered_digest.metadata["run_summary"]
+    assert run_summary["ai_usage"] == {
+        "requested_calls": 3,
+        "succeeded_calls": 1,
+        "failed_calls": 1,
+        "skipped_by_budget": 1,
+        "approx_prompt_tokens": 120,
+        "approx_completion_tokens": 40,
+        "approx_total_tokens": 160,
+    }
+
+
 def test_pipeline_runner_redacts_secret_like_error_values_in_run_summary(tmp_path) -> None:
     calls: list[str] = []
 

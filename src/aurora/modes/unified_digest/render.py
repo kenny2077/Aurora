@@ -165,7 +165,7 @@ def _select_news_items(section_items: Sequence[SignalItem], limit: int) -> list[
         source = _news_source_key(item)
         if source in seen_sources or _item_score(item) < NEWS_DIVERSE_MIN_SCORE:
             continue
-        selected.append(item)
+        selected.append(_annotate_selection(item, "news", "source-diverse news item"))
         selected_ids.add(item.id)
         seen_sources.add(source)
 
@@ -174,7 +174,7 @@ def _select_news_items(section_items: Sequence[SignalItem], limit: int) -> list[
             break
         if item.id in selected_ids:
             continue
-        selected.append(item)
+        selected.append(_annotate_selection(item, "news", "fallback news selection"))
         selected_ids.add(item.id)
 
     return selected
@@ -185,14 +185,14 @@ def _select_paper_items(section_items: Sequence[SignalItem], limit: int) -> list
     selected_ids: set[str] = set()
 
     for item in [item for item in section_items if _is_current_top_venue_paper(item)][: min(2, limit)]:
-        selected.append(item)
+        selected.append(_annotate_selection(item, "top_venue", "current top-venue paper"))
         selected_ids.add(item.id)
 
     if len(selected) < limit:
         for item in section_items:
             if item.id in selected_ids or not _is_arxiv_preprint(item):
                 continue
-            selected.append(item)
+            selected.append(_annotate_selection(item, "high_potential", "high-potential arXiv preprint"))
             selected_ids.add(item.id)
             break
 
@@ -201,7 +201,7 @@ def _select_paper_items(section_items: Sequence[SignalItem], limit: int) -> list
             break
         if item.id in selected_ids:
             continue
-        selected.append(item)
+        selected.append(_annotate_selection(item, "fallback", "fallback paper selection"))
         selected_ids.add(item.id)
 
     return selected
@@ -216,7 +216,7 @@ def _select_repo_items(section_items: Sequence[SignalItem], limit: int) -> list[
         key=_established_repo_key,
     )
     for item in established[: min(2, limit)]:
-        selected.append(item)
+        selected.append(_annotate_selection(item, "classic", "established current repository"))
         selected_ids.add(item.id)
 
     if len(selected) < limit:
@@ -229,7 +229,13 @@ def _select_repo_items(section_items: Sequence[SignalItem], limit: int) -> list[
             key=_high_potential_repo_key,
         )
         if high_potential:
-            selected.append(high_potential[0])
+            selected.append(
+                _annotate_selection(
+                    high_potential[0],
+                    "high_potential",
+                    "new high-potential repository",
+                )
+            )
             selected_ids.add(high_potential[0].id)
 
     for item in section_items:
@@ -237,10 +243,17 @@ def _select_repo_items(section_items: Sequence[SignalItem], limit: int) -> list[
             break
         if item.id in selected_ids:
             continue
-        selected.append(item)
+        selected.append(_annotate_selection(item, "fallback", "fallback repository selection"))
         selected_ids.add(item.id)
 
     return selected
+
+
+def _annotate_selection(item: SignalItem, quality_label: str, selection_reason: str) -> SignalItem:
+    metadata = dict(item.metadata)
+    metadata["quality_label"] = quality_label
+    metadata["selection_reason"] = selection_reason
+    return item.model_copy(update={"metadata": metadata})
 
 
 def _section_limit(config: UnifiedDigestModeConfig, item_type: str) -> int:

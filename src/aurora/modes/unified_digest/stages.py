@@ -33,6 +33,7 @@ class UnifiedFetchStage:
         collected: list[SignalItem] = []
         failures: list[dict[str, str]] = []
         child_run_summaries: list[dict[str, Any]] = []
+        _ensure_ai_usage(context.metadata)
         for mode in self.config.modes.unified_digest.include_modes:
             builder = self.builders.get(mode)
             try:
@@ -246,9 +247,34 @@ def _without_delivery(pipeline: ModePipeline) -> ModePipeline:
 def _child_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
     return {
         key: metadata[key]
-        for key in ("skip_llm", "skip_delivery", "strict_delivery")
+        for key in ("skip_llm", "skip_delivery", "strict_delivery", "ai_usage")
         if key in metadata
     }
+
+
+def _ensure_ai_usage(metadata: dict[str, Any]) -> None:
+    usage = metadata.setdefault(
+        "ai_usage",
+        {
+            "requested_calls": 0,
+            "succeeded_calls": 0,
+            "failed_calls": 0,
+            "skipped_by_budget": 0,
+            "approx_prompt_tokens": 0,
+            "approx_completion_tokens": 0,
+            "approx_total_tokens": 0,
+        },
+    )
+    if not isinstance(usage, dict):
+        metadata["ai_usage"] = {
+            "requested_calls": 0,
+            "succeeded_calls": 0,
+            "failed_calls": 0,
+            "skipped_by_budget": 0,
+            "approx_prompt_tokens": 0,
+            "approx_completion_tokens": 0,
+            "approx_total_tokens": 0,
+        }
 
 
 def _prefer_item(first: SignalItem, second: SignalItem) -> SignalItem:

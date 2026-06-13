@@ -68,6 +68,18 @@ jobs:
         run: |
           uv sync --dev
           npm --prefix web ci
+      - name: Test Python
+        run: uv run pytest -q
+      - name: Security scan
+        run: uvx --from bandit bandit -q -r src
+      - name: Audit Python dependencies
+        run: |
+          REQ_FILE="$(mktemp)"
+          uv export --dev --format requirements-txt --no-hashes > "$REQ_FILE"
+          timeout 90s uvx --from pip-audit pip-audit -r "$REQ_FILE" --no-deps --timeout 10
+          rm "$REQ_FILE"
+      - name: Audit web dependencies
+        run: npm --prefix web audit --audit-level=high --registry=https://registry.npmjs.org
       - name: Restore Aurora state
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |

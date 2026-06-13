@@ -254,6 +254,18 @@ Every run writes JSONL snapshots and a `run_summary.json` file under
 `data/runs/<run_id>/<mode>/`. Use that file first when debugging missing
 content, source failures, rate limits, or delivery issues.
 
+## Cost And Source Guardrails
+
+`ai.max_requests_per_run` and `ai.max_tokens_per_run` cap optional LLM analysis
+for a whole run. When the budget is exhausted, Aurora keeps the digest running
+with deterministic scoring and records AI usage counters in `run_summary.json`.
+Use `--skip-llm` when you want a fully deterministic run.
+
+Tech news source packs are opt-in. In addition to Hacker News and explicit RSS
+feeds, config can enable curated RSS groups, Reddit listings, and GitHub
+releases. Source health history is tracked in the cache and weak source health
+demotes candidates internally without adding diagnostics to the public digest.
+
 ## Quality Evaluation
 
 Aurora can replay saved `SignalItem` JSONL fixtures through unified digest
@@ -265,7 +277,7 @@ rtk uv run aurora eval replay --fixture tests/fixtures/digest_quality/agents.jso
 ```
 
 Compare two replay reports to see selected item churn, count changes, missing
-sections, and source mix differences:
+sections, source mix differences, and internal selection diagnostics:
 
 ```bash
 rtk uv run aurora eval compare --before /tmp/aurora-before.json --after /tmp/aurora-after.json

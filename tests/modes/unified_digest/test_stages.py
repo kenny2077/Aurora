@@ -268,6 +268,11 @@ def test_unified_paper_selection_prefers_two_top_venues_and_one_arxiv_preprint()
         "paper:neurips",
         "paper:arxiv",
     ]
+    selected_by_id = {item.id: item for item in selected}
+    assert selected_by_id["paper:iclr"].metadata["quality_label"] == "top_venue"
+    assert selected_by_id["paper:iclr"].metadata["selection_reason"] == "current top-venue paper"
+    assert selected_by_id["paper:arxiv"].metadata["quality_label"] == "high_potential"
+    assert selected_by_id["paper:arxiv"].metadata["selection_reason"] == "high-potential arXiv preprint"
 
 
 def test_unified_repo_selection_prefers_two_established_and_one_high_potential_repo() -> None:
@@ -337,6 +342,11 @@ def test_unified_repo_selection_prefers_two_established_and_one_high_potential_r
         "repo:50k",
         "repo:1k",
     ]
+    selected_by_id = {item.id: item for item in selected}
+    assert selected_by_id["repo:80k"].metadata["quality_label"] == "classic"
+    assert selected_by_id["repo:80k"].metadata["selection_reason"] == "established current repository"
+    assert selected_by_id["repo:1k"].metadata["quality_label"] == "high_potential"
+    assert selected_by_id["repo:1k"].metadata["selection_reason"] == "new high-potential repository"
 
 
 def test_unified_section_limit_falls_back_to_max_items_per_type_when_missing() -> None:

@@ -72,6 +72,7 @@ class TechNewsScorer:
             "engagement": _engagement(item),
             "recency": _recency(item, context),
             "topic_relevance": _topic_relevance(matched_keywords),
+            "source_health": _source_health(item, context),
         }
         weights = {
             "source_authority": self.scoring.source_authority_weight,
@@ -80,7 +81,8 @@ class TechNewsScorer:
             "topic_relevance": self.scoring.topic_relevance_weight,
         }
         total_weight = sum(weights.values()) or 1.0
-        final_score = sum(breakdown[key] * weights[key] for key in breakdown) / total_weight
+        final_score = sum(breakdown[key] * weights[key] for key in weights) / total_weight
+        final_score -= _source_health_penalty(breakdown["source_health"])
         final_score = round(max(0.0, min(10.0, final_score)), 2)
         if final_score < self.filters.min_source_score:
             final_score = 0.0
@@ -147,6 +149,10 @@ class TechNewsEnricher:
 def _source_authority(item: SignalItem) -> float:
     if item.source == "hackernews":
         return 8.0
+    if item.source == "github_releases":
+        return 7.2
+    if item.source == "reddit":
+        return 6.2
     if item.source == "rss":
         feed_name = str(item.metadata.get("feed_name") or "").strip().lower()
         return HIGH_AUTHORITY_RSS_FEEDS.get(feed_name, 6.5)
@@ -158,6 +164,14 @@ def _engagement(item: SignalItem) -> float:
         score = float(item.metadata.get("score") or 0)
         comments = float(item.metadata.get("descendants") or 0)
         return min(10.0, 2.0 + math.log10(score + 1) * 2.2 + math.log10(comments + 1) * 1.2)
+    if item.source == "reddit":
+        score = float(item.metadata.get("score") or 0)
+        comments = float(item.metadata.get("num_comments") or 0)
+        return min(8.0, 2.0 + math.log10(score + 1) * 1.8 + math.log10(comments + 1) * 1.0)
+    if item.source == "github_releases":
+        text = f"{item.title} {item.raw_content}".lower()
+        impact_signal = min(2.0, sum(1 for term in HIGH_IMPACT_TERMS if term in text) * 0.4)
+        return min(7.2, 4.5 + impact_signal)
     text = f"{item.title} {item.raw_content}".lower()
     content_signal = 0.8 if len(item.raw_content.split()) >= 40 else 0.0
     impact_signal = min(1.5, sum(1 for term in HIGH_IMPACT_TERMS if term in text) * 0.3)
@@ -184,6 +198,25 @@ def _topic_relevance(matches: list[str]) -> float:
     if not matches:
         return 4.0
     return min(10.0, 5.0 + len(matches) * 1.5)
+
+
+def _source_health(item: SignalItem, context: StageContext) -> float:
+    quality = context.metadata.get("source_quality")
+    if not isinstance(quality, dict):
+        return 10.0
+    record = quality.get(f"{context.mode}:{item.source}") or quality.get(item.source)
+    if not isinstance(record, dict):
+        return 10.0
+    try:
+        return max(0.0, min(10.0, float(record.get("quality_score"))))
+    except (TypeError, ValueError):
+        return 10.0
+
+
+def _source_health_penalty(quality_score: float) -> float:
+    if quality_score >= 8.0:
+        return 0.0
+    return min(2.0, (8.0 - quality_score) * 0.25)
 
 
 def _matched_keywords(item: SignalItem, keywords: list[str]) -> list[str]:

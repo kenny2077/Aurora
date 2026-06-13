@@ -5,8 +5,18 @@ from datetime import datetime, timezone
 
 import httpx
 
-from aurora.config import HackerNewsSourceConfig, RSSSourceConfig
-from aurora.modes.tech_news.sources import HackerNewsFetchStage, RSSFetchStage
+from aurora.config import (
+    GitHubReleasesSourceConfig,
+    HackerNewsSourceConfig,
+    RedditSourceConfig,
+    RSSSourceConfig,
+)
+from aurora.modes.tech_news.sources import (
+    GitHubReleasesFetchStage,
+    HackerNewsFetchStage,
+    RSSFetchStage,
+    RedditFetchStage,
+)
 from aurora.pipeline import StageContext
 
 
@@ -102,3 +112,103 @@ def test_rss_fetch_parses_dates_skips_old_entries_and_tolerates_failures() -> No
     assert records[0]["metadata"]["feed_name"] == "Good"
     assert records[0]["metadata"]["tags"] == ["AI"]
 
+
+def test_reddit_fetch_parses_listing_and_filters_score_and_window() -> None:
+    since = datetime(2026, 5, 25, 0, 0, tzinfo=timezone.utc)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/r/MachineLearning/top.json"
+        return httpx.Response(
+            200,
+            json={
+                "data": {
+                    "children": [
+                        {
+                            "data": {
+                                "id": "abc",
+                                "subreddit": "MachineLearning",
+                                "title": "Agent benchmark release",
+                                "url": "https://example.com/agents",
+                                "permalink": "/r/MachineLearning/comments/abc/story/",
+                                "score": 450,
+                                "num_comments": 88,
+                                "author": "researcher",
+                                "created_utc": 1780012800,
+                                "selftext": "A practical benchmark for LLM agents.",
+                            }
+                        },
+                        {
+                            "data": {
+                                "id": "low",
+                                "title": "Low score",
+                                "score": 3,
+                                "created_utc": 1780012800,
+                            }
+                        },
+                    ]
+                }
+            },
+        )
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await RedditFetchStage(
+                RedditSourceConfig(enabled=True, subreddits=["MachineLearning"], min_score=100),
+                http_client=client,
+                base_url="https://www.reddit.com",
+            ).fetch(StageContext(mode="tech_news", run_id="test", since=since))
+
+    records = asyncio.run(exercise())
+
+    assert len(records) == 1
+    assert records[0]["id"] == "reddit:MachineLearning:abc"
+    assert records[0]["source"] == "reddit"
+    assert records[0]["metadata"]["subreddit"] == "MachineLearning"
+    assert records[0]["metadata"]["score"] == 450
+    assert records[0]["metadata"]["discussion_url"] == "https://www.reddit.com/r/MachineLearning/comments/abc/story/"
+
+
+def test_github_releases_fetch_parses_recent_releases() -> None:
+    since = datetime(2026, 5, 25, 0, 0, tzinfo=timezone.utc)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        assert request.url.path == "/repos/org/project/releases"
+        return httpx.Response(
+            200,
+            json=[
+                {
+                    "id": 100,
+                    "name": "v2.0",
+                    "tag_name": "v2.0.0",
+                    "html_url": "https://github.com/org/project/releases/tag/v2.0.0",
+                    "published_at": "2026-05-26T00:00:00Z",
+                    "body": "Adds agent workflow support.",
+                    "author": {"login": "maintainer"},
+                },
+                {
+                    "id": 99,
+                    "name": "old",
+                    "tag_name": "v1.0.0",
+                    "html_url": "https://github.com/org/project/releases/tag/v1.0.0",
+                    "published_at": "2020-01-01T00:00:00Z",
+                    "body": "Old release.",
+                },
+            ],
+        )
+
+    async def exercise() -> list[dict]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await GitHubReleasesFetchStage(
+                GitHubReleasesSourceConfig(enabled=True, repositories=["org/project"]),
+                http_client=client,
+                base_url="https://api.github.com",
+            ).fetch(StageContext(mode="tech_news", run_id="test", since=since))
+
+    records = asyncio.run(exercise())
+
+    assert len(records) == 1
+    assert records[0]["id"] == "github_release:org/project:100"
+    assert records[0]["source"] == "github_releases"
+    assert records[0]["title"] == "org/project v2.0"
+    assert records[0]["metadata"]["repository"] == "org/project"
+    assert records[0]["metadata"]["tag_name"] == "v2.0.0"

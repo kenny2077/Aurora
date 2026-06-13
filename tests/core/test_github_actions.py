@@ -28,6 +28,10 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "cache-dependency-path: web/package-lock.json" in workflow
     assert "python -m pip install --user \"uv==0.11.15\"" in workflow
     assert "npm --prefix web ci" in workflow
+    assert "uv run pytest -q" in workflow
+    assert "uvx --from bandit bandit -q -r src" in workflow
+    assert "uvx --from pip-audit pip-audit" in workflow
+    assert "npm --prefix web audit --audit-level=high --registry=https://registry.npmjs.org" in workflow
     assert "uv run aurora config validate --config data/actions.config.json" in workflow
     assert "Missing required email secret" in workflow
     assert "Missing required LLM secret: DEEPSEEK_API_KEY" in workflow

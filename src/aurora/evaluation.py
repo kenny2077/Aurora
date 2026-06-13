@@ -10,7 +10,11 @@ from typing import Any
 
 from aurora.config import AuroraConfig
 from aurora.models import SignalItem
-from aurora.modes.unified_digest.render import UnifiedDigestRenderer, UnifiedDigestSummarizer
+from aurora.modes.unified_digest.render import (
+    UnifiedDigestRenderer,
+    UnifiedDigestSummarizer,
+    select_items,
+)
 from aurora.pipeline import StageContext
 from aurora.storage.jsonl import read_jsonl
 
@@ -28,7 +32,7 @@ def replay_fixture(config: AuroraConfig, fixture_path: Path) -> dict[str, Any]:
     summary = asyncio.run(summarizer.summarize(items, context))
     rendered = asyncio.run(renderer.render(summary, items, context))
     selected_ids = [str(item_id) for item_id in rendered.metadata.get("selected_item_ids") or []]
-    selected = [item for item in items if item.id in set(selected_ids)]
+    selected = [item for item in select_items(items, config.modes.unified_digest) if item.id in set(selected_ids)]
     item_counts = _item_counts(selected, config)
     return {
         "fixture": str(fixture_path),
@@ -40,6 +44,7 @@ def replay_fixture(config: AuroraConfig, fixture_path: Path) -> dict[str, Any]:
             if item_counts.get(item_type, 0) == 0
         ],
         "source_mix": _source_mix(selected, config),
+        "selection_diagnostics": _selection_diagnostics(selected),
         "markdown": rendered.markdown,
     }
 
@@ -101,6 +106,19 @@ def _source_mix(items: list[SignalItem], config: AuroraConfig) -> dict[str, dict
         counter = Counter(item.source for item in items if item.type == item_type)
         mix[item_type] = dict(sorted(counter.items()))
     return mix
+
+
+def _selection_diagnostics(items: list[SignalItem]) -> dict[str, dict[str, str]]:
+    diagnostics: dict[str, dict[str, str]] = {}
+    for item in items:
+        quality_label = str(item.metadata.get("quality_label") or "").strip()
+        selection_reason = str(item.metadata.get("selection_reason") or "").strip()
+        if quality_label or selection_reason:
+            diagnostics[item.id] = {
+                "quality_label": quality_label,
+                "selection_reason": selection_reason,
+            }
+    return diagnostics
 
 
 def _count_delta(before: object, after: object) -> dict[str, int]:

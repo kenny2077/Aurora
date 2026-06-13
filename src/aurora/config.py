@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator
+from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator, model_validator
 
 from aurora.interests import REPO_INTEREST_PRESETS, SCHOLAR_FIELD_PRESETS, clean_preset_names
 
@@ -105,6 +106,9 @@ class AIConfig(BaseModel):
     api_key_env: str = "DEEPSEEK_API_KEY"
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_tokens: int = Field(default=4096, ge=1)
+    max_requests_per_run: int | None = Field(default=None, ge=0)
+    max_tokens_per_run: int | None = Field(default=None, ge=0)
+    fail_open_on_budget_exceeded: bool = True
     analysis_concurrency: int = Field(default=2, ge=1)
     enrichment_concurrency: int = Field(default=2, ge=1)
     throttle_sec: float = Field(default=0.0, ge=0.0)
@@ -209,6 +213,77 @@ class RSSSourceConfig(BaseModel):
         return value.strip()
 
 
+CURATED_RSS_GROUP_NAMES = {"ai_labs", "ai_infrastructure", "ai_tools"}
+
+
+class RedditSourceConfig(BaseModel):
+    """Reddit source configuration for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    subreddits: list[str] = Field(default_factory=lambda: ["MachineLearning", "LocalLLaMA"])
+    listing: str = "top"
+    time_filter: str = "day"
+    limit: int = Field(default=25, ge=1, le=100)
+    min_score: int = Field(default=100, ge=0)
+
+    @field_validator("subreddits")
+    @classmethod
+    def clean_subreddits(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip().strip("/")
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            cleaned.append(value)
+            seen.add(key)
+        if not cleaned:
+            raise ValueError("at least one subreddit is required")
+        return cleaned
+
+    @field_validator("listing", "time_filter")
+    @classmethod
+    def validate_text(cls, value: str) -> str:
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError("value must be a non-empty string")
+        return value.strip()
+
+
+class GitHubReleasesSourceConfig(BaseModel):
+    """GitHub releases source configuration for tech_news mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    repositories: list[str] = Field(default_factory=list)
+    per_repo_limit: int = Field(default=5, ge=1, le=100)
+
+    @field_validator("repositories")
+    @classmethod
+    def clean_repositories(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip()
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            if not re.match(r"^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$", value):
+                raise ValueError("repositories must use owner/repo slugs")
+            cleaned.append(value)
+            seen.add(key)
+        return cleaned
+
+    @model_validator(mode="after")
+    def validate_enabled_repositories(self) -> "GitHubReleasesSourceConfig":
+        if self.enabled and not self.repositories:
+            raise ValueError("at least one GitHub repository is required when enabled")
+        return self
+
+
 class TechNewsSourcesConfig(BaseModel):
     """Source configuration for tech_news mode."""
 
@@ -216,6 +291,27 @@ class TechNewsSourcesConfig(BaseModel):
 
     hackernews: HackerNewsSourceConfig = Field(default_factory=HackerNewsSourceConfig)
     rss: list[RSSSourceConfig] = Field(default_factory=list)
+    curated_rss_groups: list[str] = Field(default_factory=list)
+    reddit: RedditSourceConfig = Field(default_factory=RedditSourceConfig)
+    github_releases: GitHubReleasesSourceConfig = Field(
+        default_factory=GitHubReleasesSourceConfig
+    )
+
+    @field_validator("curated_rss_groups")
+    @classmethod
+    def clean_curated_rss_groups(cls, values: list[str]) -> list[str]:
+        cleaned: list[str] = []
+        seen: set[str] = set()
+        for raw in values:
+            value = str(raw).strip()
+            key = value.lower()
+            if not value or key in seen:
+                continue
+            if key not in CURATED_RSS_GROUP_NAMES:
+                raise ValueError(f"unknown curated RSS group: {value}")
+            cleaned.append(key)
+            seen.add(key)
+        return cleaned
 
 
 class TechNewsFiltersConfig(BaseModel):

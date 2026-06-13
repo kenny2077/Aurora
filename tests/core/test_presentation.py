@@ -174,6 +174,36 @@ def test_unified_digest_html_hides_top_blocks_and_diagnostics() -> None:
     assert "<b>Learn:</b> Learn the evaluation setup." not in web_html
 
 
+def test_unified_digest_html_escapes_generated_item_text() -> None:
+    item = SignalItem(
+        id="news:unsafe",
+        type="news",
+        title="Unsafe <script>alert(1)</script>",
+        url="https://example.com/news?x=<bad>",
+        source="rss",
+        published_at=datetime(2026, 5, 25, tzinfo=timezone.utc),
+        summary="<b>unsafe summary</b>",
+        metadata={"feed_name": "Feed <unsafe>"},
+        final_score=8.0,
+    )
+
+    _email_html, web_html = render_unified_digest_html(
+        "Aurora Unified Digest",
+        [item],
+        StageContext(mode="unified_digest", run_id="test"),
+        [],
+        ["news", "repo", "paper"],
+    )
+
+    assert "<script>" not in web_html
+    assert "<b>unsafe summary</b>" not in web_html
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in web_html
+    assert "&lt;b&gt;unsafe summary&lt;/b&gt;" in web_html
+    assert "Feed" in web_html
+    assert "<unsafe>" not in web_html
+    assert "<bad>" not in web_html
+
+
 def _repo(
     full_name: str,
     *,
