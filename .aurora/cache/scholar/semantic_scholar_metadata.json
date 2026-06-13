@@ -1,0 +1,253 @@
+{
+  "entries": {
+    "title:activation control for efficiently eliciting long chain of thought ability of language models": {
+      "cached_at": "2026-06-13T05:07:00.307070+00:00",
+      "data": {
+        "abstract": "Despite the remarkable reasoning performance, eliciting the long chain-of-thought (CoT) ability in large language models (LLMs) typically requires costly reinforcement learning or supervised fine-tuning on high-quality distilled data. We investigate the internal mechanisms behind this capability and show that a small set of high-impact activations in the last few layers largely governs long-form reasoning attributes, such as output length and self-reflection. By simply amplifying these activations and inserting\"wait\"tokens, we can invoke the long CoT ability without any training, resulting in significantly increased self-reflection rates and accuracy. Moreover, we find that the activation dynamics follow predictable trajectories, with a sharp rise after special tokens and a subsequent exponential decay. Building on these insights, we introduce a general training-free activation control technique. It leverages a few contrastive examples to identify key activations, and employs simple analytic functions to modulate their values at inference time to elicit long CoTs. Extensive experiments confirm the effectiveness of our method in efficiently eliciting long CoT reasoning in LLMs and improving their performance. Additionally, we propose a parameter-efficient fine-tuning method that trains only a last-layer activation amplification module and a few LoRA layers, outperforming full LoRA fine-tuning on reasoning benchmarks with significantly fewer parameters. Our code and data are publicly released.",
+        "authors": [
+          {
+            "authorId": "2363371182",
+            "name": "Zekai Zhao"
+          },
+          {
+            "authorId": "2383246188",
+            "name": "Qi Liu"
+          },
+          {
+            "authorId": "2364091644",
+            "name": "Kun Zhou"
+          },
+          {
+            "authorId": "2364553550",
+            "name": "Zihan Liu"
+          },
+          {
+            "authorId": "2362323734",
+            "name": "Yifei Shao"
+          },
+          {
+            "authorId": "2364468600",
+            "name": "Zhiting Hu"
+          },
+          {
+            "authorId": "2363876418",
+            "name": "Biwei Huang"
+          }
+        ],
+        "citationCount": 9,
+        "externalIds": {
+          "ArXiv": "2505.17697",
+          "CorpusId": 278886235,
+          "DBLP": "journals/corr/abs-2505-17697",
+          "DOI": "10.48550/arXiv.2505.17697"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2505.17697, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "96d0c138741dbdf1a1be14df902fb5e2909ab81d",
+        "title": "Activation Control for Efficiently Eliciting Long Chain-of-thought Ability of Language Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A general training-free activation control technique that leverages a few contrastive examples to identify key activations, and employs simple analytic functions to modulate their values at inference time to elicit long CoTs and proposes a parameter-efficient fine-tuning method that outperforms full LoRA fine-tuning on reasoning benchmarks with significantly fewer parameters."
+        },
+        "url": "https://www.semanticscholar.org/paper/96d0c138741dbdf1a1be14df902fb5e2909ab81d",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:diversity aware policy optimization for large language model reasoning": {
+      "cached_at": "2026-06-13T05:07:10.314131+00:00",
+      "data": {
+        "abstract": "The reasoning capabilities of large language models (LLMs) have advanced rapidly, particularly following the release of DeepSeek R1, which has inspired a surge of research into data quality and reinforcement learning (RL) algorithms. Despite the pivotal role diversity plays in RL, its influence on LLM reasoning remains largely underexplored. To bridge this gap, this work presents a systematic investigation into the impact of diversity in RL-based training for LLM reasoning, and proposes a novel diversity-aware policy optimization method. Across evaluations on 12 LLMs, we observe a strong positive correlation between the solution diversity and Potential at k (a novel metric quantifying an LLM's reasoning potential) in high-performing models. This finding motivates our method to explicitly promote diversity during RL training. Specifically, we design a token-level diversity and reformulate it into a practical objective, then we selectively apply it to positive samples. Integrated into the R1-zero training framework, our method achieves a 3.5 percent average improvement across four mathematical reasoning benchmarks, while generating more diverse and robust solutions.",
+        "authors": [
+          {
+            "authorId": "2364294020",
+            "name": "Jian Yao"
+          },
+          {
+            "authorId": "2338829765",
+            "name": "Ran Cheng"
+          },
+          {
+            "authorId": "2267908970",
+            "name": "Xingyu Wu"
+          },
+          {
+            "authorId": "47876444",
+            "name": "Jibin Wu"
+          },
+          {
+            "authorId": "2257371227",
+            "name": "Kay Chen Tan"
+          }
+        ],
+        "citationCount": 37,
+        "externalIds": {
+          "ArXiv": "2505.23433",
+          "CorpusId": 278996188,
+          "DBLP": "journals/corr/abs-2505-23433",
+          "DOI": "10.48550/arXiv.2505.23433"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 5,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2505.23433, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4a0be5039b2d462fedafec282ac19dce5746dad8",
+        "title": "Diversity-Aware Policy Optimization for Large Language Model Reasoning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A systematic investigation into the impact of diversity in RL-based training for LLM reasoning, and a novel diversity-aware policy optimization method that achieves a 3.5 percent average improvement across four mathematical reasoning benchmarks, while generating more diverse and robust solutions."
+        },
+        "url": "https://www.semanticscholar.org/paper/4a0be5039b2d462fedafec282ac19dce5746dad8",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:enhancing generative auto bidding with offline reward evaluation and policy search": {
+      "cached_at": "2026-06-13T05:06:57.931574+00:00",
+      "data": {
+        "abstract": "Auto-bidding is a critical tool for advertisers to improve advertising performance. Recent progress has demonstrated that AI-Generated Bidding (AIGB), which learns a conditional generative planner from offline data, achieves superior performance compared to typical offline reinforcement learning (RL)-based auto-bidding methods. However, existing AIGB methods still face a performance bottleneck due to their inherent inability to explore beyond the static dataset with feedback. To address this, we propose \\textbf{AIGB-Pearl} (\\emph{\\textbf{P}lanning with \\textbf{E}valu\\textbf{A}tor via \\textbf{RL}}), a novel method that integrates generative planning and policy optimization. The core of AIGB-Pearl lies in constructing a trajectory evaluator to assess the quality of generated scores and designing a provably sound KL-Lipschitz-constrained score-maximization scheme to ensure safe and efficient exploration beyond the offline dataset. A practical algorithm that incorporates the synchronous coupling technique is further developed to ensure the model regularity required by the proposed scheme. Extensive experiments on both simulated and real-world advertising systems demonstrate the state-of-the-art performance of our approach.",
+        "authors": [
+          {
+            "authorId": "2349810107",
+            "name": "Zhiyu Mou"
+          },
+          {
+            "authorId": "2313700210",
+            "name": "Yiqin Lv"
+          },
+          {
+            "authorId": "2142868750",
+            "name": "Miao Xu"
+          },
+          {
+            "authorId": "2383808276",
+            "name": "Qi Wang"
+          },
+          {
+            "authorId": "2287961724",
+            "name": "Yixiu Mao"
+          },
+          {
+            "authorId": "2381322467",
+            "name": "Qichen Ye"
+          },
+          {
+            "authorId": "2354633651",
+            "name": "Chao Li"
+          },
+          {
+            "authorId": "2260648520",
+            "name": "Rongquan Bai"
+          },
+          {
+            "authorId": "2155747949",
+            "name": "Chuan Yu"
+          },
+          {
+            "authorId": "2238223391",
+            "name": "Jian Xu"
+          },
+          {
+            "authorId": "2268396345",
+            "name": "Bo Zheng"
+          }
+        ],
+        "citationCount": 2,
+        "externalIds": {
+          "ArXiv": "2509.15927",
+          "CorpusId": 281411206,
+          "DBLP": "journals/corr/abs-2509-15927",
+          "DOI": "10.48550/arXiv.2509.15927"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2509.15927, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "6831f2569ddc905e4c09a3544549d994376679ad",
+        "title": "Enhancing Generative Auto-bidding with Offline Reward Evaluation and Policy Search",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The core of AIGB-Pearl lies in constructing a trajectory evaluator to assess the quality of generated scores and designing a provably sound KL-Lipschitz-constrained score-maximization scheme to ensure safe and efficient exploration beyond the offline dataset."
+        },
+        "url": "https://www.semanticscholar.org/paper/6831f2569ddc905e4c09a3544549d994376679ad",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:klass kl guided fast inference in masked diffusion models": {
+      "cached_at": "2026-06-13T05:07:12.545001+00:00",
+      "data": {
+        "abstract": "Masked diffusion models have demonstrated competitive results on various tasks including language generation. However, due to its iterative refinement process, the inference is often bottlenecked by slow and static sampling speed. To overcome this problem, we introduce `KL-Adaptive Stability Sampling'(KLASS), a fast yet effective sampling method that exploits token-level KL divergence to identify stable, high-confidence predictions. By unmasking multiple tokens in each iteration without any additional model training, our approach speeds up generation significantly while maintaining sample quality. On reasoning benchmarks, KLASS achieves up to $2.78\\times$ wall-clock speedups while improving performance over standard greedy decoding, attaining state-of-the-art results among diffusion-based samplers. We further validate KLASS across diverse domains, including text, image, and molecular generation, showing its effectiveness as a broadly applicable sampler across different models.",
+        "authors": [
+          {
+            "authorId": "2290628040",
+            "name": "Seo Hyun Kim"
+          },
+          {
+            "authorId": "2328249433",
+            "name": "Sunwoo Hong"
+          },
+          {
+            "authorId": "2309214104",
+            "name": "Hojung Jung"
+          },
+          {
+            "authorId": "2381685140",
+            "name": "Y. Park"
+          },
+          {
+            "authorId": "2392603456",
+            "name": "Se-Young Yun"
+          }
+        ],
+        "citationCount": 28,
+        "externalIds": {
+          "ArXiv": "2511.05664",
+          "CorpusId": 282911486,
+          "DBLP": "journals/corr/abs-2511-05664",
+          "DOI": "10.48550/arXiv.2511.05664"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 11,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2511.05664, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "240b1411de9ed6649344d9e8eb79c95afe944d36",
+        "title": "KLASS: KL-Guided Fast Inference in Masked Diffusion Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "KL-Adaptive Stability Sampling (KLASS), a fast yet effective sampling method that exploits token-level KL divergence to identify stable, high-confidence predictions that speeds up generation significantly while maintaining sample quality is introduced."
+        },
+        "url": "https://www.semanticscholar.org/paper/240b1411de9ed6649344d9e8eb79c95afe944d36",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    }
+  },
+  "version": 1
+}
