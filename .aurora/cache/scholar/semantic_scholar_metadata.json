@@ -1,5 +1,79 @@
 {
   "entries": {
+    "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
+      "cached_at": "2026-06-14T05:18:48.768036+00:00",
+      "data": {
+        "abstract": "Search-augmented LLMs often struggle with complex reasoning tasks due to ineffective multi-hop retrieval and limited reasoning ability. We propose AceSearcher, a cooperative self-play framework that trains a single large language model (LLM) to alternate between two roles: a decomposer that breaks down complex queries and a solver that integrates retrieved contexts for answer generation. AceSearcher couples supervised fine-tuning on a diverse mixture of search, reasoning, and decomposition tasks with reinforcement fine-tuning optimized for final answer accuracy, eliminating the need for intermediate annotations. Extensive experiments on three reasoning-intensive tasks across 10 datasets show that AceSearcher outperforms state-of-the-art baselines, achieving an average exact match improvement of 7.6%. Remarkably, on document-level finance reasoning tasks, AceSearcher-32B matches the performance of the DeepSeek-V3 model using less than 5% of its parameters. Even at smaller scales (1.5B and 8B), AceSearcher often surpasses existing search-augmented LLMs with up to 9x more parameters, highlighting its exceptional efficiency and effectiveness in tackling complex reasoning tasks. Our code will be published at https://github.com/ritaranx/AceSearcher and https://huggingface.co/AceSearcher.",
+        "authors": [
+          {
+            "authorId": "2265148831",
+            "name": "Ran Xu"
+          },
+          {
+            "authorId": "8103389",
+            "name": "Yuchen Zhuang"
+          },
+          {
+            "authorId": "2348316610",
+            "name": "Zihan Dong"
+          },
+          {
+            "authorId": "2344693764",
+            "name": "Jonathan Wang"
+          },
+          {
+            "authorId": "2218865512",
+            "name": "Yue Yu"
+          },
+          {
+            "authorId": "2263536473",
+            "name": "Joyce C. Ho"
+          },
+          {
+            "authorId": "2343691573",
+            "name": "Linjun Zhang"
+          },
+          {
+            "authorId": "2354188596",
+            "name": "Haoyu Wang"
+          },
+          {
+            "authorId": "2263890944",
+            "name": "Wenqi Shi"
+          },
+          {
+            "authorId": "2344721951",
+            "name": "Carl Yang"
+          }
+        ],
+        "citationCount": 10,
+        "externalIds": {
+          "ArXiv": "2509.24193",
+          "CorpusId": 281674248,
+          "DBLP": "journals/corr/abs-2509-24193",
+          "DOI": "10.48550/arXiv.2509.24193"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2509.24193, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c50c3be47d24af9110b4e821b71c06d718b03707",
+        "title": "AceSearcher: Bootstrapping Reasoning and Search for LLMs via Reinforced Self-Play",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A cooperative self-play framework that trains a single large language model to alternate between two roles: a decomposer that breaks down complex queries and a solver that integrates retrieved contexts for answer generation, AceSearcher couples supervised fine-tuning on a diverse mixture of search, reasoning, and decomposition tasks with reinforcement fine-tuning optimized for final answer accuracy."
+        },
+        "url": "https://www.semanticscholar.org/paper/c50c3be47d24af9110b4e821b71c06d718b03707",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
     "title:activation control for efficiently eliciting long chain of thought ability of language models": {
       "cached_at": "2026-06-13T05:07:00.307070+00:00",
       "data": {
@@ -58,6 +132,189 @@
           "text": "A general training-free activation control technique that leverages a few contrastive examples to identify key activations, and employs simple analytic functions to modulate their values at inference time to elicit long CoTs and proposes a parameter-efficient fine-tuning method that outperforms full LoRA fine-tuning on reasoning benchmarks with significantly fewer parameters."
         },
         "url": "https://www.semanticscholar.org/paper/96d0c138741dbdf1a1be14df902fb5e2909ab81d",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:common corpus the largest collection of ethical data for llm pre training": {
+      "cached_at": "2026-06-14T05:18:51.104424+00:00",
+      "data": {
+        "abstract": "Large Language Models (LLMs) are pre-trained on large amounts of data from different sources and domains. Such datasets often contain trillions of tokens, including large portions of copyrighted or proprietary content, which raises questions about the legal use of such models. This underscores the need for truly open pre-training data that complies with data security regulations. In this paper, we introduce Common Corpus, the largest open dataset for LLM pre-training. The data assembled in Common Corpus are either uncopyrighted or under open licenses, totaling about two trillion tokens. The dataset contains a wide variety of languages, ranging from the high-resource European languages to some low-resource languages rarely represented in pre-training datasets. In addition, it includes a large amount of code data. The diversity of data sources in terms of covered domains and time periods opens up the paths for both research and entrepreneurial needs across diverse areas of knowledge. In this paper, we present the detailed provenance of data assembling and the details of dataset filtering and curation. We train two small language models on Common Corpus and find that they perform comparably to other models of their size, indicating that our dataset is suitable for multilingual pretraining. Common Corpus represents a key contribution to the ecosystem for open science research on Large Language Models.",
+        "authors": [
+          {
+            "authorId": "2062410942",
+            "name": "Pierre-Carl Langlais"
+          },
+          {
+            "authorId": "2357720743",
+            "name": "C. Hinostroza"
+          },
+          {
+            "authorId": "2354554798",
+            "name": "Mattia Nee"
+          },
+          {
+            "authorId": "2320309179",
+            "name": "Catherine Arnett"
+          },
+          {
+            "authorId": "2320308996",
+            "name": "Pavel Chizhov"
+          },
+          {
+            "authorId": "2329002620",
+            "name": "E. Jones"
+          },
+          {
+            "authorId": "2357719428",
+            "name": "Ir\u00e8ne Girard"
+          },
+          {
+            "authorId": "2071873787",
+            "name": "David Mach"
+          },
+          {
+            "authorId": "2357719083",
+            "name": "A. Stasenko"
+          },
+          {
+            "authorId": "2130008929",
+            "name": "Ivan P. Yamshchikov"
+          }
+        ],
+        "citationCount": 15,
+        "externalIds": {
+          "ArXiv": "2506.01732",
+          "CorpusId": 279119641,
+          "DBLP": "journals/corr/abs-2506-01732",
+          "DOI": "10.48550/arXiv.2506.01732"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2506.01732, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9aff73d0ddf6badbecee2979782003376020cf93",
+        "title": "Common Corpus: The Largest Collection of Ethical Data for LLM Pre-Training",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The detailed provenance of data assembling and the details of dataset filtering and curation are presented and it is found that two small language models trained on Common Corpus perform comparably to other models of their size, indicating that the dataset is suitable for multilingual pretraining."
+        },
+        "url": "https://www.semanticscholar.org/paper/9aff73d0ddf6badbecee2979782003376020cf93",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:deltaflow an efficient multi frame scene flow estimation method": {
+      "cached_at": "2026-06-14T05:18:08.322497+00:00",
+      "data": {
+        "abstract": "Previous dominant methods for scene flow estimation focus mainly on input from two consecutive frames, neglecting valuable information in the temporal domain. While recent trends shift towards multi-frame reasoning, they suffer from rapidly escalating computational costs as the number of frames grows. To leverage temporal information more efficiently, we propose DeltaFlow ($\\Delta$Flow), a lightweight 3D framework that captures motion cues via a $\\Delta$ scheme, extracting temporal features with minimal computational cost, regardless of the number of frames. Additionally, scene flow estimation faces challenges such as imbalanced object class distributions and motion inconsistency. To tackle these issues, we introduce a Category-Balanced Loss to enhance learning across underrepresented classes and an Instance Consistency Loss to enforce coherent object motion, improving flow accuracy. Extensive evaluations on the Argoverse 2, Waymo and nuScenes datasets show that $\\Delta$Flow achieves state-of-the-art performance with up to 22% lower error and $2\\times$ faster inference compared to the next-best multi-frame supervised method, while also demonstrating a strong cross-domain generalization ability. The code is open-sourced at https://github.com/Kin-Zhang/DeltaFlow along with trained model weights.",
+        "authors": [
+          {
+            "authorId": "2243332339",
+            "name": "Qingwen Zhang"
+          },
+          {
+            "authorId": "2376280990",
+            "name": "Xiaomeng Zhu"
+          },
+          {
+            "authorId": "121310531",
+            "name": "Yushan Zhang"
+          },
+          {
+            "authorId": "2372227755",
+            "name": "Yixi Cai"
+          },
+          {
+            "authorId": "2309248592",
+            "name": "Olov Andersson"
+          },
+          {
+            "authorId": "1770066",
+            "name": "P. Jensfelt"
+          }
+        ],
+        "citationCount": 6,
+        "externalIds": {
+          "ArXiv": "2508.17054",
+          "CorpusId": 280711530,
+          "DBLP": "journals/corr/abs-2508-17054",
+          "DOI": "10.48550/arXiv.2508.17054"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2508.17054, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "11e5077d89d7865a0a7a4a0fab08674a811f048b",
+        "title": "DeltaFlow: An Efficient Multi-frame Scene Flow Estimation Method",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "DeltaFlow is proposed, a lightweight 3D framework that captures motion cues via a $\\Delta$ scheme, extracting temporal features with minimal computational cost, regardless of the number of frames, and introduces a Category-Balanced Loss and an Instance Consistency Loss to enforce coherent object motion, improving flow accuracy."
+        },
+        "url": "https://www.semanticscholar.org/paper/11e5077d89d7865a0a7a4a0fab08674a811f048b",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:direct fisher score estimation for likelihood maximization": {
+      "cached_at": "2026-06-14T05:18:43.626979+00:00",
+      "data": {
+        "abstract": "We study the problem of likelihood maximization when the likelihood function is intractable but model simulations are readily available. We propose a sequential, gradient-based optimization method that directly models the Fisher score based on a local score matching technique which uses simulations from a localized region around each parameter iterate. By employing a linear parameterization to the surrogate score model, our technique admits a closed-form, least-squares solution. This approach yields a fast, flexible, and efficient approximation to the Fisher score, effectively smoothing the likelihood objective and mitigating the challenges posed by complex likelihood landscapes. We provide theoretical guarantees for our score estimator, including bounds on the bias introduced by the smoothing. Empirical results on a range of synthetic and real-world problems demonstrate the superior performance of our method compared to existing benchmarks.",
+        "authors": [
+          {
+            "authorId": "2365923230",
+            "name": "Sherman Khoo"
+          },
+          {
+            "authorId": "2341669621",
+            "name": "Yakun Wang"
+          },
+          {
+            "authorId": "2365973264",
+            "name": "Song Liu"
+          },
+          {
+            "authorId": "2219037350",
+            "name": "Mark Beaumont"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2506.06542",
+          "CorpusId": 279251062,
+          "DBLP": "journals/corr/abs-2506-06542",
+          "DOI": "10.48550/arXiv.2506.06542"
+        },
+        "fieldsOfStudy": [
+          "Mathematics",
+          "Computer Science"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2506.06542, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7685708b2a767933a915a9d310db40aac80f5991",
+        "title": "Direct Fisher Score Estimation for Likelihood Maximization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes a sequential, gradient-based optimization method that directly models the Fisher score based on a local score matching technique which uses simulations from a localized region around each parameter iterate, yielding a fast, flexible, and efficient approximation to the Fisher score."
+        },
+        "url": "https://www.semanticscholar.org/paper/7685708b2a767933a915a9d310db40aac80f5991",
         "venue": "arXiv.org",
         "year": 2025
       }
@@ -194,6 +451,345 @@
         "year": 2025
       }
     },
+    "title:errortrace a black box traceability mechanism based on model family error space": {
+      "cached_at": "2026-06-14T05:18:46.031319+00:00",
+      "data": {
+        "abstract": null,
+        "authors": [
+          {
+            "authorId": "2434920175",
+            "name": "Chuanchao Zang"
+          },
+          {
+            "authorId": "2150591846",
+            "name": "Xiangtao Meng"
+          },
+          {
+            "authorId": "2345868781",
+            "name": "Wenyu Chen"
+          },
+          {
+            "authorId": "2265754853",
+            "name": "Tianshuo Cong"
+          },
+          {
+            "authorId": "37756895",
+            "name": "Yaxing Zha"
+          },
+          {
+            "authorId": "2294755333",
+            "name": "D. Qi"
+          },
+          {
+            "authorId": "2146248003",
+            "name": "Zheng Li"
+          },
+          {
+            "authorId": "2292890623",
+            "name": "Shanqing Guo"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "CorpusId": 288614062
+        },
+        "fieldsOfStudy": null,
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: The following paper fields have been elided by the publisher: {'abstract'}. Paper or abstract available at https://proceedings.neurips.cc/paper_files/paper/2025/file/632bd15f4a957cb912f36bea7d19daea-Paper-Conference.pdf, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "03dd077a6fe43c2af213496ebeeac7f772eefab0",
+        "title": "ErrorTrace: A Black-Box Traceability Mechanism Based on Model Family Error Space",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": null
+        },
+        "url": "https://www.semanticscholar.org/paper/03dd077a6fe43c2af213496ebeeac7f772eefab0",
+        "venue": "",
+        "year": null
+      }
+    },
+    "title:escaping saddle points without lipschitz smoothness the power of nonlinear preconditioning": {
+      "cached_at": "2026-06-14T05:18:20.345313+00:00",
+      "data": {
+        "abstract": "We study generalized smoothness in nonconvex optimization, focusing on $(L_0, L_1)$-smoothness and anisotropic smoothness. The former was empirically derived from practical neural network training examples, while the latter arises naturally in the analysis of nonlinearly preconditioned gradient methods. We introduce a new sufficient condition that encompasses both notions, reveals their close connection, and holds in key applications such as phase retrieval and matrix factorization. Leveraging tools from dynamical systems theory, we then show that nonlinear preconditioning -- including gradient clipping -- preserves the saddle point avoidance property of classical gradient descent. Crucially, the assumptions required for this analysis are actually satisfied in these applications, unlike in classical results that rely on restrictive Lipschitz smoothness conditions. We further analyze a perturbed variant that efficiently attains second-order stationarity with only logarithmic dependence on dimension, matching similar guarantees of classical gradient methods.",
+        "authors": [
+          {
+            "authorId": "2193386644",
+            "name": "Alexander Bodard"
+          },
+          {
+            "authorId": "2258626711",
+            "name": "Panagiotis Patrinos"
+          }
+        ],
+        "citationCount": 6,
+        "externalIds": {
+          "ArXiv": "2509.15817",
+          "CorpusId": 281411017
+        },
+        "fieldsOfStudy": [
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2509.15817, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c38b5944b8b5b83324f43113f66c4b36323f657f",
+        "title": "Escaping saddle points without Lipschitz smoothness: the power of nonlinear preconditioning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work shows that nonlinear preconditioning -- including gradient clipping -- preserves the saddle point avoidance property of classical gradient descent, and analyzes a perturbed variant that efficiently attains second-order stationarity with only logarithmic dependence on dimension."
+        },
+        "url": "https://www.semanticscholar.org/paper/c38b5944b8b5b83324f43113f66c4b36323f657f",
+        "venue": "",
+        "year": 2025
+      }
+    },
+    "title:fire frobenius isometry reinitialization for balancing the stability plasticity tradeoff": {
+      "cached_at": "2026-06-14T05:18:25.390809+00:00",
+      "data": {
+        "abstract": "Deep neural networks trained on nonstationary data must balance stability (i.e., retaining prior knowledge) and plasticity (i.e., adapting to new tasks). Standard reinitialization methods, which reinitialize weights toward their original values, are widely used but difficult to tune: conservative reinitializations fail to restore plasticity, while aggressive ones erase useful knowledge. We propose FIRE, a principled reinitialization method that explicitly balances the stability-plasticity tradeoff. FIRE quantifies stability through Squared Frobenius Error (SFE), measuring proximity to past weights, and plasticity through Deviation from Isometry (DfI), reflecting weight isotropy. The reinitialization point is obtained by solving a constrained optimization problem, minimizing SFE subject to DfI being zero, which is efficiently approximated by Newton-Schulz iteration. FIRE is evaluated on continual visual learning (CIFAR-10 with ResNet-18), language modeling (OpenWebText with GPT-0.1B), and reinforcement learning (HumanoidBench with SAC and Atari games with DQN). Across all domains, FIRE consistently outperforms both naive training without intervention and standard reinitialization methods, demonstrating effective balancing of the stability-plasticity tradeoff.",
+        "authors": [
+          {
+            "authorId": "2132656975",
+            "name": "Isaac Han"
+          },
+          {
+            "authorId": "2343824052",
+            "name": "Sangyeon Park"
+          },
+          {
+            "authorId": "2221144294",
+            "name": "Seungwon Oh"
+          },
+          {
+            "authorId": "2304514936",
+            "name": "Donghu Kim"
+          },
+          {
+            "authorId": "2163406260",
+            "name": "Hojoon Lee"
+          },
+          {
+            "authorId": "2343823801",
+            "name": "Kyung-Joong Kim"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2602.08040",
+          "CorpusId": 285452038,
+          "DBLP": "journals/corr/abs-2602-08040",
+          "DOI": "10.48550/arXiv.2602.08040"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2602.08040, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "aa76a2fa249cd9ee35c4ca029f9347f92249aa78",
+        "title": "FIRE: Frobenius-Isometry Reinitialization for Balancing the Stability-Plasticity Tradeoff",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Across all domains, FIRE consistently outperforms both naive training without intervention and standard reinitialization methods, demonstrating effective balancing of the stability-plasticity tradeoff."
+        },
+        "url": "https://www.semanticscholar.org/paper/aa76a2fa249cd9ee35c4ca029f9347f92249aa78",
+        "venue": "arXiv.org",
+        "year": 2026
+      }
+    },
+    "title:generalized linear mode connectivity for transformers": {
+      "cached_at": "2026-06-14T05:18:30.518426+00:00",
+      "data": {
+        "abstract": "Understanding the geometry of neural network loss landscapes is a central question in deep learning, with implications for generalization and optimization. A striking phenomenon is linear mode connectivity (LMC), where independently trained models can be connected by low- or zero-loss paths despite appearing to lie in separate loss basins. However, this is often obscured by symmetries in parameter space -- such as neuron permutations -- which make functionally equivalent models appear dissimilar. Prior work has predominantly focused on neuron reordering through permutations, but such approaches are limited in scope and fail to capture the richer symmetries exhibited by modern architectures such as Transformers. In this work, we introduce a unified framework that captures four symmetry classes -- permutations, semi-permutations, orthogonal transformations, and general invertible maps -- broadening the set of valid reparameterizations and subsuming many previous approaches as special cases. Crucially, this generalization enables, for the first time, the discovery of low- and zero-barrier linear interpolation paths between independently trained Vision Transformers and GPT-2 models. Furthermore, our framework extends beyond pairwise alignment to multi-model and width-heterogeneous settings, enabling alignment across architectures of different sizes. These results reveal deeper structure in the loss landscape and underscore the importance of symmetry-aware analysis for understanding model space geometry.",
+        "authors": [
+          {
+            "authorId": "2329169759",
+            "name": "Alexander Theus"
+          },
+          {
+            "authorId": "2371068533",
+            "name": "Alessandro Cabodi"
+          },
+          {
+            "authorId": "2329554901",
+            "name": "Sotiris Anagnostidis"
+          },
+          {
+            "authorId": "2326112647",
+            "name": "Antonio Orvieto"
+          },
+          {
+            "authorId": "24319781",
+            "name": "Sidak Pal Singh"
+          },
+          {
+            "authorId": "2307922971",
+            "name": "Valentina Boeva"
+          }
+        ],
+        "citationCount": 9,
+        "externalIds": {
+          "ArXiv": "2506.22712",
+          "CorpusId": 280010828,
+          "DBLP": "journals/corr/abs-2506-22712",
+          "DOI": "10.48550/arXiv.2506.22712"
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2506.22712, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9a1a9d3dda4be2fb3ffc0b1f64476275b0adca52",
+        "title": "Generalized Linear Mode Connectivity for Transformers",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work introduces a unified framework that captures four symmetry classes -- permutations, semi-permutations, orthogonal transformations, and general invertible maps -- broadening the set of valid reparameterizations and subsuming many previous approaches as special cases, and enables the discovery of low- and zero-barrier linear interpolation paths between independently trained Vision Transformers and GPT-2 models."
+        },
+        "url": "https://www.semanticscholar.org/paper/9a1a9d3dda4be2fb3ffc0b1f64476275b0adca52",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:generating informative samples for risk averse fine tuning of downstream tasks": {
+      "cached_at": "2026-06-14T05:18:35.572230+00:00",
+      "data": {
+        "abstract": null,
+        "authors": [
+          {
+            "authorId": "2316801360",
+            "name": "Heasung Kim"
+          },
+          {
+            "authorId": "2253435263",
+            "name": "Tae-Jin Lee"
+          },
+          {
+            "authorId": "2316778861",
+            "name": "Hyeji Kim"
+          },
+          {
+            "authorId": "1757522",
+            "name": "G. Veciana"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "CorpusId": 284930757
+        },
+        "fieldsOfStudy": null,
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: The following paper fields have been elided by the publisher: {'abstract'}. Paper or abstract available at https://proceedings.neurips.cc/paper_files/paper/2025/file/845fe27a3e5854999f972bbe729e5237-Paper-Conference.pdf, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "f996571e64348964894639d45bb431e21d637793",
+        "title": "Generating Informative Samples for Risk-Averse Fine-Tuning of Downstream Tasks",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes a novel training framework that synthesizes informative samples for CVaR optimization using score-based generative models and guides a diffusion-based generative model to sample from a reweighted distribution that emphasizes inputs likely to incur high loss under a pretrained reference model."
+        },
+        "url": "https://www.semanticscholar.org/paper/f996571e64348964894639d45bb431e21d637793",
+        "venue": "",
+        "year": null
+      }
+    },
+    "title:how do transformers learn implicit reasoning": {
+      "cached_at": "2026-06-14T05:18:38.643730+00:00",
+      "data": {
+        "abstract": "Recent work suggests that large language models (LLMs) can perform multi-hop reasoning implicitly -- producing correct answers without explicitly verbalizing intermediate steps -- but the underlying mechanisms remain poorly understood. In this paper, we study how such implicit reasoning emerges by training transformers from scratch in a controlled symbolic environment. Our analysis reveals a three-stage developmental trajectory: early memorization, followed by in-distribution generalization, and eventually cross-distribution generalization. We find that training with atomic triples is not necessary but accelerates learning, and that second-hop generalization relies on query-level exposure to specific compositional structures. To interpret these behaviors, we introduce two diagnostic tools: cross-query semantic patching, which identifies semantically reusable intermediate representations, and a cosine-based representational lens, which reveals that successful reasoning correlates with the cosine-base clustering in hidden space. This clustering phenomenon in turn provides a coherent explanation for the behavioral dynamics observed across training, linking representational structure to reasoning capability. These findings provide new insights into the interpretability of implicit multi-hop reasoning in LLMs, helping to clarify how complex reasoning processes unfold internally and offering pathways to enhance the transparency of such models.",
+        "authors": [
+          {
+            "authorId": "2364144192",
+            "name": "Jiaran Ye"
+          },
+          {
+            "authorId": "2273946831",
+            "name": "Zijun Yao"
+          },
+          {
+            "authorId": "2234629967",
+            "name": "Zhidian Huang"
+          },
+          {
+            "authorId": "2308643805",
+            "name": "Liangming Pan"
+          },
+          {
+            "authorId": "2327002994",
+            "name": "Jinxin Liu"
+          },
+          {
+            "authorId": "2141377570",
+            "name": "Yushi Bai"
+          },
+          {
+            "authorId": "2220101512",
+            "name": "Amy Xin"
+          },
+          {
+            "authorId": "2308556832",
+            "name": "Weichuan Liu"
+          },
+          {
+            "authorId": "2352280631",
+            "name": "Xiaoyin Che"
+          },
+          {
+            "authorId": "2284777109",
+            "name": "Lei Hou"
+          },
+          {
+            "authorId": "2294164848",
+            "name": "Juanzi Li"
+          }
+        ],
+        "citationCount": 14,
+        "externalIds": {
+          "ArXiv": "2505.23653",
+          "CorpusId": 278996286
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2505.23653, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "db992489e1a21da824aabb97286cb125d3cc794d",
+        "title": "How do Transformers Learn Implicit Reasoning?",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This paper studies how implicit multi-hop reasoning emerges by training transformers from scratch in a controlled symbolic environment, revealing a three-stage developmental trajectory: early memorization, followed by in-distribution generalization, and eventually cross-distribution generalization."
+        },
+        "url": "https://www.semanticscholar.org/paper/db992489e1a21da824aabb97286cb125d3cc794d",
+        "venue": "",
+        "year": 2025
+      }
+    },
     "title:klass kl guided fast inference in masked diffusion models": {
       "cached_at": "2026-06-13T05:07:12.545001+00:00",
       "data": {
@@ -244,6 +840,514 @@
           "text": "KL-Adaptive Stability Sampling (KLASS), a fast yet effective sampling method that exploits token-level KL divergence to identify stable, high-confidence predictions that speeds up generation significantly while maintaining sample quality is introduced."
         },
         "url": "https://www.semanticscholar.org/paper/240b1411de9ed6649344d9e8eb79c95afe944d36",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:opencua open foundations for computer use agents": {
+      "cached_at": "2026-06-14T05:18:18.043934+00:00",
+      "data": {
+        "abstract": "Vision-language models have demonstrated impressive capabilities as computer-use agents (CUAs) capable of automating diverse computer tasks. As their commercial potential grows, critical details of the most capable CUA systems remain closed. As these agents will increasingly mediate digital interactions and execute consequential decisions on our behalf, the research community needs access to open CUA frameworks to study their capabilities, limitations, and risks. To bridge this gap, we propose OpenCUA, a comprehensive open-source framework for scaling CUA data and foundation models. Our framework consists of: (1) an annotation infrastructure that seamlessly captures human computer-use demonstrations; (2) AgentNet, the first large-scale computer-use task dataset spanning 3 operating systems and 200+ applications and websites; (3) a scalable pipeline that transforms demonstrations into state-action pairs with reflective long Chain-of-Thought reasoning that sustain robust performance gains as data scales. Our end-to-end agent models demonstrate strong performance across CUA benchmarks. In particular, OpenCUA-72B achieves an average success rate of 45.0% on OSWorld-Verified, establishing a new state-of-the-art (SOTA) among open-source models. Further analysis confirms that our approach generalizes well across domains and benefits significantly from increased test-time computation. We release our annotation tool, datasets, code, and models to build open foundations for further CUA research.",
+        "authors": [
+          {
+            "authorId": "2261680539",
+            "name": "Xinyuan Wang"
+          },
+          {
+            "authorId": "2376019716",
+            "name": "Bowen Wang"
+          },
+          {
+            "authorId": "2334211453",
+            "name": "Dunjie Lu"
+          },
+          {
+            "authorId": "2362512516",
+            "name": "Junlin Yang"
+          },
+          {
+            "authorId": "2346173497",
+            "name": "Tianbao Xie"
+          },
+          {
+            "authorId": "2333894240",
+            "name": "Junli Wang"
+          },
+          {
+            "authorId": "2363131525",
+            "name": "Jiaqi Deng"
+          },
+          {
+            "authorId": "2375907820",
+            "name": "Xiaole Guo"
+          },
+          {
+            "authorId": "3032611",
+            "name": "Yiheng Xu"
+          },
+          {
+            "authorId": "114621402",
+            "name": "Chen Henry Wu"
+          },
+          {
+            "authorId": "2335404794",
+            "name": "Zhennan Shen"
+          },
+          {
+            "authorId": "2324897489",
+            "name": "Zhuo Li"
+          },
+          {
+            "authorId": "2327163089",
+            "name": "Ryan Li"
+          },
+          {
+            "authorId": "2296227930",
+            "name": "Xiaochuan Li"
+          },
+          {
+            "authorId": "2375947672",
+            "name": "Junda Chen"
+          },
+          {
+            "authorId": "2237880241",
+            "name": "Bo Zheng"
+          },
+          {
+            "authorId": "2389819743",
+            "name": "Peihang Li"
+          },
+          {
+            "authorId": "2330247033",
+            "name": "Fangyu Lei"
+          },
+          {
+            "authorId": "2375747329",
+            "name": "Ruisheng Cao"
+          },
+          {
+            "authorId": "2311455933",
+            "name": "Yeqiao Fu"
+          },
+          {
+            "authorId": "2260644979",
+            "name": "Dongchan Shin"
+          },
+          {
+            "authorId": "2285699391",
+            "name": "M. Shin"
+          },
+          {
+            "authorId": "2398629920",
+            "name": "Jiarui Hu"
+          },
+          {
+            "authorId": "2361859365",
+            "name": "Yuyan Wang"
+          },
+          {
+            "authorId": "2296064274",
+            "name": "Jixuan Chen"
+          },
+          {
+            "authorId": "2330377712",
+            "name": "Yuxiao Ye"
+          },
+          {
+            "authorId": "2376130182",
+            "name": "Danyang Zhang"
+          },
+          {
+            "authorId": "2354558467",
+            "name": "Dikang Du"
+          },
+          {
+            "authorId": "2256947041",
+            "name": "Hao Hu"
+          },
+          {
+            "authorId": "2371333565",
+            "name": "Hua Chen"
+          },
+          {
+            "authorId": "2293555939",
+            "name": "Zaida Zhou"
+          },
+          {
+            "authorId": "2341528471",
+            "name": "Haotian Yao"
+          },
+          {
+            "authorId": "2354616224",
+            "name": "Ziwei Chen"
+          },
+          {
+            "authorId": "2354553721",
+            "name": "Qizheng Gu"
+          },
+          {
+            "authorId": "2375993838",
+            "name": "Yipu Wang"
+          },
+          {
+            "authorId": "2375917502",
+            "name": "Heng Wang"
+          },
+          {
+            "authorId": "2254124345",
+            "name": "Diyi Yang"
+          },
+          {
+            "authorId": "2243226284",
+            "name": "Victor Zhong"
+          },
+          {
+            "authorId": "2341539158",
+            "name": "Flood Sung"
+          },
+          {
+            "authorId": "2375750336",
+            "name": "Y.Charles"
+          },
+          {
+            "authorId": "2109512754",
+            "name": "Zhilin Yang"
+          },
+          {
+            "authorId": "2330163094",
+            "name": "Tao Yu"
+          }
+        ],
+        "citationCount": 91,
+        "externalIds": {
+          "ArXiv": "2508.09123",
+          "CorpusId": 280635573,
+          "DBLP": "journals/corr/abs-2508-09123",
+          "DOI": "10.48550/arXiv.2508.09123"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 21,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2508.09123, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b1995f97c41fc38df8b05e3f9e31f3a52dd56a33",
+        "title": "OpenCUA: Open Foundations for Computer-Use Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes OpenCUA, a comprehensive open-source framework for scaling CUA data and foundation models and releases the annotation tool, datasets, code, and models to build open foundations for further CUA research."
+        },
+        "url": "https://www.semanticscholar.org/paper/b1995f97c41fc38df8b05e3f9e31f3a52dd56a33",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:q rag long context multi step retrieval via value based embedder training": {
+      "cached_at": "2026-06-14T05:18:22.735087+00:00",
+      "data": {
+        "abstract": "Retrieval-Augmented Generation (RAG) methods enhance LLM performance by efficiently filtering relevant context for LLMs, reducing hallucinations and inference cost. However, most existing RAG methods focus on single-step retrieval, which is often insufficient for answering complex questions that require multi-step search. Recently, multi-step retrieval approaches have emerged, typically involving the fine-tuning of small LLMs to perform multi-step retrieval. This type of fine-tuning is highly resource-intensive and does not enable the use of larger LLMs. In this work, we propose Q-RAG, a novel approach that fine-tunes the Embedder model for multi-step retrieval using reinforcement learning (RL). Q-RAG offers a competitive, resource-efficient alternative to existing multi-step retrieval methods for open-domain question answering and achieves state-of-the-art results on the popular long-context benchmarks BabiLong and RULER for contexts up to 10M tokens. Code is available at https://github.com/griver/Q-RAG",
+        "authors": [
+          {
+            "authorId": "2284590611",
+            "name": "Artyom Y. Sorokin"
+          },
+          {
+            "authorId": "2973035",
+            "name": "N. Buzun"
+          },
+          {
+            "authorId": "2042566345",
+            "name": "Alexander Anokhin"
+          },
+          {
+            "authorId": "2391714616",
+            "name": "Oleg Inozemcev"
+          },
+          {
+            "authorId": "146671600",
+            "name": "E. Vedernikov"
+          },
+          {
+            "authorId": "2284590453",
+            "name": "Petr Anokhin"
+          },
+          {
+            "authorId": "3359236",
+            "name": "M. Burtsev"
+          },
+          {
+            "authorId": "2402062234",
+            "name": "Alexey Trushkov"
+          },
+          {
+            "authorId": "2253448029",
+            "name": "Wen Yin"
+          },
+          {
+            "authorId": "145749032",
+            "name": "E. Burnaev"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2511.07328",
+          "CorpusId": 282912839,
+          "DBLP": "journals/corr/abs-2511-07328",
+          "DOI": "10.48550/arXiv.2511.07328"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2511.07328, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b57baae6e74b90ab3e9bcc921ec651121894b8dc",
+        "title": "Q-RAG: Long Context Multi-step Retrieval via Value-based Embedder Training",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Q-RAG offers a competitive, resource-efficient alternative to existing multi-step retrieval methods for open-domain question answering and achieves state-of-the-art results on the popular long-context benchmarks BabiLong and RULER for contexts up to 10M tokens."
+        },
+        "url": "https://www.semanticscholar.org/paper/b57baae6e74b90ab3e9bcc921ec651121894b8dc",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:the structure of relation decoding linear operators in large language models": {
+      "cached_at": "2026-06-14T05:18:53.669810+00:00",
+      "data": {
+        "abstract": "This paper investigates the structure of linear operators introduced in Hernandez et al. [2023] that decode specific relational facts in transformer language models. We extend their single-relation findings to a collection of relations and systematically chart their organization. We show that such collections of relation decoders can be highly compressed by simple order-3 tensor networks without significant loss in decoding accuracy. To explain this surprising redundancy, we develop a cross-evaluation protocol, in which we apply each linear decoder operator to the subjects of every other relation. Our results reveal that these linear maps do not encode distinct relations, but extract recurring, coarse-grained semantic properties (e.g., country of capital city and country of food are both in the country-of-X property). This property-centric structure clarifies both the operators'compressibility and highlights why they generalize only to new relations that are semantically close. Our findings thus interpret linear relational decoding in transformer language models as primarily property-based, rather than relation-specific.",
+        "authors": [
+          {
+            "authorId": "2068539230",
+            "name": "Miranda Christ"
+          },
+          {
+            "authorId": "2389396707",
+            "name": "Adri'an Csisz'arik"
+          },
+          {
+            "authorId": "2389401395",
+            "name": "Gergely Becs'o"
+          },
+          {
+            "authorId": "2179443714",
+            "name": "D'aniel Varga"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2510.26543",
+          "CorpusId": 282592398,
+          "DBLP": "journals/corr/abs-2510-26543",
+          "DOI": "10.48550/arXiv.2510.26543"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2510.26543, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c01dd96803eb95ffd3bb4472d6dcf313fe4d675d",
+        "title": "The Structure of Relation Decoding Linear Operators in Large Language Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": null
+        },
+        "url": "https://www.semanticscholar.org/paper/c01dd96803eb95ffd3bb4472d6dcf313fe4d675d",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:twilight adaptive attention sparsity with hierarchical top p pruning": {
+      "cached_at": "2026-06-14T05:18:33.057733+00:00",
+      "data": {
+        "abstract": "Leveraging attention sparsity to accelerate long-context large language models (LLMs) has been a hot research topic. However, current algorithms such as sparse attention or key-value (KV) cache compression tend to use a fixed budget, which presents a significant challenge during deployment because it fails to account for the dynamic nature of real-world scenarios, where the optimal balance between accuracy and efficiency can vary greatly. In this paper, we find that borrowing top-$p$ sampling (nucleus sampling) to sparse attention can surprisingly achieve adaptive budgeting. Based on this, we propose Twilight, a framework to bring adaptive sparsity to any existing sparse attention algorithm without sacrificing their accuracy. Empirical results show that Twilight can adaptively prune at most 98% of redundant tokens, leading to $15.4\\times$ acceleration in self-attention operations and $3.9\\times$ acceleration in end-to-end per token latency in long context LLM decoding.",
+        "authors": [
+          {
+            "authorId": "2344052205",
+            "name": "Chaofan Lin"
+          },
+          {
+            "authorId": "2214687479",
+            "name": "Jiaming Tang"
+          },
+          {
+            "authorId": "2265546903",
+            "name": "Shuo Yang"
+          },
+          {
+            "authorId": "2398304216",
+            "name": "HanShuo Wang"
+          },
+          {
+            "authorId": "2349557886",
+            "name": "Tian Tang"
+          },
+          {
+            "authorId": "2286878918",
+            "name": "Boyu Tian"
+          },
+          {
+            "authorId": "2316149874",
+            "name": "Ion Stoica"
+          },
+          {
+            "authorId": "2249530374",
+            "name": "Song Han"
+          },
+          {
+            "authorId": "2344056343",
+            "name": "Mingyu Gao"
+          }
+        ],
+        "citationCount": 34,
+        "externalIds": {
+          "ArXiv": "2502.02770",
+          "CorpusId": 276116352,
+          "DBLP": "journals/corr/abs-2502-02770",
+          "DOI": "10.48550/arXiv.2502.02770"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 5,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2502.02770, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "3b430f665a04e8ccc5fac30ff39b42d4c6cc893d",
+        "title": "Twilight: Adaptive Attention Sparsity with Hierarchical Top-p Pruning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "It is found that borrowing top-$p$ sampling (nucleus sampling) to sparse attention can surprisingly achieve adaptive budgeting and is proposed, a framework to bring adaptive sparsity to any existing sparse attention algorithm without sacrificing their accuracy."
+        },
+        "url": "https://www.semanticscholar.org/paper/3b430f665a04e8ccc5fac30ff39b42d4c6cc893d",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:webdevjudge evaluating m llms as critiques for web development quality": {
+      "cached_at": "2026-06-14T05:18:05.728692+00:00",
+      "data": {
+        "abstract": "The paradigm of LLM-as-a-judge is emerging as a scalable and efficient alternative to human evaluation, demonstrating strong performance on well-defined tasks. However, its reliability in open-ended tasks with dynamic environments and complex interactions remains unexplored. To bridge the gap, we introduce WebDevJudge, a systematic benchmark for assessing LLM-as-a-judge performance in web development, with support for both non-interactive evaluation based on static observations and continuous interactive evaluation with a dynamic web environment. WebDevJudge comprises human preference labels over paired web implementations, annotated with structured and query-grounded rubrics to ensure high-quality ground truth. Using this benchmark, we comprehensively evaluate various evaluators, including LLMs, MLLMs, and agentic workflows. We systematically investigate the impact of different paradigms and guidance mechanisms. Our experiments reveal a significant gap between LLM judges and human experts. In-depth analysis indicates this gap stems from fundamental model limitations, including failures in recognizing functional equivalence, verifying task feasibility, and mitigating bias. Overall, WebDevJudge presents a challenge to LLM-as-a-judge, offering insights to guide future research toward developing more reliable and capable automated evaluators for complicated scenarios. Code and data are available at https://github.com/lcy2723/WebDevJudge.",
+        "authors": [
+          {
+            "authorId": "2279661258",
+            "name": "Chunyang Li"
+          },
+          {
+            "authorId": "2293396848",
+            "name": "Yilun Zheng"
+          },
+          {
+            "authorId": "2356127326",
+            "name": "Xinting Huang"
+          },
+          {
+            "authorId": "2044202073",
+            "name": "Tianqing Fang"
+          },
+          {
+            "authorId": "2295118589",
+            "name": "Jiahao Xu"
+          },
+          {
+            "authorId": "2241325169",
+            "name": "Yangqiu Song"
+          },
+          {
+            "authorId": "2257977717",
+            "name": "Lihui Chen"
+          },
+          {
+            "authorId": "2357892062",
+            "name": "Han Hu"
+          }
+        ],
+        "citationCount": 8,
+        "externalIds": {
+          "ArXiv": "2510.18560",
+          "CorpusId": 282246709,
+          "DBLP": "journals/corr/abs-2510-18560",
+          "DOI": "10.48550/arXiv.2510.18560"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 2,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2510.18560, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "776763a5563815697737a404770c88726debd3fd",
+        "title": "WebDevJudge: Evaluating (M)LLMs as Critiques for Web Development Quality",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "WebDevJudge is introduced, a systematic benchmark for assessing LLM-as-a-judge performance in web development, with support for both non-interactive evaluation based on static observations and continuous interactive evaluation with a dynamic web environment."
+        },
+        "url": "https://www.semanticscholar.org/paper/776763a5563815697737a404770c88726debd3fd",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:why dpo is a misspecified estimator and how to fix it": {
+      "cached_at": "2026-06-14T05:18:27.821668+00:00",
+      "data": {
+        "abstract": "Direct alignment algorithms such as Direct Preference Optimization (DPO) fine-tune models based on preference data, using only supervised learning instead of two-stage reinforcement learning with human feedback (RLHF). We show that DPO encodes a statistical estimation problem over reward functions induced by a parametric policy class. When the true reward function that generates preferences cannot be realized via the policy class, DPO becomes misspecified, resulting in failure modes such as preference order reversal, worsening of policy reward, and high sensitivity to the input preference data distribution. On the other hand, we study the local behavior of two-stage RLHF for a parametric class and relate it to a natural gradient step in policy space. Our fine-grained geometric characterization allows us to propose AuxDPO, which introduces additional auxiliary variables in the DPO loss function to help move towards the RLHF solution in a principled manner and mitigate the misspecification in DPO. We empirically demonstrate the superior performance of AuxDPO on didactic bandit settings as well as LLM alignment tasks.",
+        "authors": [
+          {
+            "authorId": "2258712466",
+            "name": "Aditya Gopalan"
+          },
+          {
+            "authorId": "9575953",
+            "name": "Sayak Ray Chowdhury"
+          },
+          {
+            "authorId": "2069960232",
+            "name": "Debangshu Banerjee"
+          }
+        ],
+        "citationCount": 4,
+        "externalIds": {
+          "ArXiv": "2510.20413",
+          "CorpusId": 282304150,
+          "DBLP": "journals/corr/abs-2510-20413",
+          "DOI": "10.48550/arXiv.2510.20413"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2510.20413, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "63be9df4f7727e32fec3dc766a1cd467b64f461a",
+        "title": "Why DPO is a Misspecified Estimator and How to Fix It",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The authors' fine-grained geometric characterization allows us to propose AuxDPO, which introduces additional auxiliary variables in the DPO loss function to help move towards the RLHF solution in a principled manner and mitigate the misspecification in DPO."
+        },
+        "url": "https://www.semanticscholar.org/paper/63be9df4f7727e32fec3dc766a1cd467b64f461a",
         "venue": "arXiv.org",
         "year": 2025
       }
