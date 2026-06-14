@@ -169,8 +169,12 @@ def test_example_config_validates() -> None:
     assert config.modes.repo_learning.interests == ["agents", "mcp", "workflow-automation"]
     assert config.modes.scholar.fields == ["ml", "agents"]
     assert config.modes.scholar.sources.semantic_scholar.api_key_env == "SEMANTIC_SCHOLAR_API_KEY"
+    assert config.ai.max_tokens == 900
     assert config.ai.max_requests_per_run == 24
-    assert config.ai.max_tokens_per_run == 120000
+    assert config.ai.max_tokens_per_run == 150000
+    assert config.modes.tech_news.llm_analysis_top_n == 8
+    assert config.modes.scholar.llm_analysis_top_n == 10
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 8
     assert {source.name for source in config.modes.tech_news.sources.rss} >= {
         "Simon Willison",
         "OpenAI News",
@@ -187,9 +191,13 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.smtp_username_env == "SMTP_USERNAME"
     assert config.delivery.email.password_env == "EMAIL_PASSWORD"
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
-    assert config.ai.max_requests_per_run == 24
-    assert config.ai.max_tokens_per_run == 120000
+    assert config.ai.max_tokens == 900
+    assert config.ai.max_requests_per_run == 30
+    assert config.ai.max_tokens_per_run == 180000
     assert config.ai.fail_open_on_budget_exceeded is True
+    assert config.modes.tech_news.llm_analysis_top_n == 8
+    assert config.modes.scholar.llm_analysis_top_n == 12
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 10
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
     assert config.modes.tech_news.sources.reddit.enabled is True

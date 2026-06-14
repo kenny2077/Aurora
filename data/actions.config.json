@@ -30,13 +30,14 @@
     }
   },
   "ai": {
-    "max_requests_per_run": 24,
-    "max_tokens_per_run": 120000,
+    "max_tokens": 900,
+    "max_requests_per_run": 30,
+    "max_tokens_per_run": 180000,
     "fail_open_on_budget_exceeded": true
   },
   "modes": {
     "tech_news": {
-      "llm_analysis_top_n": 12,
+      "llm_analysis_top_n": 8,
       "sources": {
         "hackernews": {
           "enabled": true,
@@ -151,7 +152,7 @@
       "ranking": {
         "final_item_count": 6,
         "enrich_top_n": 12,
-        "llm_analysis_top_n": 12,
+        "llm_analysis_top_n": 10,
         "history_lookback_days": 14
       }
     },
