@@ -11,6 +11,7 @@ from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
     display_tech_news_learning,
     display_tech_news_source,
+    display_tech_news_summary,
     display_tech_news_why,
 )
 from aurora.modes.unified_digest.connections import build_connections
@@ -616,7 +617,7 @@ def _why_text(item: SignalItem) -> str:
 
 def _summary_text(item: SignalItem) -> str:
     if item.type == "news":
-        return item.summary or display_tech_news_why(item)
+        return display_tech_news_summary(item)
     return item.summary or item.why_it_matters or _excerpt(item.raw_content, 180)
 
 

@@ -339,6 +339,60 @@ def test_enricher_generates_clean_rss_learning_notes() -> None:
         assert "<p>" not in value
         assert "&#x" not in value
         assert "&amp;" not in value
+        assert "flagged this" not in value
+
+
+def test_enricher_generates_mature_rss_fallback_summary() -> None:
+    item = _item(
+        "news:rss-polish",
+        "Evaluate AI agents systematically with Agent-EvalKit",
+        "https://example.com/agent-evalkit",
+        source="rss",
+        metadata={
+            "feed_name": "AWS Machine Learning Blog",
+            "category": "Artificial Intelligence",
+            "tags": ["Amazon Bedrock", "Strands Agents"],
+        },
+        raw_content=(
+            "<p>Agent-EvalKit helps teams evaluate multi-step agents with repeatable "
+            "benchmarks and human review workflows.</p>"
+        ),
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+
+    assert enriched.why_it_matters.startswith("AWS Machine Learning Blog covers Agent-EvalKit")
+    assert "repeatable benchmarks" in enriched.why_it_matters
+    assert "flagged this" not in enriched.why_it_matters
+    assert "story as timely" not in enriched.why_it_matters
+
+
+def test_github_release_uses_public_source_label_and_release_summary() -> None:
+    item = _item(
+        "github_release:vllm:v023",
+        "vllm-project/vllm v0.23.0",
+        "https://github.com/vllm-project/vllm/releases/tag/v0.23.0",
+        source="github_releases",
+        raw_content=(
+            "Release v0.23.0 adds faster inference paths, benchmark updates, "
+            "and compatibility fixes for production serving."
+        ),
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+    summary = asyncio.run(TechNewsSummarizer().summarize([enriched], _context()))
+
+    assert "GitHub Releases" in summary
+    assert "github_releases" not in summary
+    assert "vllm-project/vllm v0.23.0 updates" in enriched.why_it_matters
+    assert "faster inference paths" in enriched.why_it_matters
+    assert "flagged this" not in enriched.why_it_matters
 
 
 def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> None:

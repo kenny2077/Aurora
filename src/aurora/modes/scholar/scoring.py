@@ -385,10 +385,11 @@ def _score_tags(item: SignalItem, config: ScholarModeConfig | None = None) -> li
 
 
 def _why_it_matters(item: SignalItem) -> str:
+    title = str(item.title or "this paper").strip() or "this paper"
     venue = item.metadata.get("venue")
     if venue:
-        return f"Relevant ML research candidate from {venue}."
-    return "Relevant ML research candidate for today's scholar radar."
+        return f"{title} is a recent {venue} paper worth reading for its research direction and practical signals."
+    return f"{title} is worth reading for its research direction and potential practical signals."
 
 
 def _learning_value(item: SignalItem) -> str:

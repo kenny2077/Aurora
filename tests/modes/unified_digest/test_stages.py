@@ -544,6 +544,65 @@ def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
     assert "## GitHub Repos" in summary
 
 
+def test_unified_rendering_uses_polished_news_summary_fallback() -> None:
+    config = UnifiedDigestModeConfig(max_items_per_type=8, max_total_items=20)
+    item = _item(
+        "news:release",
+        "news",
+        "vllm-project/vllm v0.23.0",
+        9.0,
+        source="github_releases",
+        why_it_matters="",
+        raw_content=(
+            "Release v0.23.0 adds faster inference paths, benchmark updates, "
+            "and compatibility fixes for production serving."
+        ),
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [item],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert "   - Source: GitHub Releases" in summary
+    assert "vllm-project/vllm v0.23.0 updates" in summary
+    assert "faster inference paths" in summary
+    assert "github_releases" not in summary
+    assert "flagged this" not in summary
+
+
+def test_unified_paper_description_hides_generic_scholar_fallback() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["paper", "repo", "news"],
+    )
+    paper = _item(
+        "paper:generic",
+        "paper",
+        "Reward Modeling for Multi-Agent Orchestration",
+        9.0,
+        source="arxiv",
+        raw_content="",
+        why_it_matters="Relevant ML research candidate for today's scholar radar.",
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [paper],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert "Relevant ML research candidate" not in summary
+    assert (
+        "This paper studies Reward Modeling for Multi-Agent Orchestration and why it may matter"
+        in summary
+    )
+
+
 def test_unified_rendering_prefers_polished_news_notes() -> None:
     config = UnifiedDigestModeConfig(max_items_per_type=8, max_total_items=20)
     item = _item(

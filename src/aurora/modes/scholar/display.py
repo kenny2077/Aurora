@@ -27,16 +27,22 @@ def format_paper_source_status(item: SignalItem) -> str:
 def format_paper_description(item: SignalItem) -> str:
     """Return a short, student-friendly paper description."""
     metadata = item.metadata
-    text = (
-        _clean_text(item.summary)
-        or _clean_text(metadata.get("semantic_scholar_tldr"))
-        or _clean_text(item.why_it_matters)
-        or _clean_text(item.raw_content)
-    )
-    if not text:
-        title = _clean_text(item.title) or "this paper"
-        return f"This paper studies {title} and why it may matter for future AI systems."
-    return _short_description(text)
+    title = _clean_text(item.title) or "this paper"
+    for candidate in (item.summary, metadata.get("semantic_scholar_tldr")):
+        text = _clean_text(candidate)
+        if text and not _is_generic_fallback_text(text):
+            return _short_description(text)
+    raw_text = _clean_text(item.raw_content)
+    if (
+        raw_text
+        and not _is_generic_fallback_text(raw_text)
+        and not _is_placeholder_raw_content(raw_text, title)
+    ):
+        return _short_description(raw_text)
+    why_text = _clean_text(item.why_it_matters)
+    if why_text and not _is_generic_fallback_text(why_text):
+        return _short_description(why_text)
+    return f"This paper studies {title} and why it may matter for future AI systems."
 
 
 def _paper_year(value: object) -> int | None:
@@ -65,3 +71,17 @@ def _short_description(value: str) -> str:
         return selected
     trimmed = selected[: MAX_DESCRIPTION_CHARS - 3].rsplit(" ", 1)[0].rstrip(" ,;:")
     return f"{trimmed}..."
+
+
+def _is_generic_fallback_text(value: str) -> bool:
+    normalized = value.lower()
+    generic_phrases = (
+        "relevant ml research candidate",
+        "today's scholar radar",
+        "today\u2019s scholar radar",
+    )
+    return any(phrase in normalized for phrase in generic_phrases)
+
+
+def _is_placeholder_raw_content(value: str, title: str) -> bool:
+    return value.strip().lower() == f"{title} content".strip().lower()

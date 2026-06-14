@@ -58,11 +58,22 @@ def display_tech_news_learning(item: SignalItem) -> str:
 def display_tech_news_source(item: SignalItem) -> str:
     if item.source == "hackernews":
         return "Hacker News"
+    if item.source == "github_releases":
+        return "GitHub Releases"
+    if item.source == "reddit":
+        return "Reddit"
     if item.source == "rss":
         feed_name = clean_note_text(str(item.metadata.get("feed_name") or ""))
         if feed_name:
             return feed_name
-    return item.source
+    return clean_note_text(item.source.replace("_", " ")).title() or item.source
+
+
+def display_tech_news_summary(item: SignalItem) -> str:
+    """Return the public one-sentence summary for a news item."""
+    if not is_low_quality_note(item.summary):
+        return clean_note_text(item.summary)
+    return display_tech_news_why(item)
 
 
 def clean_note_text(value: str) -> str:
@@ -86,6 +97,9 @@ def is_low_quality_note(value: str) -> bool:
     if URL_PATTERN.search(unescaped):
         return True
     if COMMENT_PREFIX_PATTERN.search(unescaped):
+        return True
+    lowered = cleaned.lower()
+    if "flagged this" in lowered and "story as timely" in lowered:
         return True
     if len(cleaned) < 20:
         return True
@@ -117,22 +131,16 @@ def _hacker_news_notes(item: SignalItem) -> TechNewsNotes:
 
 
 def _rss_notes(item: SignalItem) -> TechNewsNotes:
+    if item.source == "github_releases":
+        return _github_release_notes(item)
+
     metadata = item.metadata
-    feed_name = clean_note_text(str(metadata.get("feed_name") or item.source or "the feed"))
-    category = clean_note_text(str(metadata.get("category") or "technology"))
-    tags = [
-        clean_note_text(str(tag))
-        for tag in metadata.get("tags", [])
-        if clean_note_text(str(tag))
-    ][:3]
-    topic = ", ".join(tags) if tags else category
+    feed_name = clean_note_text(str(metadata.get("feed_name") or item.source or "the source"))
+    subject = _subject_from_title(item.title)
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = clean_note_text(item.title) or "the reported development"
-    why = (
-        f"{feed_name} flagged this {topic} story as timely, making it useful for "
-        "tracking practical technology and AI ecosystem changes."
-    )
+    why = f"{feed_name} covers {subject}, with {_sentence_fragment(excerpt, 180)}."
     learning = f"Use it to understand the concrete change: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -141,6 +149,24 @@ def _rss_notes(item: SignalItem) -> TechNewsNotes:
             "Read the source article.",
             "Identify the practical change and who is affected.",
             "Decide whether it deserves a follow-up experiment or note.",
+        ],
+    )
+
+
+def _github_release_notes(item: SignalItem) -> TechNewsNotes:
+    title = clean_note_text(item.title) or "this release"
+    excerpt = clean_note_text(item.raw_content)
+    if not excerpt:
+        excerpt = f"{title} ships a new project release."
+    why = f"{title} updates {_sentence_fragment(excerpt, 180)}."
+    learning = f"Use it to identify the practical release changes: {_truncate(excerpt, 180)}."
+    return TechNewsNotes(
+        why_it_matters=why,
+        learning_value=learning,
+        action_items=[
+            "Read the release notes.",
+            "Identify the changed APIs, performance behavior, or migration steps.",
+            "Decide whether the release affects a project or dependency you use.",
         ],
     )
 
@@ -178,3 +204,22 @@ def _truncate(value: str, limit: int) -> str:
     if len(value) <= limit:
         return value
     return value[: limit - 3].rstrip() + "..."
+
+
+def _sentence_fragment(value: str, limit: int) -> str:
+    text = _truncate(value, limit).strip()
+    if not text:
+        return "a practical technology update"
+    return text[:1].lower() + text[1:].rstrip(".")
+
+
+def _subject_from_title(value: str) -> str:
+    title = clean_note_text(value)
+    if not title:
+        return "a practical technology update"
+    match = re.search(r"\bwith\s+(.+)$", title, flags=re.IGNORECASE)
+    if match:
+        subject = clean_note_text(match.group(1))
+        if 3 <= len(subject) <= 80:
+            return subject
+    return title

@@ -11,7 +11,7 @@ from urllib.parse import urlparse
 
 from aurora.models import SignalItem
 from aurora.modes.scholar.display import format_paper_description, format_paper_source_status
-from aurora.modes.tech_news.notes import display_tech_news_source
+from aurora.modes.tech_news.notes import display_tech_news_source, display_tech_news_summary
 from aurora.pipeline import StageContext
 
 
@@ -146,6 +146,7 @@ def render_item_row(item: SignalItem) -> str:
         meta = format_paper_source_status(item)
     elif item.type == "news":
         meta = display_tech_news_source(item)
+        body = display_tech_news_summary(item)
     return (
         '<article class="aurora-row">'
         f'<h3><a {link_attrs(str(item.url))}>{escape(item.title)}</a></h3>'
