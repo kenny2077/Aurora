@@ -18,6 +18,7 @@ from aurora.modes.unified_digest.connections import build_connections
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
 from aurora.presentation import render_unified_digest_html
+from aurora.public_copy import format_repo_value
 
 
 SECTION_TITLES = {
@@ -67,7 +68,7 @@ class UnifiedDigestSummarizer:
         self.config = config
 
     async def summarize(self, items: Sequence[SignalItem], context: StageContext) -> str:
-        selected = select_items(items, self.config)
+        selected = select_items(items, self.config, selected_ids=_locked_selected_ids(context))
         lines = ["# Aurora Unified Digest", ""]
         if not selected:
             lines.append("No items were available for the unified digest.")
@@ -99,7 +100,7 @@ class UnifiedDigestRenderer:
     async def render(
         self, summary: str, items: Sequence[SignalItem], context: StageContext
     ) -> RenderedDigest:
-        selected = select_items(items, self.config)
+        selected = select_items(items, self.config, selected_ids=_locked_selected_ids(context))
         connections = build_connections(selected)
         html, web_html = render_unified_digest_html(
             "Aurora Unified Digest",
@@ -129,8 +130,14 @@ class UnifiedDigestRenderer:
 
 
 def select_items(
-    items: Sequence[SignalItem], config: UnifiedDigestModeConfig
+    items: Sequence[SignalItem],
+    config: UnifiedDigestModeConfig,
+    *,
+    selected_ids: Sequence[str] | None = None,
 ) -> list[SignalItem]:
+    if selected_ids:
+        by_id = {item.id: item for item in items}
+        return [by_id[item_id] for item_id in selected_ids if item_id in by_id]
     selected: list[SignalItem] = []
     for item_type in config.section_order:
         section_items = [item for item in items if item.type == item_type]
@@ -141,6 +148,15 @@ def select_items(
                 return selected
             selected.append(item)
     return selected
+
+
+def section_candidate_order(
+    items: Sequence[SignalItem], config: UnifiedDigestModeConfig, item_type: str
+) -> list[SignalItem]:
+    """Return section candidates in the same order used for digest selection."""
+    section_items = [item for item in items if item.type == item_type]
+    section_items.sort(key=_item_score, reverse=True)
+    return _select_section_items(section_items, item_type, len(section_items))
 
 
 def _select_section_items(
@@ -269,6 +285,14 @@ def _featured_title(items: Sequence[SignalItem], item_type: str) -> str:
         return ""
     item = candidates[0]
     return str(item.metadata.get("full_name") or item.title)
+
+
+def _locked_selected_ids(context: StageContext) -> list[str] | None:
+    value = context.metadata.get("unified_selected_item_ids")
+    if not isinstance(value, list):
+        return None
+    selected_ids = [str(item_id) for item_id in value if str(item_id).strip()]
+    return selected_ids or None
 
 
 def _excerpt(value: str, limit: int) -> str:
@@ -612,6 +636,8 @@ def _format_count(value: object) -> str:
 def _why_text(item: SignalItem) -> str:
     if item.type == "news":
         return display_tech_news_why(item)
+    if item.type == "repo":
+        return format_repo_value(item)
     return item.why_it_matters or item.summary or _excerpt(item.raw_content, 160)
 
 

@@ -13,6 +13,7 @@ from aurora.models import SignalItem
 from aurora.modes.scholar.display import format_paper_description, format_paper_source_status
 from aurora.modes.tech_news.notes import display_tech_news_source, display_tech_news_summary
 from aurora.pipeline import StageContext
+from aurora.public_copy import format_repo_value
 
 
 EMAIL_CSS = """
@@ -132,7 +133,7 @@ def render_repo_card(item: SignalItem) -> str:
         f'<h3><a {link_attrs(str(item.url))}>{escape(title)}</a></h3>'
         f'<p class="aurora-meta">{escape(stats)}</p>'
         f"{badge_html}"
-        f'{_callout("Value", item.why_it_matters or item.summary or item.raw_content, "aurora-callout")}'
+        f'{_callout("Value", format_repo_value(item), "aurora-callout")}'
         "</article>"
     )
 

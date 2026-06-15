@@ -10,6 +10,8 @@ from urllib.parse import urlsplit, urlunsplit
 
 from aurora.config import AuroraConfig, UnifiedDigestModeConfig
 from aurora.modes.repo_learning.state import RepoLearningStateStore
+from aurora.modes.unified_digest.quality import PublicCopyRepairer, public_copy_quality
+from aurora.modes.unified_digest.render import section_candidate_order, select_items
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 from aurora.storage.jsonl import read_jsonl
@@ -123,6 +125,9 @@ class UnifiedScoreStage:
 class UnifiedEnrichStage:
     """Annotate selected items with unified memory signals."""
 
+    def __init__(self, *, client: Any | None = None) -> None:
+        self.client = client
+
     async def enrich(
         self,
         items: Sequence[SignalItem],
@@ -131,21 +136,22 @@ class UnifiedEnrichStage:
     ) -> list[SignalItem]:
         if context.config is None:
             return list(items)
+        enriched = list(items)
         cutoff = (context.until or datetime.now(timezone.utc)) - timedelta(
             days=context.config.modes.repo_learning.ranking.history_lookback_days
         )
         recent_ids = RepoLearningStateStore(context.config.run.state_path).recent_signal_ids(cutoff)
-        if not recent_ids:
-            return list(items)
-        enriched: list[SignalItem] = []
-        for item in items:
-            if item.id not in recent_ids:
-                enriched.append(item)
-                continue
-            metadata = dict(item.metadata)
-            metadata["recently_seen"] = True
-            enriched.append(item.model_copy(update={"metadata": metadata}))
-        return enriched
+        if recent_ids:
+            annotated: list[SignalItem] = []
+            for item in enriched:
+                if item.id not in recent_ids:
+                    annotated.append(item)
+                    continue
+                metadata = dict(item.metadata)
+                metadata["recently_seen"] = True
+                annotated.append(item.model_copy(update={"metadata": metadata}))
+            enriched = annotated
+        return await _apply_public_copy_quality_gate(enriched, context, client=self.client)
 
 
 class UnifiedDeliveryStage:
@@ -194,6 +200,173 @@ class UnifiedDeliveryStage:
         if self.downstream is None:
             return [state_result]
         return [state_result, *(await self.downstream.deliver(rendered, context))]
+
+
+async def _apply_public_copy_quality_gate(
+    items: Sequence[SignalItem],
+    context: StageContext,
+    *,
+    client: Any | None = None,
+) -> list[SignalItem]:
+    if context.config is None:
+        return list(items)
+
+    config = context.config.modes.unified_digest
+    selected = select_items(items, config)
+    if not selected:
+        return list(items)
+
+    by_id = {item.id: item for item in items}
+    selected_ids = {item.id for item in selected}
+    locked_ids: list[str] = []
+    repairer = PublicCopyRepairer(context.config.ai, client=client)
+    diagnostics = _quality_diagnostics(context.metadata)
+
+    for selected_item in selected:
+        accepted = await _accept_or_repair_public_copy(
+            selected_item,
+            context,
+            repairer,
+            diagnostics,
+        )
+        if accepted is not None:
+            by_id[accepted.id] = accepted
+            locked_ids.append(accepted.id)
+            continue
+
+        replacement = await _find_public_copy_replacement(
+            selected_item,
+            items,
+            config,
+            context,
+            repairer,
+            diagnostics,
+            excluded_ids=selected_ids | set(locked_ids),
+        )
+        if replacement is not None:
+            by_id[replacement.id] = replacement
+            locked_ids.append(replacement.id)
+            selected_ids.add(replacement.id)
+            diagnostics["replaced"] += 1
+            continue
+
+        diagnostics["failed"] += 1
+        locked_ids.append(selected_item.id)
+        _record_quality_detail(
+            diagnostics,
+            selected_item,
+            "published_after_quality_failure",
+            public_copy_quality(selected_item).reasons,
+        )
+        context.metadata.setdefault("warnings", []).append(
+            f"Public copy quality gate could not repair or replace {selected_item.id}."
+        )
+
+    context.metadata["unified_selected_item_ids"] = locked_ids
+    return [by_id.get(item.id, item) for item in items]
+
+
+async def _accept_or_repair_public_copy(
+    item: SignalItem,
+    context: StageContext,
+    repairer: PublicCopyRepairer,
+    diagnostics: dict[str, Any],
+) -> SignalItem | None:
+    quality = public_copy_quality(item)
+    diagnostics["checked"] += 1
+    if quality.ok:
+        return item
+
+    _record_quality_detail(diagnostics, item, "repair_requested", quality.reasons)
+    repaired = await repairer.repair(item, context)
+    if repaired is None:
+        diagnostics["failed"] += 1
+        _record_quality_detail(diagnostics, item, "repair_skipped_or_failed", quality.reasons)
+        return None
+
+    repaired_quality = public_copy_quality(repaired)
+    diagnostics["checked"] += 1
+    if repaired_quality.ok:
+        diagnostics["repaired"] += 1
+        _record_quality_detail(diagnostics, item, "repaired", quality.reasons)
+        return repaired
+
+    diagnostics["failed"] += 1
+    _record_quality_detail(
+        diagnostics,
+        item,
+        "repair_still_low_quality",
+        repaired_quality.reasons,
+    )
+    return None
+
+
+async def _find_public_copy_replacement(
+    rejected_item: SignalItem,
+    items: Sequence[SignalItem],
+    config: UnifiedDigestModeConfig,
+    context: StageContext,
+    repairer: PublicCopyRepairer,
+    diagnostics: dict[str, Any],
+    *,
+    excluded_ids: set[str],
+) -> SignalItem | None:
+    for candidate in section_candidate_order(items, config, rejected_item.type):
+        if candidate.id in excluded_ids:
+            continue
+        accepted = await _accept_or_repair_public_copy(candidate, context, repairer, diagnostics)
+        if accepted is not None:
+            _record_quality_detail(
+                diagnostics,
+                accepted,
+                f"replacement_for:{rejected_item.id}",
+                [],
+            )
+            return accepted
+    return None
+
+
+def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
+    diagnostics = metadata.setdefault(
+        "public_copy_quality",
+        {
+            "checked": 0,
+            "repaired": 0,
+            "replaced": 0,
+            "failed": 0,
+            "details": [],
+        },
+    )
+    if not isinstance(diagnostics, dict):
+        diagnostics = {}
+        metadata["public_copy_quality"] = diagnostics
+    diagnostics.setdefault("checked", 0)
+    diagnostics.setdefault("repaired", 0)
+    diagnostics.setdefault("replaced", 0)
+    diagnostics.setdefault("failed", 0)
+    diagnostics.setdefault("details", [])
+    return diagnostics
+
+
+def _record_quality_detail(
+    diagnostics: dict[str, Any],
+    item: SignalItem,
+    action: str,
+    reasons: Sequence[str],
+) -> None:
+    details = diagnostics.setdefault("details", [])
+    if not isinstance(details, list):
+        details = []
+        diagnostics["details"] = details
+    details.append(
+        {
+            "item_id": item.id,
+            "type": item.type,
+            "title": item.title,
+            "action": action,
+            "reasons": list(reasons),
+        }
+    )
 
 
 class _NoDeliveryStage:

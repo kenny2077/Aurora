@@ -18,6 +18,7 @@ from aurora.modes.unified_digest.stages import (
     UnifiedEnrichStage,
     UnifiedFetchStage,
 )
+from aurora.modes.unified_digest.quality import public_copy_quality
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 
 
@@ -483,7 +484,8 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "## GitHub Repos" in summary
     assert "/10" not in summary
     assert "   - 6k stars | 420 forks | 12 open issues" in summary
-    assert "   - Value: org/noisy is worth studying because it has concrete learning evidence." in summary
+    assert "concrete learning evidence" not in summary
+    assert "   - Value: org/noisy is useful for studying its architecture" in summary
     assert "   - Why:" not in summary
     assert "   - Study:" not in summary
     assert "license" not in summary
@@ -496,6 +498,7 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
     assert "Evidence:" not in str(rendered.metadata["web_html"])
+    assert "concrete learning evidence" not in str(rendered.metadata["web_html"])
     assert "/10" not in str(rendered.metadata["web_html"])
     assert "aurora-score" not in str(rendered.metadata["web_html"])
     assert "Files:" not in str(rendered.metadata["web_html"])
@@ -567,7 +570,8 @@ def test_unified_rendering_uses_polished_news_summary_fallback() -> None:
     )
 
     assert "   - Source: GitHub Releases" in summary
-    assert "vllm-project/vllm v0.23.0 updates" in summary
+    assert "vllm-project/vllm v0.23.0 release" in summary
+    assert "updates #" not in summary
     assert "faster inference paths" in summary
     assert "github_releases" not in summary
     assert "flagged this" not in summary
@@ -601,6 +605,221 @@ def test_unified_paper_description_hides_generic_scholar_fallback() -> None:
         "This paper studies Reward Modeling for Multi-Agent Orchestration and why it may matter"
         in summary
     )
+
+
+def test_public_copy_quality_rejects_visible_digest_slop() -> None:
+    checks = [
+        _item(
+            "news:release",
+            "news",
+            "vllm-project/vllm v0.23.0",
+            9.0,
+            source="github_releases",
+            summary="vllm-project/vllm v0.23.0 updates # vLLM v0.23.0 Release Notes.",
+        ),
+        _item(
+            "news:rss",
+            "news",
+            "Why AI has not replaced software engineers",
+            9.0,
+            source="rss",
+            metadata={"feed_name": "Simon Willison"},
+            summary=(
+                "Simon Willison covers Why AI has not replaced software engineers, "
+                "with why AI has not replaced software engineers."
+            ),
+        ),
+        _item(
+            "repo:deterministic",
+            "repo",
+            "org/repo",
+            9.0,
+            why_it_matters=(
+                "org/repo is worth studying because it has concrete learning evidence: "
+                "57.4k stars, active recently, MIT license."
+            ),
+        ),
+        _item(
+            "paper:generic",
+            "paper",
+            "Reward Modeling for Agents",
+            9.0,
+            why_it_matters="Relevant ML research candidate for today's scholar radar.",
+        ),
+        _item(
+            "paper:abstract",
+            "paper",
+            "Adaptive Streaming Reasoning",
+            9.0,
+            why_it_matters="",
+            raw_content=(
+                "Large reasoning models typically follow a read-then-think paradigm: "
+                "they observe the complete input, reason over a static context, and then..."
+            ),
+        ),
+    ]
+
+    failures = [public_copy_quality(item) for item in checks]
+
+    assert all(not result.ok for result in failures)
+    assert {reason for result in failures for reason in result.reasons} >= {
+        "raw_markdown",
+        "source_covers_template",
+        "deterministic_repo_evidence",
+        "generic_scholar_fallback",
+        "truncated_raw_abstract",
+    }
+
+
+def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    items = [
+        _item(
+            "news:weak",
+            "news",
+            "vllm-project/vllm v0.23.0",
+            9.0,
+            source="github_releases",
+            summary="vllm-project/vllm v0.23.0 updates # vLLM v0.23.0 Release Notes.",
+            raw_content="# vLLM v0.23.0 Release Notes\nThis release improves serving throughput.",
+        ),
+        _item(
+            "repo:weak",
+            "repo",
+            "org/repo",
+            9.0,
+            why_it_matters="org/repo is worth studying because it has concrete learning evidence: 57k stars.",
+        ),
+        _item(
+            "paper:weak",
+            "paper",
+            "Adaptive Streaming Reasoning",
+            9.0,
+            why_it_matters="",
+            raw_content=(
+                "Large reasoning models typically follow a read-then-think paradigm: "
+                "they observe the complete input and then..."
+            ),
+        ),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient(_repair_payloads())).enrich(items, [], context)
+    )
+    summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
+
+    assert "Release notes highlight faster and more reliable vLLM serving for production inference." in summary
+    assert "org/repo is useful for learning how production AI tooling is structured" in summary
+    assert "This paper studies streaming reasoning for inputs that arrive over time" in summary
+    assert "updates #" not in summary
+    assert "concrete learning evidence" not in summary
+    assert context.metadata["unified_selected_item_ids"] == ["news:weak", "repo:weak", "paper:weak"]
+    assert context.metadata["public_copy_quality"]["repaired"] == 3
+
+
+def test_unified_enrich_replaces_item_when_repair_still_fails(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    weak_news = _item(
+        "news:weak",
+        "news",
+        "Weak News",
+        10.0,
+        source="rss",
+        metadata={"feed_name": "Weak Feed"},
+        summary="Weak Feed covers Weak News, with weak news.",
+    )
+    replacement_news = _item(
+        "news:replacement",
+        "news",
+        "Replacement News",
+        9.0,
+        source="rss",
+        metadata={"feed_name": "Replacement Feed"},
+        summary="A new agent tooling release improves deployment workflows for developers.",
+    )
+    items = [
+        weak_news,
+        replacement_news,
+        _item("repo:1", "repo", "Repo", 8.0, why_it_matters="This repo teaches a useful agent workflow."),
+        _item("paper:1", "paper", "Paper", 8.0, summary="This paper explains a practical benchmark for AI agents."),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient([_weak_news_payload()])).enrich(items, [], context)
+    )
+    summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
+
+    assert "Replacement News" in summary
+    assert "Weak News" not in summary
+    assert context.metadata["unified_selected_item_ids"][0] == "news:replacement"
+    assert context.metadata["public_copy_quality"]["replaced"] == 1
+
+
+def test_unified_enrich_records_budget_skip_without_crashing() -> None:
+    config = AuroraConfig(
+        ai={"max_requests_per_run": 0, "fail_open_on_budget_exceeded": True},
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        },
+    )
+    items = [
+        _item(
+            "news:weak",
+            "news",
+            "Weak News",
+            9.0,
+            source="rss",
+            metadata={"feed_name": "Weak Feed"},
+            summary="Weak Feed covers Weak News, with weak news.",
+        ),
+        _item("repo:1", "repo", "Repo", 8.0),
+        _item("paper:1", "paper", "Paper", 8.0),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient(_repair_payloads())).enrich(items, [], context)
+    )
+
+    assert [item.id for item in enriched] == ["news:weak", "repo:1", "paper:1"]
+    assert context.metadata["ai_usage"]["skipped_by_budget"] >= 1
+    assert context.metadata["public_copy_quality"]["failed"] >= 1
 
 
 def test_unified_rendering_prefers_polished_news_notes() -> None:
@@ -1322,6 +1541,7 @@ def _item(
     learning_value: str | None = None,
     action_items: list[str] | None = None,
     raw_content: str | None = None,
+    summary: str | None = None,
 ) -> SignalItem:
     return SignalItem(
         id=item_id,
@@ -1334,10 +1554,86 @@ def _item(
         metadata=metadata or {},
         deterministic_score=score,
         final_score=score,
+        summary=summary or "",
         why_it_matters=why_it_matters if why_it_matters is not None else f"{title} matters",
         learning_value=learning_value or "",
         action_items=action_items or [],
     )
+
+
+def _empty_ai_usage() -> dict[str, int]:
+    return {
+        "requested_calls": 0,
+        "succeeded_calls": 0,
+        "failed_calls": 0,
+        "skipped_by_budget": 0,
+        "approx_prompt_tokens": 0,
+        "approx_completion_tokens": 0,
+        "approx_total_tokens": 0,
+    }
+
+
+def _repair_payloads() -> list[dict]:
+    return [
+        {
+            "score": 8.0,
+            "summary": "Release notes highlight faster and more reliable vLLM serving for production inference.",
+            "why_it_matters": "",
+            "learning_value": "",
+            "action_items": [],
+            "suggested_learning_path": "",
+            "tags": [],
+        },
+        {
+            "score": 8.0,
+            "summary": "",
+            "why_it_matters": (
+                "org/repo is useful for learning how production AI tooling is structured "
+                "and how its core workflow is organized."
+            ),
+            "learning_value": "",
+            "action_items": [],
+            "suggested_learning_path": "",
+            "tags": [],
+        },
+        {
+            "score": 8.0,
+            "summary": (
+                "This paper studies streaming reasoning for inputs that arrive over time. "
+                "It is useful for understanding agents that must react while context is still changing."
+            ),
+            "why_it_matters": "",
+            "learning_value": "",
+            "action_items": [],
+            "suggested_learning_path": "",
+            "tags": [],
+        },
+    ]
+
+
+def _weak_news_payload() -> dict:
+    return {
+        "score": 8.0,
+        "summary": "Weak Feed covers Weak News, with weak news.",
+        "why_it_matters": "",
+        "learning_value": "",
+        "action_items": [],
+        "suggested_learning_path": "",
+        "tags": [],
+    }
+
+
+class _FakeAIClient:
+    def __init__(self, payloads: list[dict]) -> None:
+        self.payloads = list(payloads)
+
+    def is_configured(self) -> bool:
+        return True
+
+    async def complete_json(self, system_prompt: str, user_prompt: str) -> dict:
+        if not self.payloads:
+            raise AssertionError("unexpected AI repair call")
+        return self.payloads.pop(0)
 
 
 def _static_pipeline(

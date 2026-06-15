@@ -250,6 +250,9 @@ def _run_summary(
     ai_usage = _ai_usage_summary(context_metadata)
     if ai_usage:
         summary["ai_usage"] = ai_usage
+    public_copy_quality = _public_copy_quality_summary(context_metadata)
+    if public_copy_quality:
+        summary["public_copy_quality"] = public_copy_quality
     warnings = _summary_warnings(context_metadata)
     if warnings:
         summary["warnings"] = warnings
@@ -327,6 +330,26 @@ def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, int]
             summary[key] = int(usage.get(key) or 0)
         except (TypeError, ValueError):
             summary[key] = 0
+    return summary
+
+
+def _public_copy_quality_summary(context_metadata: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(context_metadata, dict):
+        return {}
+    quality = context_metadata.get("public_copy_quality")
+    if not isinstance(quality, dict):
+        return {}
+    summary: dict[str, Any] = {}
+    for key in ("checked", "repaired", "replaced", "failed"):
+        try:
+            summary[key] = int(quality.get(key) or 0)
+        except (TypeError, ValueError):
+            summary[key] = 0
+    details = quality.get("details")
+    if isinstance(details, list):
+        summary["details"] = [
+            detail for detail in details if isinstance(detail, dict)
+        ][:50]
     return summary
 
 

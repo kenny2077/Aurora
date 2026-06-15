@@ -82,8 +82,11 @@ def clean_note_text(value: str) -> str:
     text = HTML_TAG_PATTERN.sub(" ", text)
     text = COMMENT_PREFIX_PATTERN.sub(" ", text)
     text = URL_PATTERN.sub(" ", text)
+    text = re.sub(r"(?m)^\s{0,3}#{1,6}\s+", " ", text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
+    text = text.replace("`", " ")
     text = re.sub(r"\s+", " ", text)
-    return text.strip(" \t\r\n-:;,.")
+    return text.strip(" \t\r\n#-:;,")
 
 
 def is_low_quality_note(value: str) -> bool:
@@ -135,12 +138,11 @@ def _rss_notes(item: SignalItem) -> TechNewsNotes:
         return _github_release_notes(item)
 
     metadata = item.metadata
-    feed_name = clean_note_text(str(metadata.get("feed_name") or item.source or "the source"))
     subject = _subject_from_title(item.title)
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = clean_note_text(item.title) or "the reported development"
-    why = f"{feed_name} covers {subject}, with {_sentence_fragment(excerpt, 180)}."
+    why = f"{subject}: {_sentence_fragment(excerpt, 180)}."
     learning = f"Use it to understand the concrete change: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -158,7 +160,7 @@ def _github_release_notes(item: SignalItem) -> TechNewsNotes:
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = f"{title} ships a new project release."
-    why = f"{title} updates {_sentence_fragment(excerpt, 180)}."
+    why = f"{title} release: {_sentence_fragment(excerpt, 180)}."
     learning = f"Use it to identify the practical release changes: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,

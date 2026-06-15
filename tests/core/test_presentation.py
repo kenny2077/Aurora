@@ -199,7 +199,8 @@ def test_unified_digest_html_escapes_generated_item_text() -> None:
     assert "<b>unsafe summary</b>" not in web_html
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in web_html
     assert "&lt;b&gt;unsafe summary&lt;/b&gt;" not in web_html
-    assert "Feed covers Unsafe alert(1)" in web_html
+    assert "Unsafe alert(1): unsafe alert(1)." in web_html
+    assert "Feed covers" not in web_html
     assert "Feed" in web_html
     assert "<unsafe>" not in web_html
     assert "<bad>" not in web_html

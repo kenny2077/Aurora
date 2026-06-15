@@ -334,6 +334,50 @@ def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
     }
 
 
+def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -> None:
+    calls: list[str] = []
+    context = StageContext(
+        mode="unified_digest",
+        run_id="copy-quality",
+        metadata={
+            "public_copy_quality": {
+                "checked": 5,
+                "repaired": 2,
+                "replaced": 1,
+                "failed": 1,
+                "details": [
+                    {
+                        "item_id": "repo:weak",
+                        "type": "repo",
+                        "title": "org/repo",
+                        "action": "repaired",
+                        "reasons": ["deterministic_repo_evidence"],
+                    }
+                ],
+            }
+        },
+    )
+
+    result = asyncio.run(PipelineRunner(tmp_path).run(_pipeline(calls), context))
+
+    run_summary = result.rendered_digest.metadata["run_summary"]
+    assert run_summary["public_copy_quality"] == {
+        "checked": 5,
+        "repaired": 2,
+        "replaced": 1,
+        "failed": 1,
+        "details": [
+            {
+                "item_id": "repo:weak",
+                "type": "repo",
+                "title": "org/repo",
+                "action": "repaired",
+                "reasons": ["deterministic_repo_evidence"],
+            }
+        ],
+    }
+
+
 def test_pipeline_runner_redacts_secret_like_error_values_in_run_summary(tmp_path) -> None:
     calls: list[str] = []
 

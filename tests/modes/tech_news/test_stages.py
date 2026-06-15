@@ -333,7 +333,7 @@ def test_enricher_generates_clean_rss_learning_notes() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert "Example Feed" in enriched.why_it_matters
+    assert enriched.why_it_matters.startswith("Nvidia releases a compact AI workstation:")
     assert "local inference" in enriched.learning_value
     for value in (enriched.why_it_matters, enriched.learning_value):
         assert "<p>" not in value
@@ -364,8 +364,9 @@ def test_enricher_generates_mature_rss_fallback_summary() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("AWS Machine Learning Blog covers Agent-EvalKit")
+    assert enriched.why_it_matters.startswith("Agent-EvalKit:")
     assert "repeatable benchmarks" in enriched.why_it_matters
+    assert "covers" not in enriched.why_it_matters
     assert "flagged this" not in enriched.why_it_matters
     assert "story as timely" not in enriched.why_it_matters
 
@@ -390,8 +391,9 @@ def test_github_release_uses_public_source_label_and_release_summary() -> None:
 
     assert "GitHub Releases" in summary
     assert "github_releases" not in summary
-    assert "vllm-project/vllm v0.23.0 updates" in enriched.why_it_matters
+    assert "vllm-project/vllm v0.23.0 release" in enriched.why_it_matters
     assert "faster inference paths" in enriched.why_it_matters
+    assert "updates #" not in enriched.why_it_matters
     assert "flagged this" not in enriched.why_it_matters
 
 

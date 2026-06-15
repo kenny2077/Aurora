@@ -191,13 +191,13 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.smtp_username_env == "SMTP_USERNAME"
     assert config.delivery.email.password_env == "EMAIL_PASSWORD"
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
-    assert config.ai.max_tokens == 900
-    assert config.ai.max_requests_per_run == 30
-    assert config.ai.max_tokens_per_run == 180000
+    assert config.ai.max_tokens == 800
+    assert config.ai.max_requests_per_run == 38
+    assert config.ai.max_tokens_per_run == 220000
     assert config.ai.fail_open_on_budget_exceeded is True
-    assert config.modes.tech_news.llm_analysis_top_n == 8
-    assert config.modes.scholar.llm_analysis_top_n == 12
-    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 10
+    assert config.modes.tech_news.llm_analysis_top_n == 6
+    assert config.modes.scholar.llm_analysis_top_n == 10
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 8
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
     assert config.modes.tech_news.sources.reddit.enabled is True
