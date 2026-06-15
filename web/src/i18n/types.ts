@@ -1,11 +1,14 @@
 export interface UIStrings {
   nav: {
     home: string;
+    product: string;
+    workflow: string;
     posts: string;
     tags: string;
     about: string;
     archives: string;
     search: string;
+    github: string;
   };
   post: {
     publishedAt: string;

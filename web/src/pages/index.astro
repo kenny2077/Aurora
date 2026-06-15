@@ -8,14 +8,20 @@ import Footer from "@/components/Footer.astro";
 import Datetime from "@/components/Datetime.astro";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getAssetPath } from "@/utils/withBase";
 import config from "@/config";
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const posts = await getCollection("posts");
 const sortedPosts = getSortedPosts(posts);
 const latestDigest = sortedPosts[0];
-const previousDigests = sortedPosts.slice(1);
 const homePath = getRelativeLocaleUrl(locale, "");
+const digestArchiveUrl = getRelativeLocaleUrl(locale, "posts");
+const githubUrl = "https://github.com/kenny2077/Aurora";
+const latestDigestUrl = latestDigest
+  ? getPostUrl(latestDigest.id, latestDigest.filePath, locale)
+  : digestArchiveUrl;
+const radarImage = getAssetPath("aurora-radar.png");
 
 const digestDate = latestDigest
   ? latestDigest.data.digest_date ??
@@ -24,129 +30,289 @@ const digestDate = latestDigest
     }).format(new Date(latestDigest.data.pubDatetime))
   : "";
 
-const archiveGroups = previousDigests.reduce(
-  (groups, post) => {
-    const label = new Intl.DateTimeFormat("en", {
-      month: "long",
-      year: "numeric",
-      timeZone: post.data.timezone ?? config.site.timezone,
-    }).format(new Date(post.data.pubDatetime));
-    groups[label] ??= [];
-    groups[label].push(post);
-    return groups;
-  },
-  {} as Record<string, typeof previousDigests>
-);
+const workflowSteps = [
+  ["Sources", "Tech news, GitHub repositories, and research papers."],
+  ["Signal scoring", "Freshness, relevance, quality, and learning value."],
+  ["Daily digest", "A compact reading queue built for one focused session."],
+  ["Delivery", "Static web archive, RSS, and email-ready HTML."],
+];
+
+const features = [
+  [
+    "Cross-source radar",
+    "One briefing blends ecosystem news, useful repositories, and papers worth studying.",
+  ],
+  [
+    "Learning-first ranking",
+    "Items are selected for practical value, not just engagement or recency.",
+  ],
+  [
+    "Builder-native output",
+    "Every digest is web-friendly, email-friendly, and easy to archive.",
+  ],
+  [
+    "Self-hostable system",
+    "Run Aurora from GitHub Actions and tune topics for your own learning loop.",
+  ],
+];
 ---
 
-<Layout>
+<Layout
+  title="Aurora Digest | Personal AI Learning Radar"
+  description="Aurora turns scattered AI news, repositories, and papers into one high-signal daily learning radar for builders."
+>
   <Header />
   <main
     id="main-content"
     data-layout="index"
     data-home-path={homePath}
-    class="app-layout"
+    class="mx-auto w-full max-w-6xl px-4"
   >
-    <section class="border-border border-b py-12 sm:py-16">
-      <p class="text-muted-foreground text-sm tracking-wide uppercase">
-        Aurora Unified Digest
-      </p>
-      <h1 class="mt-4 max-w-2xl text-3xl leading-tight font-semibold sm:text-4xl">
-        A quiet daily brief for builders.
-      </h1>
-      <p class="text-muted-foreground mt-5 max-w-2xl text-base leading-7">
-        Tech news, useful repositories, and research papers distilled into one
-        compact reading queue.
-      </p>
-    </section>
-
-    {
-      latestDigest && (
-        <section class="border-border border-b py-10">
-          <div class="mb-5 flex items-end justify-between gap-4">
-            <div>
-              <p class="text-muted-foreground text-sm tracking-wide uppercase">
-                Latest
-              </p>
-              <h2 class="mt-1 text-2xl font-semibold">Today's Digest</h2>
-            </div>
-            <time class="text-muted-foreground text-sm" datetime={digestDate}>
-              {digestDate}
-            </time>
-          </div>
-
+    <section
+      id="product"
+      class="grid gap-10 border-border border-b py-14 sm:py-20 lg:grid-cols-[1fr_0.9fr] lg:items-center"
+    >
+      <div>
+        <p class="text-accent text-sm font-semibold tracking-wide uppercase">
+          Aurora Unified Digest
+        </p>
+        <h1 class="mt-5 max-w-3xl text-4xl leading-tight font-semibold text-balance sm:text-5xl lg:text-6xl">
+          Your AI learning radar, rebuilt every morning.
+        </h1>
+        <p class="text-muted-foreground mt-6 max-w-2xl text-lg leading-8">
+          Aurora turns scattered AI news, repositories, and research papers into
+          one compact briefing for builders who want to keep moving without
+          living in feeds.
+        </p>
+        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
-            href={getPostUrl(latestDigest.id, latestDigest.filePath, locale)}
-            class="group border-border hover:border-accent/40 block rounded-lg border p-5 transition-colors"
+            href={latestDigestUrl}
+            class="bg-accent text-accent-foreground inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 font-semibold transition-opacity hover:opacity-90"
           >
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <h3 class="text-accent text-xl font-semibold">
-                  {latestDigest.data.title}
-                </h3>
-                <p class="text-muted-foreground mt-2 max-w-xl leading-7">
-                  {latestDigest.data.description}
-                </p>
-                <div class="mt-3">
-                  <Datetime {...latestDigest.data} />
-                </div>
-              </div>
-              <span class="inline-flex items-center gap-1 whitespace-nowrap font-medium group-hover:text-accent">
-                Read
-                <IconArrowRight class="inline-block rtl:-rotate-180" />
-              </span>
-            </div>
+            Read Today's Digest
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
           </a>
-        </section>
-      )
-    }
-
-    <section class="py-10">
-      <div class="mb-6 flex items-end justify-between gap-4">
-        <div>
-          <p class="text-muted-foreground text-sm tracking-wide uppercase">
-            Archive
-          </p>
-          <h2 class="mt-1 text-2xl font-semibold">Previous Digests</h2>
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="border-border hover:border-accent/60 inline-flex items-center justify-center gap-2 rounded-md border px-5 py-3 font-semibold transition-colors"
+          >
+            View on GitHub
+          </a>
         </div>
-        <a
-          href={getRelativeLocaleUrl(locale, "posts")}
-          class="text-muted-foreground hover:text-accent text-sm"
-        >
-          All digests
-        </a>
+        <div class="text-muted-foreground mt-8 grid max-w-xl grid-cols-3 gap-4 text-sm">
+          <p>
+            <span class="text-foreground block text-xl font-semibold">5</span>
+            tech signals
+          </p>
+          <p>
+            <span class="text-foreground block text-xl font-semibold">3</span>
+            repositories
+          </p>
+          <p>
+            <span class="text-foreground block text-xl font-semibold">3</span>
+            papers
+          </p>
+        </div>
       </div>
 
-      {
-        Object.entries(archiveGroups).length > 0 ? (
-          Object.entries(archiveGroups).map(([month, group]) => (
-            <section class="mt-7">
-              <h3 class="text-muted-foreground text-sm tracking-wide uppercase">
-                {month}
-              </h3>
-              <ul class="mt-3 divide-y divide-border">
-                {group.map(post => (
-                  <li class="py-4">
-                    <a
-                      href={getPostUrl(post.id, post.filePath, locale)}
-                      class="group flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <span class="font-medium group-hover:text-accent">
-                        {post.data.title}
-                      </span>
-                      <Datetime {...post.data} class="sm:justify-end" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
+      <div class="relative">
+        <div class="absolute inset-0 -z-10 rounded-3xl bg-cyan-500/10 blur-3xl dark:bg-cyan-300/10" />
+        <div class="border-border bg-muted/20 overflow-hidden rounded-2xl border shadow-2xl shadow-cyan-950/10 dark:bg-slate-950/70">
+          <img
+            src={radarImage}
+            alt="Abstract Aurora radar visual"
+            width="1586"
+            height="992"
+            loading="eager"
+            decoding="async"
+            class="aspect-[16/10] w-full object-cover"
+          />
+          <div class="border-border border-t p-5">
+            <p class="text-muted-foreground text-xs tracking-wide uppercase">
+              Automated learning radar
+            </p>
+            <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
+              <span class="border-border rounded-md border px-3 py-2">
+                News
+              </span>
+              <span class="border-border rounded-md border px-3 py-2">
+                GitHub
+              </span>
+              <span class="border-border rounded-md border px-3 py-2">
+                Papers
+              </span>
+              <span class="border-border rounded-md border px-3 py-2">
+                Digest
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid gap-8 border-border border-b py-12 sm:py-16 lg:grid-cols-[0.7fr_1fr]">
+      <div>
+        <p class="text-muted-foreground text-sm tracking-wide uppercase">
+          The problem
+        </p>
+        <h2 class="mt-3 text-3xl leading-tight font-semibold">
+          AI learning is scattered across too many surfaces.
+        </h2>
+      </div>
+      <div class="text-muted-foreground grid gap-4 text-base leading-7 sm:grid-cols-2">
+        <p class="border-border rounded-xl border p-5">
+          News gives you urgency, but rarely tells you what is worth studying.
+        </p>
+        <p class="border-border rounded-xl border p-5">
+          GitHub exposes what builders are adopting, but the signal is noisy.
+        </p>
+        <p class="border-border rounded-xl border p-5">
+          Papers hold durable ideas, but they are hard to triage every day.
+        </p>
+        <p class="border-border rounded-xl border p-5">
+          Aurora compresses that scan into a single reading queue.
+        </p>
+      </div>
+    </section>
+
+    <section id="workflow" class="border-border border-b py-12 sm:py-16">
+      <div class="max-w-2xl">
+        <p class="text-muted-foreground text-sm tracking-wide uppercase">
+          Workflow
+        </p>
+        <h2 class="mt-3 text-3xl leading-tight font-semibold">
+          From raw sources to a daily briefing.
+        </h2>
+      </div>
+      <div class="mt-8 grid gap-4 lg:grid-cols-4">
+        {
+          workflowSteps.map(([title, body], index) => (
+            <article class="border-border bg-muted/20 rounded-xl border p-5">
+              <span class="text-accent text-sm font-semibold">
+                0{index + 1}
+              </span>
+              <h3 class="mt-4 font-semibold">{title}</h3>
+              <p class="text-muted-foreground mt-3 text-sm leading-6">{body}</p>
+            </article>
           ))
-        ) : (
-          <p class="text-muted-foreground">
-            Previous digests will appear after additional Aurora runs.
-          </p>
-        )
-      }
+        }
+      </div>
+      <div class="border-border mt-6 rounded-2xl border p-5">
+        <div class="grid gap-3 text-sm sm:grid-cols-4">
+          <span class="rounded-lg bg-cyan-500/10 px-3 py-3 text-cyan-700 dark:text-cyan-200">
+            Sources
+          </span>
+          <span class="rounded-lg bg-emerald-500/10 px-3 py-3 text-emerald-700 dark:text-emerald-200">
+            Ranking
+          </span>
+          <span class="rounded-lg bg-violet-500/10 px-3 py-3 text-violet-700 dark:text-violet-200">
+            Enrichment
+          </span>
+          <span class="rounded-lg bg-amber-500/10 px-3 py-3 text-amber-700 dark:text-amber-200">
+            Digest
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <section class="border-border border-b py-12 sm:py-16">
+      <div class="max-w-2xl">
+        <p class="text-muted-foreground text-sm tracking-wide uppercase">
+          Product
+        </p>
+        <h2 class="mt-3 text-3xl leading-tight font-semibold">
+          Built for a focused daily learning loop.
+        </h2>
+      </div>
+      <div class="mt-8 grid gap-4 sm:grid-cols-2">
+        {
+          features.map(([title, body]) => (
+            <article class="border-border hover:border-accent/40 rounded-xl border p-5 transition-colors">
+              <h3 class="font-semibold">{title}</h3>
+              <p class="text-muted-foreground mt-3 leading-7">{body}</p>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section id="digest" class="grid gap-8 border-border border-b py-12 sm:py-16 lg:grid-cols-[0.7fr_1fr]">
+      <div>
+        <p class="text-muted-foreground text-sm tracking-wide uppercase">
+          Live proof
+        </p>
+        <h2 class="mt-3 text-3xl leading-tight font-semibold">
+          The latest briefing is always one click away.
+        </h2>
+      </div>
+      <a
+        href={latestDigestUrl}
+        class="group border-border bg-muted/20 hover:border-accent/50 rounded-2xl border p-6 transition-colors"
+      >
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-muted-foreground text-sm tracking-wide uppercase">
+              Today's Digest
+            </p>
+            <h3 class="text-accent mt-3 text-2xl font-semibold">
+              {latestDigest?.data.title ?? "Aurora Digest"}
+            </h3>
+            <p class="text-muted-foreground mt-3 max-w-xl leading-7">
+              {
+                latestDigest?.data.description ??
+                  "Open the digest archive to read the latest Aurora briefing."
+              }
+            </p>
+            {
+              latestDigest && (
+                <div class="mt-4">
+                  <Datetime {...latestDigest.data} />
+                </div>
+              )
+            }
+          </div>
+          <div class="flex items-center gap-3 font-semibold group-hover:text-accent">
+            <span>{digestDate || "Archive"}</span>
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </div>
+        </div>
+      </a>
+    </section>
+
+    <section class="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_0.8fr] lg:items-center">
+      <div>
+        <p class="text-muted-foreground text-sm tracking-wide uppercase">
+          Open source
+        </p>
+        <h2 class="mt-3 text-3xl leading-tight font-semibold">
+          Run Aurora as your own learning infrastructure.
+        </h2>
+        <p class="text-muted-foreground mt-4 max-w-2xl leading-7">
+          Aurora is designed to run from configuration, scheduled automation,
+          and static publishing. Start with the public digest, then self-host it
+          when you want your own topics and delivery settings.
+        </p>
+      </div>
+      <div class="border-border rounded-2xl border p-6">
+        <p class="text-sm font-semibold">Self-hostable today</p>
+        <ul class="text-muted-foreground mt-4 space-y-3 text-sm">
+          <li>GitHub Actions schedule</li>
+          <li>Email-ready HTML output</li>
+          <li>GitHub Pages static archive</li>
+          <li>Configurable topics for repos and papers</li>
+        </ul>
+        <a
+          href={githubUrl}
+          target="_blank"
+          rel="noreferrer"
+          class="mt-6 inline-flex items-center gap-2 font-semibold text-accent"
+        >
+          Explore the repository
+          <IconArrowRight class="inline-block rtl:-rotate-180" />
+        </a>
+      </div>
     </section>
   </main>
   <Footer />

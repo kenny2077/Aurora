@@ -2,7 +2,6 @@
 import { getRelativeLocaleUrl } from "astro:i18n";
 import IconUnderline from "@/assets/icons/IconUnderline.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
-import IconArchive from "@/assets/icons/IconArchive.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
@@ -32,6 +31,9 @@ const isActive = (path: string) => {
   const pathArray = path.split("/").filter(p => p.trim());
   return currentPath === path || currentPathArray[0] === pathArray[0];
 };
+
+const homeUrl = getRelativeLocaleUrl(locale, "");
+const githubUrl = "https://github.com/kenny2077/Aurora";
 ---
 
 <a
@@ -42,14 +44,12 @@ const isActive = (path: string) => {
   {t.a11y.skipToContent}
 </a>
 
-<header
-  class="app-layout flex flex-col items-center justify-between sm:flex-row"
->
+<header class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between px-4 sm:flex-row">
   <div
     class="border-border bg-background relative flex w-full items-baseline justify-between border-b py-4 sm:items-center sm:py-6"
   >
     <a
-      href={getRelativeLocaleUrl(locale, "")}
+      href={homeUrl}
       class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
     >
       {site.title}
@@ -76,6 +76,17 @@ const isActive = (path: string) => {
       >
         <li class="col-span-2">
           <a
+            href={`${homeUrl}#product`}
+            class:list={{ "active-nav": currentPath === "/" }}
+          >
+            {t.nav.product}
+          </a>
+        </li>
+        <li class="col-span-2">
+          <a href={`${homeUrl}#workflow`}>{t.nav.workflow}</a>
+        </li>
+        <li class="col-span-2">
+          <a
             href={getRelativeLocaleUrl(locale, "posts")}
             class:list={{ "active-nav": isActive("/posts") }}
           >
@@ -83,45 +94,10 @@ const isActive = (path: string) => {
           </a>
         </li>
         <li class="col-span-2">
-          <a
-            href={getRelativeLocaleUrl(locale, "tags")}
-            class:list={{ "active-nav": isActive("/tags") }}
-          >
-            {t.nav.tags}
+          <a href={githubUrl} target="_blank" rel="noreferrer">
+            {t.nav.github}
           </a>
         </li>
-        <li class="col-span-2">
-          <a
-            href={getRelativeLocaleUrl(locale, "about")}
-            class:list={{ "active-nav": isActive("/about") }}
-          >
-            {t.nav.about}
-          </a>
-        </li>
-        {
-          features.showArchives && (
-            <li class="col-span-2">
-              <LinkButton
-                href={getRelativeLocaleUrl(locale, "archives")}
-                class:list={[
-                  "focus-outline flex size-full justify-center p-3 sm:relative sm:size-8 sm:p-0",
-                  { "active-nav": isActive("/archives") },
-                ]}
-                title={t.nav.archives}
-                aria-label={t.nav.archives}
-              >
-                <IconArchive class="hidden sm:absolute sm:top-1/2 sm:left-1/2 sm:block sm:size-6 sm:-translate-x-1/2 sm:-translate-y-1/2" />
-                <span class="sm:sr-only">{t.nav.archives}</span>
-                {isActive("/archives") && (
-                  <IconUnderline
-                    aria-hidden="true"
-                    class="scale-125 max-sm:hidden sm:absolute sm:bottom-0 sm:w-6"
-                  />
-                )}
-              </LinkButton>
-            </li>
-          )
-        }
         {
           features.search !== false && (
             <li class="col-span-1 flex items-center justify-center">
