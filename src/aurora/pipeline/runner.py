@@ -340,7 +340,16 @@ def _public_copy_quality_summary(context_metadata: dict[str, Any] | None) -> dic
     if not isinstance(quality, dict):
         return {}
     summary: dict[str, Any] = {}
-    for key in ("checked", "repaired", "replaced", "failed"):
+    for key in (
+        "checked",
+        "polished",
+        "repaired",
+        "replaced",
+        "failed",
+        "polish_failed",
+        "replacement_attempted",
+        "replacement_succeeded",
+    ):
         try:
             summary[key] = int(quality.get(key) or 0)
         except (TypeError, ValueError):

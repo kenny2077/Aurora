@@ -475,6 +475,38 @@ def test_run_prints_run_summary_warnings(tmp_path: Path, monkeypatch, capsys) ->
     ) in output
 
 
+def test_run_prints_ai_usage_and_public_copy_quality(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["unified_digest"]}}', encoding="utf-8")
+    monkeypatch.setattr("aurora.cli.build_unified_digest_pipeline", _observability_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "unified_digest",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--run-id",
+            "test-run",
+        ]
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert (
+        "unified_digest: ai requests 12 requested, 10 succeeded, 1 failed, "
+        "1 skipped, ~4200 tokens"
+    ) in output
+    assert (
+        "unified_digest: public copy 11 checked, 9 polished, 1 repaired, "
+        "1 replaced, 1 failed"
+    ) in output
+
+
 class _Fetch:
     name = "fake"
 
@@ -528,6 +560,28 @@ class _WarningEnrich:
                 ],
             }
         ]
+        return [items[0].model_copy(update={"final_score": 8.0})]
+
+
+class _ObservabilityEnrich:
+    async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
+        context.metadata["ai_usage"] = {
+            "requested_calls": 12,
+            "succeeded_calls": 10,
+            "failed_calls": 1,
+            "skipped_by_budget": 1,
+            "approx_prompt_tokens": 3000,
+            "approx_completion_tokens": 1200,
+            "approx_total_tokens": 4200,
+        }
+        context.metadata["public_copy_quality"] = {
+            "checked": 11,
+            "polished": 9,
+            "repaired": 1,
+            "replaced": 1,
+            "failed": 1,
+            "details": [],
+        }
         return [items[0].model_copy(update={"final_score": 8.0})]
 
 
@@ -586,6 +640,21 @@ def _warning_pipeline(config) -> ModePipeline:
         deduplicate_stage=pipeline.deduplicate_stage,
         score_stage=pipeline.score_stage,
         enrich_stage=_WarningEnrich(),
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=pipeline.deliver_stage,
+    )
+
+
+def _observability_pipeline(config) -> ModePipeline:
+    pipeline = _mode_pipeline("unified_digest", "news")
+    return ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=_ObservabilityEnrich(),
         summarize_stage=pipeline.summarize_stage,
         render_stage=pipeline.render_stage,
         deliver_stage=pipeline.deliver_stage,

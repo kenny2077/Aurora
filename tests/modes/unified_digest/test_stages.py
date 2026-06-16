@@ -657,6 +657,48 @@ def test_public_copy_quality_rejects_visible_digest_slop() -> None:
                 "they observe the complete input, reason over a static context, and then..."
             ),
         ),
+        _item(
+            "news:title-duplicate",
+            "news",
+            "The Fable 5 Export Controls Harm US Cyber Defense",
+            9.0,
+            summary=(
+                "The Fable 5 Export Controls Harm US Cyber Defense: "
+                "the Fable 5 Export Controls Harm US Cyber Defense quoted a security researcher."
+            ),
+        ),
+        _item(
+            "news:dangling",
+            "news",
+            "Build context-rich research agents",
+            9.0,
+            summary=(
+                "Deep Agents and Bedrock AgentCore: this walkthrough targets developers "
+                "building multi-step AI workflows who need."
+            ),
+        ),
+        _item(
+            "news:release-notes",
+            "news",
+            "vllm-project/vllm v0.23.0",
+            9.0,
+            source="github_releases",
+            summary=(
+                "vllm-project/vllm v0.23.0 release: vLLM v0.23.0 Release Notes "
+                "* **DeepSeek-V4 matures across backends**."
+            ),
+        ),
+        _item(
+            "paper:raw-voice",
+            "paper",
+            "TuneJury",
+            9.0,
+            source="arxiv",
+            summary=(
+                "We introduce TuneJury, an open, instance-level pairwise reward model "
+                "for text-to-music that predicts a music preference score from a text prompt."
+            ),
+        ),
     ]
 
     failures = [public_copy_quality(item) for item in checks]
@@ -668,7 +710,133 @@ def test_public_copy_quality_rejects_visible_digest_slop() -> None:
         "deterministic_repo_evidence",
         "generic_scholar_fallback",
         "truncated_raw_abstract",
+        "duplicated_title_prefix",
+        "dangling_fragment",
+        "release_note_remnant",
+        "raw_abstract_voice",
     }
+
+
+def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    items = [
+        _item(
+            "news:ok",
+            "news",
+            "Context-rich research agents",
+            9.0,
+            summary="AWS shows a practical pattern for context-rich research agents.",
+        ),
+        _item(
+            "repo:ok",
+            "repo",
+            "org/agent-kit",
+            9.0,
+            why_it_matters="This repo teaches a useful agent workflow with clear examples.",
+        ),
+        _item(
+            "paper:ok",
+            "paper",
+            "Agent Benchmark",
+            9.0,
+            summary="This paper explains a practical benchmark for testing AI agents.",
+        ),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+    payloads = [
+        _payload(summary="Polished news explains why the research-agent workflow matters for builders."),
+        _payload(why="org/agent-kit is valuable for learning how agent workflows are packaged and tested."),
+        _payload(summary="This paper gives students a practical way to understand agent benchmark design."),
+    ]
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient(payloads)).enrich(items, [], context)
+    )
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context)
+    )
+
+    assert "Polished news explains why the research-agent workflow matters for builders." in summary
+    assert "org/agent-kit is valuable for learning how agent workflows are packaged and tested." in summary
+    assert "This paper gives students a practical way to understand agent benchmark design." in summary
+    assert context.metadata["public_copy_quality"]["polished"] == 3
+    assert context.metadata["public_copy_quality"]["repaired"] == 0
+
+
+def test_unified_enrich_replaces_june_16_style_slop_after_failed_polish(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    weak_news = _item(
+        "news:weak-june16",
+        "news",
+        "Build context-rich research agents with Deep Agents and Bedrock AgentCore",
+        10.0,
+        summary=(
+            "Deep Agents and Bedrock AgentCore: in this post, you'll build a competitive "
+            "research agent that demonstrates this pattern end to end. This walkthrough "
+            "targets developers building multi-step AI workflows who need."
+        ),
+    )
+    replacement_news = _item(
+        "news:replacement",
+        "news",
+        "Microsoft turns to AWS as GitHub faces AI capacity crunch",
+        8.0,
+        source="hackernews",
+        summary="Microsoft is using AWS capacity to meet demand for GitHub AI features.",
+    )
+    items = [
+        weak_news,
+        replacement_news,
+        _item("repo:1", "repo", "Repo", 8.0, why_it_matters="This repo teaches a useful workflow."),
+        _item("paper:1", "paper", "Paper", 8.0, summary="This paper explains a practical agent benchmark."),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+    payloads = [
+        _payload(summary="Deep Agents and Bedrock AgentCore: developers building workflows who need."),
+        _payload(summary="Microsoft is using AWS capacity to meet demand for GitHub AI features."),
+        _payload(why="This repo teaches a useful workflow for agent builders."),
+        _payload(summary="This paper explains a practical agent benchmark for students."),
+    ]
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient(payloads)).enrich(items, [], context)
+    )
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context)
+    )
+
+    assert "Microsoft turns to AWS" in summary
+    assert "Build context-rich research agents" not in summary
+    assert "who need." not in summary
+    assert context.metadata["unified_selected_item_ids"][0] == "news:replacement"
+    assert context.metadata["public_copy_quality"]["replacement_attempted"] >= 1
+    assert context.metadata["public_copy_quality"]["replacement_succeeded"] == 1
 
 
 def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
@@ -1617,6 +1785,18 @@ def _weak_news_payload() -> dict:
         "summary": "Weak Feed covers Weak News, with weak news.",
         "why_it_matters": "",
         "learning_value": "",
+        "action_items": [],
+        "suggested_learning_path": "",
+        "tags": [],
+    }
+
+
+def _payload(*, summary: str = "", why: str = "", learning: str = "") -> dict:
+    return {
+        "score": 8.0,
+        "summary": summary,
+        "why_it_matters": why,
+        "learning_value": learning,
         "action_items": [],
         "suggested_learning_path": "",
         "tags": [],

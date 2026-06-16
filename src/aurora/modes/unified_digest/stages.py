@@ -274,29 +274,45 @@ async def _accept_or_repair_public_copy(
 ) -> SignalItem | None:
     quality = public_copy_quality(item)
     diagnostics["checked"] += 1
-    if quality.ok:
-        return item
-
-    _record_quality_detail(diagnostics, item, "repair_requested", quality.reasons)
-    repaired = await repairer.repair(item, context)
-    if repaired is None:
+    action = "polish_requested" if quality.ok else "repair_requested"
+    _record_quality_detail(diagnostics, item, action, quality.reasons)
+    polished = await repairer.repair(item, context)
+    if polished is None:
+        diagnostics["polish_failed"] += 1
+        if quality.ok:
+            _record_quality_detail(diagnostics, item, "polish_skipped_or_failed", quality.reasons)
+            return item
         diagnostics["failed"] += 1
         _record_quality_detail(diagnostics, item, "repair_skipped_or_failed", quality.reasons)
         return None
 
-    repaired_quality = public_copy_quality(repaired)
+    polished_quality = public_copy_quality(polished)
     diagnostics["checked"] += 1
-    if repaired_quality.ok:
-        diagnostics["repaired"] += 1
-        _record_quality_detail(diagnostics, item, "repaired", quality.reasons)
-        return repaired
+    if polished_quality.ok:
+        if quality.ok:
+            diagnostics["polished"] += 1
+            _record_quality_detail(diagnostics, item, "polished", quality.reasons)
+        else:
+            diagnostics["repaired"] += 1
+            _record_quality_detail(diagnostics, item, "repaired", quality.reasons)
+        return polished
+
+    diagnostics["polish_failed"] += 1
+    if quality.ok:
+        _record_quality_detail(
+            diagnostics,
+            item,
+            "polish_still_low_quality_original_kept",
+            polished_quality.reasons,
+        )
+        return item
 
     diagnostics["failed"] += 1
     _record_quality_detail(
         diagnostics,
         item,
         "repair_still_low_quality",
-        repaired_quality.reasons,
+        polished_quality.reasons,
     )
     return None
 
@@ -311,11 +327,13 @@ async def _find_public_copy_replacement(
     *,
     excluded_ids: set[str],
 ) -> SignalItem | None:
+    diagnostics["replacement_attempted"] += 1
     for candidate in section_candidate_order(items, config, rejected_item.type):
         if candidate.id in excluded_ids:
             continue
         accepted = await _accept_or_repair_public_copy(candidate, context, repairer, diagnostics)
         if accepted is not None:
+            diagnostics["replacement_succeeded"] += 1
             _record_quality_detail(
                 diagnostics,
                 accepted,
@@ -334,6 +352,10 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
             "repaired": 0,
             "replaced": 0,
             "failed": 0,
+            "polished": 0,
+            "polish_failed": 0,
+            "replacement_attempted": 0,
+            "replacement_succeeded": 0,
             "details": [],
         },
     )
@@ -344,6 +366,10 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
     diagnostics.setdefault("repaired", 0)
     diagnostics.setdefault("replaced", 0)
     diagnostics.setdefault("failed", 0)
+    diagnostics.setdefault("polished", 0)
+    diagnostics.setdefault("polish_failed", 0)
+    diagnostics.setdefault("replacement_attempted", 0)
+    diagnostics.setdefault("replacement_succeeded", 0)
     diagnostics.setdefault("details", [])
     return diagnostics
 

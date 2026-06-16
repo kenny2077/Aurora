@@ -28,6 +28,18 @@ class PublicCopyQuality:
 SOURCE_COVERS_PATTERN = re.compile(r"\bcovers\b.{0,180}\bwith\b", re.IGNORECASE)
 MARKDOWN_HEADING_PATTERN = re.compile(r"(^|\s)#{1,6}\s+\S")
 MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\([^)]*$")
+EMPHASIS_OR_BULLET_PATTERN = re.compile(r"(^|\s)(?:[*-]\s+|\*\*[^*]+\*\*)")
+RELEASE_NOTES_PATTERN = re.compile(r"\bRelease Notes\b")
+RAW_ABSTRACT_PATTERN = re.compile(r"^(?:we introduce|we propose|we present|in this paper)", re.IGNORECASE)
+DANGLING_ENDINGS = (
+    " who need.",
+    " they enable.",
+    " a vs.",
+    " b vs.",
+    " and then.",
+    " because.",
+    " with.",
+)
 
 
 def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
@@ -45,6 +57,12 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
         reasons.append("raw_markdown")
     if MARKDOWN_LINK_PATTERN.search(normalized):
         reasons.append("broken_markdown")
+    if _has_duplicated_title_prefix(item, normalized):
+        reasons.append("duplicated_title_prefix")
+    if _has_dangling_fragment(normalized):
+        reasons.append("dangling_fragment")
+    if RELEASE_NOTES_PATTERN.search(normalized) or EMPHASIS_OR_BULLET_PATTERN.search(normalized):
+        reasons.append("release_note_remnant")
     if item.type == "repo" and is_deterministic_repo_evidence(normalized):
         reasons.append("deterministic_repo_evidence")
     source_text = " ".join(
@@ -60,6 +78,8 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
         reasons.append("generic_scholar_fallback")
     if _looks_like_truncated_raw_abstract(item, normalized):
         reasons.append("truncated_raw_abstract")
+    if item.type == "paper" and RAW_ABSTRACT_PATTERN.search(normalized):
+        reasons.append("raw_abstract_voice")
 
     return PublicCopyQuality(ok=not reasons, text=normalized, reasons=reasons)
 
@@ -108,6 +128,29 @@ def apply_public_copy_repair(item: SignalItem, analysis: LLMAnalysis) -> SignalI
             "why_it_matters": why or item.why_it_matters,
         }
     )
+
+
+def _has_duplicated_title_prefix(item: SignalItem, text: str) -> bool:
+    if ":" not in text:
+        return False
+    title = _normalized_words(item.title)
+    prefix, remainder = text.split(":", 1)
+    return (
+        bool(title)
+        and _normalized_words(prefix) == title
+        and _normalized_words(remainder).startswith(title)
+    )
+
+
+def _has_dangling_fragment(text: str) -> bool:
+    lowered = text.strip().lower()
+    if lowered.endswith(DANGLING_ENDINGS):
+        return True
+    return lowered.endswith((" vs.", " e.g.", " i.e."))
+
+
+def _normalized_words(value: object) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", str(value or "").lower())).strip()
 
 
 def _public_text(item: SignalItem) -> str:

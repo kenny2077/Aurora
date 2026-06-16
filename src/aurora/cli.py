@@ -225,6 +225,8 @@ def _handle_run(args: argparse.Namespace) -> int:
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
         _print_source_health(result)
+        _print_ai_usage(result)
+        _print_public_copy_quality(result)
         _print_run_warnings(result)
         for delivery_result in result.delivery_results:
             status = "ok" if delivery_result.ok else "failed"
@@ -423,6 +425,47 @@ def _print_run_warnings(result: Any) -> None:
         text = str(warning).strip()
         if text:
             print(f"{result.mode}: warning {text}")
+
+
+def _print_ai_usage(result: Any) -> None:
+    run_summary = result.rendered_digest.metadata.get("run_summary")
+    if not isinstance(run_summary, dict):
+        return
+    usage = run_summary.get("ai_usage")
+    if not isinstance(usage, dict):
+        return
+    print(
+        f"{result.mode}: ai requests "
+        f"{_int_value(usage, 'requested_calls')} requested, "
+        f"{_int_value(usage, 'succeeded_calls')} succeeded, "
+        f"{_int_value(usage, 'failed_calls')} failed, "
+        f"{_int_value(usage, 'skipped_by_budget')} skipped, "
+        f"~{_int_value(usage, 'approx_total_tokens')} tokens"
+    )
+
+
+def _print_public_copy_quality(result: Any) -> None:
+    run_summary = result.rendered_digest.metadata.get("run_summary")
+    if not isinstance(run_summary, dict):
+        return
+    quality = run_summary.get("public_copy_quality")
+    if not isinstance(quality, dict):
+        return
+    print(
+        f"{result.mode}: public copy "
+        f"{_int_value(quality, 'checked')} checked, "
+        f"{_int_value(quality, 'polished')} polished, "
+        f"{_int_value(quality, 'repaired')} repaired, "
+        f"{_int_value(quality, 'replaced')} replaced, "
+        f"{_int_value(quality, 'failed')} failed"
+    )
+
+
+def _int_value(payload: dict[str, Any], key: str) -> int:
+    try:
+        return int(payload.get(key) or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 def _build_dry_run_pipeline(mode: str) -> ModePipeline:

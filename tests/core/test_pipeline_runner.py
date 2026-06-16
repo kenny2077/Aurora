@@ -363,9 +363,13 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
     run_summary = result.rendered_digest.metadata["run_summary"]
     assert run_summary["public_copy_quality"] == {
         "checked": 5,
+        "polished": 0,
         "repaired": 2,
         "replaced": 1,
         "failed": 1,
+        "polish_failed": 0,
+        "replacement_attempted": 0,
+        "replacement_succeeded": 0,
         "details": [
             {
                 "item_id": "repo:weak",
