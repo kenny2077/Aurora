@@ -7,7 +7,7 @@ import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconMoon from "@/assets/icons/IconMoon.svg";
 import IconX from "@/assets/icons/IconX.svg";
 import LinkButton from "./LinkButton.astro";
-import { stripBase, stripLocale } from "@/utils/withBase";
+import { getAssetPath, stripBase, stripLocale } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
 
@@ -34,6 +34,7 @@ const isActive = (path: string) => {
 
 const homeUrl = getRelativeLocaleUrl(locale, "");
 const githubUrl = "https://github.com/kenny2077/Aurora";
+const markUrl = getAssetPath("readme/aurora-mark.png");
 ---
 
 <a
@@ -44,14 +45,17 @@ const githubUrl = "https://github.com/kenny2077/Aurora";
   {t.a11y.skipToContent}
 </a>
 
-<header class="mx-auto flex w-full max-w-6xl flex-col items-center justify-between px-4 sm:flex-row">
+<header class="sticky top-0 z-30 border-b border-black/10 bg-[#f6f6f4]/90 backdrop-blur dark:border-white/10 dark:bg-[#080810]/85">
   <div
-    class="border-border bg-background relative flex w-full items-baseline justify-between border-b py-4 sm:items-center sm:py-6"
+    class="relative mx-auto flex w-full max-w-7xl items-baseline justify-between px-5 py-4 sm:items-center sm:px-8 lg:px-10"
   >
     <a
       href={homeUrl}
-      class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="absolute flex items-center gap-3 py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
     >
+      <span class="flex size-9 items-center justify-center overflow-hidden rounded-lg bg-[#05050d] p-1.5 dark:bg-white">
+        <img src={markUrl} alt="" class="size-full object-contain" />
+      </span>
       {site.title}
     </a>
     <nav
@@ -72,7 +76,7 @@ const githubUrl = "https://github.com/kenny2077/Aurora";
       </button>
       <ul
         id="menu-items"
-        class="[&>li>a]:hover:text-accent mt-4 hidden w-44 grid-cols-2 place-content-center gap-2 sm:mt-0 sm:flex sm:w-auto sm:gap-x-5 sm:gap-y-0 sm:[&>li]:h-8 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-2 sm:[&>li>a]:py-1"
+        class="[&>li>a]:hover:text-foreground mt-4 hidden w-44 grid-cols-2 place-content-center gap-2 text-muted-foreground sm:mt-0 sm:flex sm:w-auto sm:items-center sm:gap-x-6 sm:gap-y-0 sm:[&>li]:h-9 [&>li>a]:block [&>li>a]:px-4 [&>li>a]:py-3 [&>li>a]:text-center [&>li>a]:font-medium sm:[&>li>a]:px-0 sm:[&>li>a]:py-1"
       >
         <li class="col-span-2">
           <a
@@ -94,7 +98,12 @@ const githubUrl = "https://github.com/kenny2077/Aurora";
           </a>
         </li>
         <li class="col-span-2">
-          <a href={githubUrl} target="_blank" rel="noreferrer">
+          <a
+            href={githubUrl}
+            target="_blank"
+            rel="noreferrer"
+            class="rounded-lg bg-[#05050d] text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:text-white sm:px-4! sm:py-2! dark:bg-white dark:text-[#080810] dark:hover:bg-white/90 dark:hover:text-[#080810]"
+          >
             {t.nav.github}
           </a>
         </li>

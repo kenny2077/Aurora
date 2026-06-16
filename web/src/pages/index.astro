@@ -21,7 +21,11 @@ const githubUrl = "https://github.com/kenny2077/Aurora";
 const latestDigestUrl = latestDigest
   ? getPostUrl(latestDigest.id, latestDigest.filePath, locale)
   : digestArchiveUrl;
-const radarImage = getAssetPath("aurora-radar.png");
+
+const markImage = getAssetPath("readme/aurora-mark.png");
+const overviewImage = getAssetPath("readme/aurora-digest-overview.png");
+const workflowImage = getAssetPath("readme/aurora-digest-workflow.png");
+const dashboardImage = getAssetPath("readme/aurora-digest-dashboard.png");
 
 const digestDate = latestDigest
   ? latestDigest.data.digest_date ??
@@ -30,30 +34,86 @@ const digestDate = latestDigest
     }).format(new Date(latestDigest.data.pubDatetime))
   : "";
 
-const workflowSteps = [
-  ["Sources", "Tech news, GitHub repositories, and research papers."],
-  ["Signal scoring", "Freshness, relevance, quality, and learning value."],
-  ["Daily digest", "A compact reading queue built for one focused session."],
-  ["Delivery", "Static web archive, RSS, and email-ready HTML."],
+const floatingPanels = [
+  {
+    title: "News",
+    value: "5 signals",
+    body: "Timely AI and technology stories compressed into a short scan.",
+    className: "left-[7%] top-[12%] w-[250px] aurora-float-one",
+  },
+  {
+    title: "GitHub",
+    value: "3 repos",
+    body: "Active projects selected for adoption, quality, and learning value.",
+    className: "right-[8%] top-[11%] w-[250px] aurora-float-two",
+  },
+  {
+    title: "Papers",
+    value: "3 reads",
+    body: "Research papers filtered into a practical study queue.",
+    className: "left-[14%] bottom-[13%] w-[260px] aurora-float-three",
+  },
+  {
+    title: "Delivery",
+    value: "Email + Pages",
+    body: "One digest rendered for inboxes, RSS, and a static web archive.",
+    className: "right-[12%] bottom-[14%] w-[270px] aurora-float-four",
+  },
 ];
 
 const features = [
-  [
-    "Cross-source radar",
-    "One briefing blends ecosystem news, useful repositories, and papers worth studying.",
-  ],
-  [
-    "Learning-first ranking",
-    "Items are selected for practical value, not just engagement or recency.",
-  ],
-  [
-    "Builder-native output",
-    "Every digest is web-friendly, email-friendly, and easy to archive.",
-  ],
-  [
-    "Self-hostable system",
-    "Run Aurora from GitHub Actions and tune topics for your own learning loop.",
-  ],
+  {
+    tag: "Radar",
+    title: "Cross-source signal",
+    body: "Aurora reads across news, repositories, and papers so your daily scan is not trapped in one feed.",
+  },
+  {
+    tag: "Rank",
+    title: "Learning-first selection",
+    body: "The digest favors usefulness, freshness, adoption, and practical study value over raw popularity.",
+  },
+  {
+    tag: "Digest",
+    title: "Compact by design",
+    body: "The unified digest stays intentionally small: 5 news items, 3 repos, and 3 papers.",
+  },
+  {
+    tag: "Output",
+    title: "Built for publishing",
+    body: "Render the same daily brief to email, GitHub Pages, RSS, Markdown, and local HTML.",
+  },
+  {
+    tag: "Control",
+    title: "Self-hosted workflow",
+    body: "Run it locally or from GitHub Actions with topic presets for your own learning priorities.",
+  },
+  {
+    tag: "Trace",
+    title: "Diagnostics stay private",
+    body: "Operational source health and run summaries stay in logs and artifacts, not the reader-facing digest.",
+  },
+];
+
+const workflow = [
+  {
+    label: "Input",
+    title: "Collect",
+    body: "Fetch timely stories, GitHub candidates, and research papers from configured sources.",
+    items: ["RSS and news sources", "GitHub Search", "arXiv/OpenReview"],
+  },
+  {
+    label: "Most useful",
+    title: "Rank",
+    body: "Normalize, deduplicate, score, and enrich candidates before the visible digest is rendered.",
+    items: ["Freshness scoring", "Optional LLM analysis", "Topic presets"],
+    highlight: true,
+  },
+  {
+    label: "Output",
+    title: "Publish",
+    body: "Deliver a clean daily learning queue to the web, email, and local reports.",
+    items: ["GitHub Pages", "Email HTML", "Markdown reports"],
+  },
 ];
 ---
 
@@ -61,261 +121,298 @@ const features = [
   title="Aurora Digest | Personal AI Learning Radar"
   description="Aurora turns scattered AI news, repositories, and papers into one high-signal daily learning radar for builders."
 >
-  <Header />
-  <main
-    id="main-content"
-    data-layout="index"
-    data-home-path={homePath}
-    class="mx-auto w-full max-w-6xl px-4"
-  >
-    <section
-      id="product"
-      class="grid gap-10 border-border border-b py-14 sm:py-20 lg:grid-cols-[1fr_0.9fr] lg:items-center"
+  <div class="min-h-screen bg-[#f6f6f4] text-[#090912] dark:bg-[#080810] dark:text-white">
+    <Header />
+    <main
+      id="main-content"
+      data-layout="index"
+      data-home-path={homePath}
     >
-      <div>
-        <p class="text-accent text-sm font-semibold tracking-wide uppercase">
-          Aurora Unified Digest
-        </p>
-        <h1 class="mt-5 max-w-3xl text-4xl leading-tight font-semibold text-balance sm:text-5xl lg:text-6xl">
-          Your AI learning radar, rebuilt every morning.
+      <section
+        id="product"
+        class="mx-auto max-w-7xl px-5 pb-16 pt-20 text-center sm:px-8 sm:pb-20 sm:pt-28 lg:px-10"
+      >
+        <div class="aurora-page-enter mx-auto flex size-16 items-center justify-center overflow-hidden rounded-lg bg-[#05050d] p-3 shadow-sm dark:bg-white">
+          <img src={markImage} alt="" width="840" height="777" class="size-full object-contain" />
+        </div>
+        <h1 class="aurora-page-enter aurora-delay-1 mx-auto mt-8 max-w-6xl text-5xl leading-[1.07] font-semibold text-balance sm:text-6xl lg:text-7xl">
+          Your AI learning radar, <span class="text-[#74737e] dark:text-white/45">rebuilt every morning.</span>
         </h1>
-        <p class="text-muted-foreground mt-6 max-w-2xl text-lg leading-8">
-          Aurora turns scattered AI news, repositories, and research papers into
-          one compact briefing for builders who want to keep moving without
-          living in feeds.
+        <p class="aurora-page-enter aurora-delay-2 mx-auto mt-7 max-w-3xl text-lg leading-8 text-[#72717d] sm:text-xl dark:text-white/55">
+          Aurora turns scattered AI news, GitHub repositories, and research
+          papers into one compact daily briefing for builders who want a focused
+          learning queue.
         </p>
-        <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div class="aurora-page-enter aurora-delay-3 mt-10 flex flex-wrap items-center justify-center gap-4">
           <a
             href={latestDigestUrl}
-            class="bg-accent text-accent-foreground inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 font-semibold transition-opacity hover:opacity-90"
+            class="aurora-button-arrow inline-flex h-14 items-center justify-center gap-3 rounded-lg bg-[#05050d] px-7 text-base font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md active:translate-y-0 dark:bg-white dark:text-[#080810] dark:hover:bg-white/90"
           >
             Read Today's Digest
             <IconArrowRight class="inline-block rtl:-rotate-180" />
           </a>
           <a
-            href={githubUrl}
-            target="_blank"
-            rel="noreferrer"
-            class="border-border hover:border-accent/60 inline-flex items-center justify-center gap-2 rounded-md border px-5 py-3 font-semibold transition-colors"
+            href="#features"
+            class="inline-flex h-14 items-center justify-center gap-3 rounded-lg border border-black/10 bg-white px-7 text-base font-semibold text-[#090912] shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-[#fbfbfa] hover:shadow-md active:translate-y-0 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
           >
-            View on GitHub
+            View features
           </a>
         </div>
-        <div class="text-muted-foreground mt-8 grid max-w-xl grid-cols-3 gap-4 text-sm">
-          <p>
-            <span class="text-foreground block text-xl font-semibold">5</span>
-            tech signals
-          </p>
-          <p>
-            <span class="text-foreground block text-xl font-semibold">3</span>
-            repositories
-          </p>
-          <p>
-            <span class="text-foreground block text-xl font-semibold">3</span>
-            papers
-          </p>
-        </div>
-      </div>
+      </section>
 
-      <div class="relative">
-        <div class="absolute inset-0 -z-10 rounded-3xl bg-cyan-500/10 blur-3xl dark:bg-cyan-300/10" />
-        <div class="border-border bg-muted/20 overflow-hidden rounded-2xl border shadow-2xl shadow-cyan-950/10 dark:bg-slate-950/70">
-          <img
-            src={radarImage}
-            alt="Abstract Aurora radar visual"
-            width="1586"
-            height="992"
-            loading="eager"
-            decoding="async"
-            class="aspect-[16/10] w-full object-cover"
-          />
-          <div class="border-border border-t p-5">
-            <p class="text-muted-foreground text-xs tracking-wide uppercase">
-              Automated learning radar
+      <section class="mx-auto max-w-7xl px-5 pb-24 sm:px-8 lg:px-10">
+        <div class="relative min-h-[560px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-black/10 dark:border-white/10 dark:bg-white/[0.04] dark:hover:shadow-black/40">
+          <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.055)_1px,transparent_1px)] bg-[length:56px_56px] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_1px,transparent_1px)]" />
+          <div class="absolute left-1/2 top-1/2 h-px w-[74%] -translate-x-1/2 -translate-y-1/2 rotate-[18deg] bg-black/8 dark:bg-white/10" />
+          <div class="absolute left-1/2 top-1/2 h-px w-[70%] -translate-x-1/2 -translate-y-1/2 -rotate-[24deg] bg-black/8 dark:bg-white/10" />
+          <div class="absolute left-1/2 top-1/2 h-px w-[58%] -translate-x-1/2 -translate-y-1/2 rotate-[145deg] bg-black/8 dark:bg-white/10" />
+
+          <div class="absolute left-1/2 top-1/2 z-10 flex w-[76%] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-black/10 bg-[#f8f8f7] shadow-2xl shadow-black/15 dark:border-white/10 dark:bg-[#10131c]">
+            <img
+              src={overviewImage}
+              alt="Aurora Digest product overview"
+              width="1400"
+              height="735"
+              loading="eager"
+              decoding="async"
+              class="w-full object-cover"
+            />
+          </div>
+
+          {
+            floatingPanels.map(panel => (
+              <article
+                class={`aurora-interactive-card absolute z-20 hidden rounded-lg border border-black/10 bg-white/95 p-5 shadow-xl shadow-black/10 backdrop-blur md:block dark:border-white/10 dark:bg-[#111520]/95 ${panel.className}`}
+              >
+                <div class="flex items-center justify-between gap-3">
+                  <h3 class="text-sm font-semibold text-[#74737e] dark:text-white/55">
+                    {panel.title}
+                  </h3>
+                  <span class="size-2.5 rounded-full bg-[#080810] dark:bg-white" />
+                </div>
+                <div class="mt-3 text-2xl font-semibold">{panel.value}</div>
+                <p class="mt-3 text-sm leading-6 text-[#72717d] dark:text-white/55">
+                  {panel.body}
+                </p>
+              </article>
+            ))
+          }
+
+          <div class="absolute inset-x-5 bottom-5 z-20 grid gap-3 md:hidden">
+            {
+              floatingPanels.slice(0, 3).map(panel => (
+                <article class="aurora-interactive-card rounded-lg border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-[#111520]">
+                  <div class="flex items-center justify-between gap-3">
+                    <h3 class="text-sm font-semibold">{panel.title}</h3>
+                    <span class="text-sm font-medium text-[#72717d] dark:text-white/55">
+                      {panel.value}
+                    </span>
+                  </div>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section id="features" class="border-y border-black/10 bg-[#f1f1f0] dark:border-white/10 dark:bg-white/[0.03]">
+        <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10">
+          <div class="mx-auto max-w-5xl text-center">
+            <h2 class="text-4xl leading-tight font-semibold sm:text-5xl">
+              Everything you need for a daily AI learning loop.
+            </h2>
+            <p class="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+              A focused product surface for deciding what is worth reading,
+              studying, and experimenting with today.
             </p>
-            <div class="mt-3 grid grid-cols-2 gap-3 text-sm">
-              <span class="border-border rounded-md border px-3 py-2">
-                News
-              </span>
-              <span class="border-border rounded-md border px-3 py-2">
-                GitHub
-              </span>
-              <span class="border-border rounded-md border px-3 py-2">
-                Papers
-              </span>
-              <span class="border-border rounded-md border px-3 py-2">
-                Digest
-              </span>
+          </div>
+
+          <div class="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {
+              features.map(feature => (
+                <article class="aurora-interactive-card min-h-[232px] rounded-lg border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111520]">
+                  <div class="flex items-start justify-between gap-3">
+                    <span class="flex size-10 items-center justify-center rounded-lg bg-[#05050d] text-sm font-semibold text-white dark:bg-white dark:text-[#080810]">
+                      {feature.tag.slice(0, 1)}
+                    </span>
+                    <span class="rounded-lg bg-[#eeeeef] px-2.5 py-1 text-xs font-semibold text-[#262631] sm:text-sm dark:bg-white/10 dark:text-white/70">
+                      {feature.tag}
+                    </span>
+                  </div>
+                  <h3 class="mt-6 text-[1.75rem] leading-[1.15] font-semibold">
+                    {feature.title}
+                  </h3>
+                  <p class="mt-4 text-base leading-7 text-[#72717d] dark:text-white/55">
+                    {feature.body}
+                  </p>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section id="workflow" class="bg-[#f6f6f4] dark:bg-[#080810]">
+        <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10">
+          <div class="mx-auto max-w-5xl text-center">
+            <h2 class="text-4xl leading-tight font-semibold sm:text-5xl">
+              One polished automation workflow.
+            </h2>
+            <p class="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+              The product stays focused: collect, rank, publish. No dashboard
+              sprawl, no noisy archive on the homepage.
+            </p>
+          </div>
+
+          <div class="mt-14 overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-[#111520]">
+            <img
+              src={workflowImage}
+              alt="Aurora Digest workflow"
+              width="1400"
+              height="788"
+              loading="lazy"
+              decoding="async"
+              class="w-full object-cover"
+            />
+          </div>
+
+          <div class="mt-12 grid gap-8 lg:grid-cols-3">
+            {
+              workflow.map(step => (
+                <article
+                  class:list={[
+                    "aurora-interactive-card relative rounded-lg border bg-white p-8 shadow-sm dark:bg-[#111520]",
+                    step.highlight
+                      ? "border-[#080810] shadow-xl shadow-black/10 dark:border-white dark:shadow-black/40"
+                      : "border-black/10 dark:border-white/10",
+                  ]}
+                >
+                  {step.highlight ? (
+                    <span class="absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-lg bg-[#05050d] px-4 py-1.5 text-sm font-semibold text-white dark:bg-white dark:text-[#080810]">
+                      {step.label}
+                    </span>
+                  ) : (
+                    <span class="rounded-lg bg-[#eeeeef] px-3 py-1 text-sm font-semibold text-[#262631] dark:bg-white/10 dark:text-white/70">
+                      {step.label}
+                    </span>
+                  )}
+                  <h3 class="mt-8 text-3xl font-semibold">{step.title}</h3>
+                  <p class="mt-5 min-h-24 text-lg leading-8 text-[#72717d] dark:text-white/55">
+                    {step.body}
+                  </p>
+                  <ul class="mt-8 space-y-4">
+                    {step.items.map(item => (
+                      <li class="flex items-center gap-3 text-base font-medium text-[#262631] dark:text-white/75">
+                        <span class="size-2.5 rounded-full bg-[#080810] dark:bg-white" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </article>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+
+      <section id="digest" class="border-y border-black/10 bg-[#f1f1f0] dark:border-white/10 dark:bg-white/[0.03]">
+        <div class="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[0.85fr_1fr] lg:px-10">
+          <div>
+            <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
+              Live proof
+            </p>
+            <h2 class="mt-4 text-4xl leading-tight font-semibold sm:text-5xl">
+              The latest briefing is the product demo.
+            </h2>
+            <p class="mt-5 max-w-xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+              Aurora publishes a real digest every run. The homepage points to
+              the current edition, while the Digest page remains the archive.
+            </p>
+          </div>
+          <a
+            href={latestDigestUrl}
+            class="aurora-interactive-card group rounded-lg border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#111520]"
+          >
+            <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
+                  Today's Digest
+                </p>
+                <h3 class="mt-4 text-3xl leading-tight font-semibold">
+                  {latestDigest?.data.title ?? "Aurora Digest"}
+                </h3>
+                <p class="mt-4 max-w-xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+                  {
+                    latestDigest?.data.description ??
+                      "Open the digest archive to read the latest Aurora briefing."
+                  }
+                </p>
+                {
+                  latestDigest && (
+                    <div class="mt-6">
+                      <Datetime {...latestDigest.data} />
+                    </div>
+                  )
+                }
+              </div>
+              <div class="aurora-button-arrow flex shrink-0 items-center gap-3 font-semibold group-hover:text-[#080810] dark:group-hover:text-white">
+                <span>{digestDate || "Archive"}</span>
+                <IconArrowRight class="inline-block rtl:-rotate-180" />
+              </div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section class="bg-[#f6f6f4] dark:bg-[#080810]">
+        <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10">
+          <div class="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+            <div>
+              <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
+                Self-hosted
+              </p>
+              <h2 class="mt-4 text-4xl leading-tight font-semibold sm:text-5xl">
+                Run Aurora as your own learning infrastructure.
+              </h2>
+              <p class="mt-5 max-w-2xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+                Start with the public digest, then fork the repository when you
+                want your own topics, delivery settings, and scheduled runs.
+              </p>
+              <div class="mt-8 flex flex-wrap gap-4">
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  class="aurora-button-arrow inline-flex h-13 items-center justify-center gap-3 rounded-lg bg-[#05050d] px-6 text-base font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-black hover:shadow-md dark:bg-white dark:text-[#080810] dark:hover:bg-white/90"
+                >
+                  Explore repository
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </a>
+                <a
+                  href={digestArchiveUrl}
+                  class="inline-flex h-13 items-center justify-center rounded-lg border border-black/10 bg-white px-6 text-base font-semibold text-[#090912] shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-[#fbfbfa] dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+                >
+                  Open digest archive
+                </a>
+              </div>
+            </div>
+            <div class="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-[#111520]">
+              <img
+                src={dashboardImage}
+                alt="Aurora Digest web surface"
+                width="1400"
+                height="788"
+                loading="lazy"
+                decoding="async"
+                class="w-full object-cover"
+              />
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <section class="grid gap-8 border-border border-b py-12 sm:py-16 lg:grid-cols-[0.7fr_1fr]">
-      <div>
-        <p class="text-muted-foreground text-sm tracking-wide uppercase">
-          The problem
-        </p>
-        <h2 class="mt-3 text-3xl leading-tight font-semibold">
-          AI learning is scattered across too many surfaces.
-        </h2>
-      </div>
-      <div class="text-muted-foreground grid gap-4 text-base leading-7 sm:grid-cols-2">
-        <p class="border-border rounded-xl border p-5">
-          News gives you urgency, but rarely tells you what is worth studying.
-        </p>
-        <p class="border-border rounded-xl border p-5">
-          GitHub exposes what builders are adopting, but the signal is noisy.
-        </p>
-        <p class="border-border rounded-xl border p-5">
-          Papers hold durable ideas, but they are hard to triage every day.
-        </p>
-        <p class="border-border rounded-xl border p-5">
-          Aurora compresses that scan into a single reading queue.
-        </p>
-      </div>
-    </section>
-
-    <section id="workflow" class="border-border border-b py-12 sm:py-16">
-      <div class="max-w-2xl">
-        <p class="text-muted-foreground text-sm tracking-wide uppercase">
-          Workflow
-        </p>
-        <h2 class="mt-3 text-3xl leading-tight font-semibold">
-          From raw sources to a daily briefing.
-        </h2>
-      </div>
-      <div class="mt-8 grid gap-4 lg:grid-cols-4">
-        {
-          workflowSteps.map(([title, body], index) => (
-            <article class="border-border bg-muted/20 rounded-xl border p-5">
-              <span class="text-accent text-sm font-semibold">
-                0{index + 1}
-              </span>
-              <h3 class="mt-4 font-semibold">{title}</h3>
-              <p class="text-muted-foreground mt-3 text-sm leading-6">{body}</p>
-            </article>
-          ))
-        }
-      </div>
-      <div class="border-border mt-6 rounded-2xl border p-5">
-        <div class="grid gap-3 text-sm sm:grid-cols-4">
-          <span class="rounded-lg bg-cyan-500/10 px-3 py-3 text-cyan-700 dark:text-cyan-200">
-            Sources
-          </span>
-          <span class="rounded-lg bg-emerald-500/10 px-3 py-3 text-emerald-700 dark:text-emerald-200">
-            Ranking
-          </span>
-          <span class="rounded-lg bg-violet-500/10 px-3 py-3 text-violet-700 dark:text-violet-200">
-            Enrichment
-          </span>
-          <span class="rounded-lg bg-amber-500/10 px-3 py-3 text-amber-700 dark:text-amber-200">
-            Digest
-          </span>
-        </div>
-      </div>
-    </section>
-
-    <section class="border-border border-b py-12 sm:py-16">
-      <div class="max-w-2xl">
-        <p class="text-muted-foreground text-sm tracking-wide uppercase">
-          Product
-        </p>
-        <h2 class="mt-3 text-3xl leading-tight font-semibold">
-          Built for a focused daily learning loop.
-        </h2>
-      </div>
-      <div class="mt-8 grid gap-4 sm:grid-cols-2">
-        {
-          features.map(([title, body]) => (
-            <article class="border-border hover:border-accent/40 rounded-xl border p-5 transition-colors">
-              <h3 class="font-semibold">{title}</h3>
-              <p class="text-muted-foreground mt-3 leading-7">{body}</p>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <section id="digest" class="grid gap-8 border-border border-b py-12 sm:py-16 lg:grid-cols-[0.7fr_1fr]">
-      <div>
-        <p class="text-muted-foreground text-sm tracking-wide uppercase">
-          Live proof
-        </p>
-        <h2 class="mt-3 text-3xl leading-tight font-semibold">
-          The latest briefing is always one click away.
-        </h2>
-      </div>
-      <a
-        href={latestDigestUrl}
-        class="group border-border bg-muted/20 hover:border-accent/50 rounded-2xl border p-6 transition-colors"
-      >
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p class="text-muted-foreground text-sm tracking-wide uppercase">
-              Today's Digest
-            </p>
-            <h3 class="text-accent mt-3 text-2xl font-semibold">
-              {latestDigest?.data.title ?? "Aurora Digest"}
-            </h3>
-            <p class="text-muted-foreground mt-3 max-w-xl leading-7">
-              {
-                latestDigest?.data.description ??
-                  "Open the digest archive to read the latest Aurora briefing."
-              }
-            </p>
-            {
-              latestDigest && (
-                <div class="mt-4">
-                  <Datetime {...latestDigest.data} />
-                </div>
-              )
-            }
-          </div>
-          <div class="flex items-center gap-3 font-semibold group-hover:text-accent">
-            <span>{digestDate || "Archive"}</span>
-            <IconArrowRight class="inline-block rtl:-rotate-180" />
-          </div>
-        </div>
-      </a>
-    </section>
-
-    <section class="grid gap-8 py-12 sm:py-16 lg:grid-cols-[1fr_0.8fr] lg:items-center">
-      <div>
-        <p class="text-muted-foreground text-sm tracking-wide uppercase">
-          Open source
-        </p>
-        <h2 class="mt-3 text-3xl leading-tight font-semibold">
-          Run Aurora as your own learning infrastructure.
-        </h2>
-        <p class="text-muted-foreground mt-4 max-w-2xl leading-7">
-          Aurora is designed to run from configuration, scheduled automation,
-          and static publishing. Start with the public digest, then self-host it
-          when you want your own topics and delivery settings.
-        </p>
-      </div>
-      <div class="border-border rounded-2xl border p-6">
-        <p class="text-sm font-semibold">Self-hostable today</p>
-        <ul class="text-muted-foreground mt-4 space-y-3 text-sm">
-          <li>GitHub Actions schedule</li>
-          <li>Email-ready HTML output</li>
-          <li>GitHub Pages static archive</li>
-          <li>Configurable topics for repos and papers</li>
-        </ul>
-        <a
-          href={githubUrl}
-          target="_blank"
-          rel="noreferrer"
-          class="mt-6 inline-flex items-center gap-2 font-semibold text-accent"
-        >
-          Explore the repository
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </a>
-      </div>
-    </section>
-  </main>
-  <Footer />
+      </section>
+    </main>
+    <Footer />
+  </div>
 </Layout>
 
 <script>

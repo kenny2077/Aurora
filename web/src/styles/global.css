@@ -38,6 +38,62 @@
 }
 
 @layer components {
+  .aurora-page-enter {
+    animation: aurora-page-enter 680ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .aurora-delay-1 {
+    animation-delay: 80ms;
+  }
+
+  .aurora-delay-2 {
+    animation-delay: 160ms;
+  }
+
+  .aurora-delay-3 {
+    animation-delay: 240ms;
+  }
+
+  .aurora-interactive-card {
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease,
+      border-color 220ms ease,
+      background-color 220ms ease;
+    will-change: transform;
+  }
+
+  .aurora-interactive-card:hover {
+    transform: translate3d(0, -4px, 0);
+    box-shadow:
+      0 18px 42px rgba(9, 9, 18, 0.1),
+      0 0 0 1px rgba(9, 9, 18, 0.04);
+  }
+
+  .aurora-button-arrow svg {
+    transition: transform 180ms ease;
+  }
+
+  .aurora-button-arrow:hover svg {
+    transform: translate3d(3px, 0, 0);
+  }
+
+  .aurora-float-one {
+    animation: aurora-float-one 8s ease-in-out infinite;
+  }
+
+  .aurora-float-two {
+    animation: aurora-float-two 9s ease-in-out infinite;
+  }
+
+  .aurora-float-three {
+    animation: aurora-float-three 10s ease-in-out infinite;
+  }
+
+  .aurora-float-four {
+    animation: aurora-float-four 8.5s ease-in-out infinite;
+  }
+
   .aurora-digest-prose h2 {
     @apply border-border mt-10 border-b pb-2 not-italic;
   }
@@ -96,4 +152,82 @@
     @apply border-border bg-muted/35 my-3 rounded-lg border border-s-4 border-s-blue-600 px-4 py-3 text-sm;
   }
 
+}
+
+@keyframes aurora-page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: blur(0);
+  }
+}
+
+@keyframes aurora-float-one {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate3d(0, -18px, 0) rotate(1deg);
+  }
+}
+
+@keyframes aurora-float-two {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(1deg);
+  }
+
+  50% {
+    transform: translate3d(0, 16px, 0) rotate(-1deg);
+  }
+}
+
+@keyframes aurora-float-three {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(1deg);
+  }
+
+  50% {
+    transform: translate3d(16px, -12px, 0) rotate(-1deg);
+  }
+}
+
+@keyframes aurora-float-four {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate3d(-14px, 12px, 0) rotate(1deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-page-enter,
+  .aurora-float-one,
+  .aurora-float-two,
+  .aurora-float-three,
+  .aurora-float-four {
+    animation: none;
+  }
+
+  .aurora-interactive-card,
+  .aurora-button-arrow svg {
+    transition: none;
+  }
+
+  .aurora-interactive-card:hover,
+  .aurora-button-arrow:hover svg {
+    transform: none;
+  }
 }
