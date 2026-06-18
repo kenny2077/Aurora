@@ -39,25 +39,25 @@ const floatingPanels = [
     title: "News",
     value: "5 signals",
     body: "Timely AI and technology stories compressed into a short scan.",
-    className: "left-[7%] top-[12%] w-[250px] aurora-float-one",
+    className: "left-[4%] top-[11%] w-[230px] aurora-float-one",
   },
   {
     title: "GitHub",
     value: "3 repos",
     body: "Active projects selected for adoption, quality, and learning value.",
-    className: "right-[8%] top-[11%] w-[250px] aurora-float-two",
+    className: "right-[4%] top-[11%] w-[230px] aurora-float-two",
   },
   {
     title: "Papers",
     value: "3 reads",
     body: "Research papers filtered into a practical study queue.",
-    className: "left-[14%] bottom-[13%] w-[260px] aurora-float-three",
+    className: "left-[3%] bottom-[10%] w-[230px] aurora-float-three",
   },
   {
     title: "Delivery",
     value: "Email + Pages",
     body: "One digest rendered for inboxes, RSS, and a static web archive.",
-    className: "right-[12%] bottom-[14%] w-[270px] aurora-float-four",
+    className: "right-[3%] bottom-[10%] w-[230px] aurora-float-four",
   },
 ];
 
@@ -161,13 +161,13 @@ const workflow = [
       </section>
 
       <section class="mx-auto max-w-7xl px-5 pb-24 sm:px-8 lg:px-10">
-        <div class="relative min-h-[560px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-black/10 dark:border-white/10 dark:bg-white/[0.04] dark:hover:shadow-black/40">
+        <div class="relative min-h-[620px] overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition-shadow duration-300 hover:shadow-xl hover:shadow-black/10 dark:border-white/10 dark:bg-white/[0.04] dark:hover:shadow-black/40">
           <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.055)_1px,transparent_1px)] bg-[length:56px_56px] dark:bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.08)_1px,transparent_1px)]" />
           <div class="absolute left-1/2 top-1/2 h-px w-[74%] -translate-x-1/2 -translate-y-1/2 rotate-[18deg] bg-black/8 dark:bg-white/10" />
           <div class="absolute left-1/2 top-1/2 h-px w-[70%] -translate-x-1/2 -translate-y-1/2 -rotate-[24deg] bg-black/8 dark:bg-white/10" />
           <div class="absolute left-1/2 top-1/2 h-px w-[58%] -translate-x-1/2 -translate-y-1/2 rotate-[145deg] bg-black/8 dark:bg-white/10" />
 
-          <div class="absolute left-1/2 top-1/2 z-10 flex w-[76%] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-black/10 bg-[#f8f8f7] shadow-2xl shadow-black/15 dark:border-white/10 dark:bg-[#10131c]">
+          <div class="absolute left-1/2 top-1/2 z-10 flex w-[78%] max-w-3xl -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-black/10 bg-[#f8f8f7] shadow-2xl shadow-black/15 md:w-[68%] xl:w-[52%] dark:border-white/10 dark:bg-[#10131c]">
             <img
               src={overviewImage}
               alt="Aurora Digest product overview"
@@ -182,7 +182,7 @@ const workflow = [
           {
             floatingPanels.map(panel => (
               <article
-                class={`aurora-interactive-card absolute z-20 hidden rounded-lg border border-black/10 bg-white/95 p-5 shadow-xl shadow-black/10 backdrop-blur md:block dark:border-white/10 dark:bg-[#111520]/95 ${panel.className}`}
+                class={`aurora-interactive-card absolute z-20 hidden rounded-lg border border-black/10 bg-white/95 p-5 shadow-xl shadow-black/10 backdrop-blur xl:block dark:border-white/10 dark:bg-[#111520]/95 ${panel.className}`}
               >
                 <div class="flex items-center justify-between gap-3">
                   <h3 class="text-sm font-semibold text-[#74737e] dark:text-white/55">
