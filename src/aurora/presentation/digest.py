@@ -293,6 +293,8 @@ def _repo_badges(metadata: dict[str, Any]) -> list[str]:
 
 def _repo_quality_label(metadata: dict[str, Any]) -> str:
     configured = str(metadata.get("quality_label") or "").strip()
+    if configured.lower() == "fallback":
+        return "Learning Pick"
     if configured:
         return configured.replace("_", " ").title()
     stars = _int_metadata(metadata, "stars")

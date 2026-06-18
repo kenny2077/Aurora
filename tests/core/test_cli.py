@@ -503,7 +503,7 @@ def test_run_prints_ai_usage_and_public_copy_quality(tmp_path: Path, monkeypatch
     ) in output
     assert (
         "unified_digest: public copy 11 checked, 9 polished, 1 repaired, "
-        "1 replaced, 1 failed"
+        "1 sanitized, 1 replaced, 1 failed, 0 delivery blocked"
     ) in output
 
 
@@ -578,8 +578,10 @@ class _ObservabilityEnrich:
             "checked": 11,
             "polished": 9,
             "repaired": 1,
+            "sanitized": 1,
             "replaced": 1,
             "failed": 1,
+            "delivery_blocked": 0,
             "details": [],
         }
         return [items[0].model_copy(update={"final_score": 8.0})]

@@ -456,8 +456,10 @@ def _print_public_copy_quality(result: Any) -> None:
         f"{_int_value(quality, 'checked')} checked, "
         f"{_int_value(quality, 'polished')} polished, "
         f"{_int_value(quality, 'repaired')} repaired, "
+        f"{_int_value(quality, 'sanitized')} sanitized, "
         f"{_int_value(quality, 'replaced')} replaced, "
-        f"{_int_value(quality, 'failed')} failed"
+        f"{_int_value(quality, 'failed')} failed, "
+        f"{_int_value(quality, 'delivery_blocked')} delivery blocked"
     )
 
 

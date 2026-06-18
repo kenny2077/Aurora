@@ -155,9 +155,35 @@ class PipelineRunner:
         rendered_digest = rendered_digest.model_copy(
             update={"metadata": {**rendered_digest.metadata, "run_summary": run_summary}}
         )
-        delivery_results = await pipeline.deliver_stage.deliver(rendered_digest, context)
         run_summary_path = run_dir / "run_summary.json"
         output_paths["run_summary"] = run_summary_path
+        try:
+            delivery_results = await pipeline.deliver_stage.deliver(rendered_digest, context)
+        except Exception as exc:
+            delivery_results = [
+                DeliveryResult(
+                    channel="delivery",
+                    ok=False,
+                    error=_redact_secret_like_text(str(exc)),
+                )
+            ]
+            final_run_summary = _run_summary(
+                run_id=context.run_id,
+                mode=pipeline.mode,
+                raw_count=len(raw_items),
+                normalized_count=len(normalized_items),
+                deduplicated_count=len(deduplicated_items),
+                score_result_count=len(score_results),
+                enriched_count=len(enriched_items),
+                source_statuses=source_statuses,
+                delivery_results=delivery_results,
+                output_paths=output_paths,
+                source_quality=context.metadata.get("source_quality"),
+                context_metadata=context.metadata,
+            )
+            _write_json(run_summary_path, final_run_summary)
+            raise
+
         final_run_summary = _run_summary(
             run_id=context.run_id,
             mode=pipeline.mode,
@@ -347,8 +373,10 @@ def _public_copy_quality_summary(context_metadata: dict[str, Any] | None) -> dic
         "replaced",
         "failed",
         "polish_failed",
+        "sanitized",
         "replacement_attempted",
         "replacement_succeeded",
+        "delivery_blocked",
     ):
         try:
             summary[key] = int(quality.get(key) or 0)

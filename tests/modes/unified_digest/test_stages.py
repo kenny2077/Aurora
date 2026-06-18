@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import httpx
+import pytest
 
 from aurora.config import AuroraConfig, RunConfig, UnifiedDigestModeConfig
 from aurora.config import ScholarModeConfig
@@ -18,7 +19,10 @@ from aurora.modes.unified_digest.stages import (
     UnifiedEnrichStage,
     UnifiedFetchStage,
 )
-from aurora.modes.unified_digest.quality import public_copy_quality
+from aurora.modes.unified_digest.quality import (
+    audit_rendered_public_digest,
+    public_copy_quality,
+)
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
 
 
@@ -570,7 +574,7 @@ def test_unified_rendering_uses_polished_news_summary_fallback() -> None:
     )
 
     assert "   - Source: GitHub Releases" in summary
-    assert "vllm-project/vllm v0.23.0 release" in summary
+    assert "The release highlights" in summary
     assert "updates #" not in summary
     assert "faster inference paths" in summary
     assert "github_releases" not in summary
@@ -689,6 +693,33 @@ def test_public_copy_quality_rejects_visible_digest_slop() -> None:
             ),
         ),
         _item(
+            "news:june18-similar",
+            "news",
+            "GLM-5.2 - Simon Willison",
+            9.0,
+            source="rss",
+            metadata={"feed_name": "Simon Willison"},
+            summary="GLM-5.2 - Simon Willison: GLM-5.2 is a new reasoning model. Similar i.",
+        ),
+        _item(
+            "news:june18-and",
+            "news",
+            "Context intelligence in AWS Developer tools",
+            9.0,
+            source="rss",
+            metadata={"feed_name": "AWS Machine Learning Blog"},
+            summary="Context intelligence in AWS Developer tools: AWS describes context intelligence for developer tools and.",
+        ),
+        _item(
+            "news:title-restatement",
+            "news",
+            "Introducing OpenAI Partner Network",
+            9.0,
+            source="rss",
+            metadata={"feed_name": "OpenAI News"},
+            summary="Introducing OpenAI Partner Network launches the OpenAI Partner Network.",
+        ),
+        _item(
             "paper:raw-voice",
             "paper",
             "TuneJury",
@@ -714,7 +745,46 @@ def test_public_copy_quality_rejects_visible_digest_slop() -> None:
         "dangling_fragment",
         "release_note_remnant",
         "raw_abstract_voice",
+        "title_restatement",
     }
+
+
+def test_rendered_public_digest_audit_blocks_public_slop() -> None:
+    audit = audit_rendered_public_digest(
+        "# Aurora Unified Digest\n\n## Tech News\n\n"
+        "Simon Willison covers Why AI has not replaced software engineers, with why AI has not replaced software engineers.\n\n"
+        "## Source Health\n\nrun-20260618T052001Z\n",
+        "<section>Release Notes</section>",
+    )
+
+    assert not audit.ok
+    assert set(audit.reasons) >= {
+        "source_covers_template",
+        "release_note_remnant",
+        "visible_diagnostics",
+        "public_run_id",
+    }
+
+
+def test_rendered_public_digest_audit_accepts_clean_digest() -> None:
+    audit = audit_rendered_public_digest(
+        "# Aurora Unified Digest\n\n"
+        "## Tech News\n\n"
+        "1. [Useful update](https://example.com)\n"
+        "   - Source: OpenAI News\n"
+        "   - Summary: The update explains a practical deployment change for AI teams.\n\n"
+        "## GitHub Repos\n\n"
+        "1. [org/repo](https://github.com/org/repo)\n"
+        "   - 12k stars | 800 forks | 10 open issues\n"
+        "   - Value: This repo is useful for learning a production agent workflow.\n\n"
+        "## Research Papers\n\n"
+        "1. [Paper](https://example.com/paper)\n"
+        "   - Source: ICLR 2026 (Oral)\n"
+        "   - Description: This paper explains a practical way to evaluate agents.\n",
+        "<section><h2>Tech News</h2><p>The update explains a practical deployment change.</p></section>",
+    )
+
+    assert audit.ok
 
 
 def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
@@ -796,6 +866,7 @@ def test_unified_enrich_replaces_june_16_style_slop_after_failed_polish(monkeypa
             "research agent that demonstrates this pattern end to end. This walkthrough "
             "targets developers building multi-step AI workflows who need."
         ),
+        raw_content="",
     )
     replacement_news = _item(
         "news:replacement",
@@ -837,6 +908,51 @@ def test_unified_enrich_replaces_june_16_style_slop_after_failed_polish(monkeypa
     assert context.metadata["unified_selected_item_ids"][0] == "news:replacement"
     assert context.metadata["public_copy_quality"]["replacement_attempted"] >= 1
     assert context.metadata["public_copy_quality"]["replacement_succeeded"] == 1
+
+
+def test_unified_enrich_sanitizes_weak_public_copy_before_replacement(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    weak_news = _item(
+        "news:weak-june18",
+        "news",
+        "Context intelligence in AWS Developer tools",
+        10.0,
+        source="rss",
+        metadata={"feed_name": "AWS Machine Learning Blog"},
+        summary="Context intelligence in AWS Developer tools: AWS describes context intelligence and.",
+        raw_content="AWS describes context intelligence features for developer tools.",
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient([_payload(summary="Context intelligence and.")])).enrich(
+            [
+                weak_news,
+                _item("repo:1", "repo", "Repo", 8.0, why_it_matters="This repo teaches a useful workflow."),
+                _item("paper:1", "paper", "Paper", 8.0, summary="This paper explains a practical agent benchmark."),
+            ],
+            [],
+            context,
+        )
+    )
+    summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
+
+    assert "Context intelligence and." not in summary
+    assert "The update describes AWS describes context intelligence features" in summary
+    assert context.metadata["public_copy_quality"]["sanitized"] >= 1
 
 
 def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
@@ -917,6 +1033,7 @@ def test_unified_enrich_replaces_item_when_repair_still_fails(monkeypatch) -> No
         source="rss",
         metadata={"feed_name": "Weak Feed"},
         summary="Weak Feed covers Weak News, with weak news.",
+        raw_content="",
     )
     replacement_news = _item(
         "news:replacement",
@@ -988,6 +1105,27 @@ def test_unified_enrich_records_budget_skip_without_crashing() -> None:
     assert [item.id for item in enriched] == ["news:weak", "repo:1", "paper:1"]
     assert context.metadata["ai_usage"]["skipped_by_budget"] >= 1
     assert context.metadata["public_copy_quality"]["failed"] >= 1
+
+
+def test_unified_delivery_blocks_failed_public_audit_before_downstream() -> None:
+    delivered: list[str] = []
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Aurora Unified Digest",
+        markdown="# Aurora Unified Digest\n\n## Tech News\n\nRelease Notes",
+        metadata={"selected_item_ids": ["news:weak"], "recommended_repo_ids": []},
+    )
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    with pytest.raises(RuntimeError, match="public digest delivery blocked"):
+        asyncio.run(
+            UnifiedDeliveryStage(RepoLearningStateStore(Path("/tmp/aurora-test-state.json")), _Deliver(delivered)).deliver(
+                rendered, context
+            )
+        )
+
+    assert delivered == []
+    assert context.metadata["public_copy_quality"]["delivery_blocked"] == 1
 
 
 def test_unified_rendering_prefers_polished_news_notes() -> None:

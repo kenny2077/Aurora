@@ -125,6 +125,13 @@ class FailingNormalize:
         raise RuntimeError("normalize failed")
 
 
+class FailingDeliver:
+    async def deliver(
+        self, rendered: RenderedDigest, context: StageContext
+    ) -> list[DeliveryResult]:
+        raise RuntimeError("delivery blocked")
+
+
 def _pipeline(calls: list[str], fetch_stages=None, normalize_stage=None) -> ModePipeline:
     return ModePipeline(
         mode="tech_news",
@@ -345,6 +352,8 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
                 "repaired": 2,
                 "replaced": 1,
                 "failed": 1,
+                "sanitized": 1,
+                "delivery_blocked": 0,
                 "details": [
                     {
                         "item_id": "repo:weak",
@@ -368,8 +377,10 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
         "replaced": 1,
         "failed": 1,
         "polish_failed": 0,
+        "sanitized": 1,
         "replacement_attempted": 0,
         "replacement_succeeded": 0,
+        "delivery_blocked": 0,
         "details": [
             {
                 "item_id": "repo:weak",
@@ -380,6 +391,37 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
             }
         ],
     }
+
+
+def test_pipeline_runner_writes_run_summary_when_delivery_raises(tmp_path) -> None:
+    calls: list[str] = []
+    pipeline = _pipeline(calls)
+    pipeline = ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=pipeline.enrich_stage,
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=FailingDeliver(),
+    )
+
+    with pytest.raises(RuntimeError, match="delivery blocked"):
+        asyncio.run(
+            PipelineRunner(tmp_path).run(
+                pipeline,
+                StageContext(mode="tech_news", run_id="blocked"),
+            )
+        )
+
+    payload = __import__("json").loads(
+        (tmp_path / "blocked" / "tech_news" / "run_summary.json").read_text(encoding="utf-8")
+    )
+    assert payload["delivery_results"][0]["ok"] is False
+    assert payload["delivery_results"][0]["channel"] == "delivery"
+    assert "delivery blocked" in payload["delivery_results"][0]["error"]
 
 
 def test_pipeline_runner_redacts_secret_like_error_values_in_run_summary(tmp_path) -> None:

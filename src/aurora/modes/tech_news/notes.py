@@ -72,7 +72,7 @@ def display_tech_news_source(item: SignalItem) -> str:
 def display_tech_news_summary(item: SignalItem) -> str:
     """Return the public one-sentence summary for a news item."""
     if not is_low_quality_note(item.summary):
-        return clean_note_text(item.summary)
+        return _public_sentence(clean_note_text(item.summary), item.title)
     return display_tech_news_why(item)
 
 
@@ -84,6 +84,8 @@ def clean_note_text(value: str) -> str:
     text = URL_PATTERN.sub(" ", text)
     text = re.sub(r"(?m)^\s{0,3}#{1,6}\s+", " ", text)
     text = re.sub(r"\[([^\]]+)\]\([^)]*\)", r"\1", text)
+    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
+    text = re.sub(r"(?m)^\s*[*-]\s+", " ", text)
     text = text.replace("`", " ")
     text = re.sub(r"\s+", " ", text)
     return text.strip(" \t\r\n#-:;,")
@@ -103,6 +105,10 @@ def is_low_quality_note(value: str) -> bool:
         return True
     lowered = cleaned.lower()
     if "flagged this" in lowered and "story as timely" in lowered:
+        return True
+    if re.search(r"\bRelease Notes\b", cleaned):
+        return True
+    if _has_dangling_end(cleaned):
         return True
     if len(cleaned) < 20:
         return True
@@ -138,11 +144,10 @@ def _rss_notes(item: SignalItem) -> TechNewsNotes:
         return _github_release_notes(item)
 
     metadata = item.metadata
-    subject = _subject_from_title(item.title)
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
-        excerpt = clean_note_text(item.title) or "the reported development"
-    why = f"{subject}: {_sentence_fragment(excerpt, 180)}."
+        excerpt = clean_note_text(item.title)
+    why = _prefixed_public_sentence("The update describes", excerpt, item.title)
     learning = f"Use it to understand the concrete change: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -160,7 +165,7 @@ def _github_release_notes(item: SignalItem) -> TechNewsNotes:
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = f"{title} ships a new project release."
-    why = f"{title} release: {_sentence_fragment(excerpt, 180)}."
+    why = _prefixed_public_sentence("The release highlights", excerpt, item.title)
     learning = f"Use it to identify the practical release changes: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -212,16 +217,63 @@ def _sentence_fragment(value: str, limit: int) -> str:
     text = _truncate(value, limit).strip()
     if not text:
         return "a practical technology update"
+    if len(text) > 1 and text[:2].isupper():
+        return text.rstrip(".")
     return text[:1].lower() + text[1:].rstrip(".")
 
 
-def _subject_from_title(value: str) -> str:
-    title = clean_note_text(value)
-    if not title:
-        return "a practical technology update"
-    match = re.search(r"\bwith\s+(.+)$", title, flags=re.IGNORECASE)
-    if match:
-        subject = clean_note_text(match.group(1))
-        if 3 <= len(subject) <= 80:
-            return subject
-    return title
+def _prefixed_public_sentence(prefix: str, value: str, title: str) -> str:
+    text = _public_sentence(_strip_title_prefix(value, title), "")
+    text = _sentence_fragment(text, 180)
+    if not text or _has_dangling_end(text):
+        return "This item points to a practical AI tooling or research update worth checking from the source."
+    return f"{prefix} {text}."
+
+
+def _public_sentence(value: str, title: str) -> str:
+    text = _strip_title_prefix(value, title)
+    text = _truncate(text, 220).strip(" \t\r\n#-:;,.")
+    while _has_dangling_end(text) and " " in text:
+        text = text.rsplit(" ", 1)[0].strip(" \t\r\n#-:;,.")
+    if not text:
+        return "This item points to a practical AI tooling or research update worth checking from the source."
+    return text if text[-1] in ".!?" else f"{text}."
+
+
+def _strip_title_prefix(value: str, title: str) -> str:
+    text = clean_note_text(value)
+    title_text = clean_note_text(title)
+    if title_text:
+        text = re.sub(rf"^\s*{re.escape(title_text)}\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
+    return text.strip(" \t\r\n#-:;,.")
+
+
+def _has_dangling_end(value: str) -> bool:
+    lowered = value.strip().lower().rstrip(".")
+    if not lowered:
+        return True
+    endings = (
+        " who need",
+        " they enable",
+        " a vs",
+        " b vs",
+        " and",
+        " or",
+        " of",
+        " to",
+        " for",
+        " from",
+        " by",
+        " as",
+        " in",
+        " on",
+        " with",
+        " that",
+        " which",
+        " because",
+        " similar i",
+    )
+    if lowered.endswith(endings):
+        return True
+    words = re.findall(r"[a-z0-9]+", lowered)
+    return bool(words and len(words[-1]) <= 2 and words[-1] not in {"ai", "ml", "rl", "ui", "ux", "os", "go", "js", "m3"})

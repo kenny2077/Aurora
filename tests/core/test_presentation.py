@@ -78,6 +78,23 @@ def test_repo_card_escapes_text_and_rejects_unsafe_urls() -> None:
     assert safe_url("javascript:alert(1)") == "#"
 
 
+def test_repo_card_hides_internal_fallback_quality_label() -> None:
+    item = _repo(
+        "org/fallback",
+        metadata={
+            "full_name": "org/fallback",
+            "quality_label": "fallback",
+            "language": "TypeScript",
+        },
+        why="This repo is useful for learning a practical workflow.",
+    )
+
+    html = render_repo_card(item)
+
+    assert "Fallback" not in html
+    assert "Learning Pick" in html
+
+
 def test_repo_digest_html_handles_missing_optional_metadata() -> None:
     item = _repo(
         "org/minimal",
@@ -199,7 +216,7 @@ def test_unified_digest_html_escapes_generated_item_text() -> None:
     assert "<b>unsafe summary</b>" not in web_html
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in web_html
     assert "&lt;b&gt;unsafe summary&lt;/b&gt;" not in web_html
-    assert "Unsafe alert(1): unsafe alert(1)." in web_html
+    assert "The update describes unsafe." in web_html
     assert "Feed covers" not in web_html
     assert "Feed" in web_html
     assert "<unsafe>" not in web_html

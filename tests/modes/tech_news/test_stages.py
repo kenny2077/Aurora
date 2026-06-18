@@ -333,7 +333,7 @@ def test_enricher_generates_clean_rss_learning_notes() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("Nvidia releases a compact AI workstation:")
+    assert enriched.why_it_matters.startswith("The update describes")
     assert "local inference" in enriched.learning_value
     for value in (enriched.why_it_matters, enriched.learning_value):
         assert "<p>" not in value
@@ -364,7 +364,7 @@ def test_enricher_generates_mature_rss_fallback_summary() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("Agent-EvalKit:")
+    assert enriched.why_it_matters.startswith("The update describes")
     assert "repeatable benchmarks" in enriched.why_it_matters
     assert "covers" not in enriched.why_it_matters
     assert "flagged this" not in enriched.why_it_matters
@@ -391,10 +391,34 @@ def test_github_release_uses_public_source_label_and_release_summary() -> None:
 
     assert "GitHub Releases" in summary
     assert "github_releases" not in summary
-    assert "vllm-project/vllm v0.23.0 release" in enriched.why_it_matters
+    assert enriched.why_it_matters.startswith("The release highlights")
     assert "faster inference paths" in enriched.why_it_matters
+    assert "Release Notes" not in enriched.why_it_matters
     assert "updates #" not in enriched.why_it_matters
     assert "flagged this" not in enriched.why_it_matters
+
+
+def test_deterministic_news_fallback_removes_title_prefix_and_dangling_fragments() -> None:
+    item = _item(
+        "news:aws",
+        "Context intelligence in AWS Developer tools",
+        "https://example.com/aws",
+        source="rss",
+        metadata={"feed_name": "AWS Machine Learning Blog"},
+        raw_content=(
+            "Context intelligence in AWS Developer tools: AWS describes context-aware "
+            "developer workflows for teams building agents and."
+        ),
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+
+    assert enriched.why_it_matters.startswith("The update describes")
+    assert "Context intelligence in AWS Developer tools:" not in enriched.why_it_matters
+    assert not enriched.why_it_matters.endswith("and.")
 
 
 def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> None:
