@@ -61,39 +61,6 @@ const floatingPanels = [
   },
 ];
 
-const features = [
-  {
-    tag: "Radar",
-    title: "Cross-source signal",
-    body: "Aurora reads across news, repositories, and papers so your daily scan is not trapped in one feed.",
-  },
-  {
-    tag: "Rank",
-    title: "Learning-first selection",
-    body: "The digest favors usefulness, freshness, adoption, and practical study value over raw popularity.",
-  },
-  {
-    tag: "Digest",
-    title: "Compact by design",
-    body: "The unified digest stays intentionally small: 5 news items, 3 repos, and 3 papers.",
-  },
-  {
-    tag: "Output",
-    title: "Built for publishing",
-    body: "Render the same daily brief to email, GitHub Pages, RSS, Markdown, and local HTML.",
-  },
-  {
-    tag: "Control",
-    title: "Self-hosted workflow",
-    body: "Run it locally or from GitHub Actions with topic presets for your own learning priorities.",
-  },
-  {
-    tag: "Trace",
-    title: "Diagnostics stay private",
-    body: "Operational source health and run summaries stay in logs and artifacts, not the reader-facing digest.",
-  },
-];
-
 const workflow = [
   {
     label: "Input",
@@ -152,10 +119,10 @@ const workflow = [
             <IconArrowRight class="inline-block rtl:-rotate-180" />
           </a>
           <a
-            href="#features"
+            href="#workflow"
             class="inline-flex h-14 items-center justify-center gap-3 rounded-lg border border-black/10 bg-white px-7 text-base font-semibold text-[#090912] shadow-sm transition hover:-translate-y-0.5 hover:border-black/20 hover:bg-[#fbfbfa] hover:shadow-md active:translate-y-0 dark:border-white/10 dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
           >
-            View features
+            See workflow
           </a>
         </div>
       </section>
@@ -208,43 +175,6 @@ const workflow = [
                       {panel.value}
                     </span>
                   </div>
-                </article>
-              ))
-            }
-          </div>
-        </div>
-      </section>
-
-      <section id="features" class="border-y border-black/10 bg-[#f1f1f0] dark:border-white/10 dark:bg-white/[0.03]">
-        <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10">
-          <div class="mx-auto max-w-5xl text-center">
-            <h2 class="text-4xl leading-tight font-semibold sm:text-5xl">
-              Everything you need for a daily AI learning loop.
-            </h2>
-            <p class="mx-auto mt-5 max-w-3xl text-lg leading-8 text-[#72717d] dark:text-white/55">
-              A focused product surface for deciding what is worth reading,
-              studying, and experimenting with today.
-            </p>
-          </div>
-
-          <div class="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {
-              features.map(feature => (
-                <article class="aurora-interactive-card min-h-[232px] rounded-lg border border-black/10 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-[#111520]">
-                  <div class="flex items-start justify-between gap-3">
-                    <span class="flex size-10 items-center justify-center rounded-lg bg-[#05050d] text-sm font-semibold text-white dark:bg-white dark:text-[#080810]">
-                      {feature.tag.slice(0, 1)}
-                    </span>
-                    <span class="rounded-lg bg-[#eeeeef] px-2.5 py-1 text-xs font-semibold text-[#262631] sm:text-sm dark:bg-white/10 dark:text-white/70">
-                      {feature.tag}
-                    </span>
-                  </div>
-                  <h3 class="mt-6 text-[1.75rem] leading-[1.15] font-semibold">
-                    {feature.title}
-                  </h3>
-                  <p class="mt-4 text-base leading-7 text-[#72717d] dark:text-white/55">
-                    {feature.body}
-                  </p>
                 </article>
               ))
             }
@@ -315,33 +245,42 @@ const workflow = [
         </div>
       </section>
 
-      <section id="digest" class="border-y border-black/10 bg-[#f1f1f0] dark:border-white/10 dark:bg-white/[0.03]">
-        <div class="mx-auto grid max-w-7xl gap-10 px-5 py-20 sm:px-8 lg:grid-cols-[0.85fr_1fr] lg:px-10">
-          <div>
+      <section
+        id="digest"
+        class="flex min-h-screen items-center border-y border-black/10 bg-[#f1f1f0] dark:border-white/10 dark:bg-white/[0.03]"
+      >
+        <div class="mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-28 sm:px-8 lg:grid-cols-[0.78fr_1fr] lg:px-10">
+          <div class="max-w-xl">
             <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
               Live proof
             </p>
             <h2 class="mt-4 text-4xl leading-tight font-semibold sm:text-5xl">
-              The latest briefing is the product demo.
+              Read the signal. Skip the feed.
             </h2>
-            <p class="mt-5 max-w-xl text-lg leading-8 text-[#72717d] dark:text-white/55">
-              Aurora publishes a real digest every run. The homepage points to
-              the current edition, while the Digest page remains the archive.
+            <p class="mt-5 text-lg leading-8 text-[#72717d] dark:text-white/55">
+              The current digest is the live product surface: a small daily
+              queue of news, repos, and papers worth opening.
             </p>
+            <a
+              href={digestArchiveUrl}
+              class="mt-8 inline-flex text-base font-semibold text-[#090912] underline decoration-black/20 underline-offset-8 hover:decoration-black dark:text-white dark:decoration-white/25"
+            >
+              Browse the archive
+            </a>
           </div>
           <a
             href={latestDigestUrl}
             class="aurora-interactive-card group rounded-lg border border-black/10 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-[#111520]"
           >
-            <div class="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+            <div class="flex flex-col gap-8">
               <div>
                 <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
                   Today's Digest
                 </p>
-                <h3 class="mt-4 text-3xl leading-tight font-semibold">
+                <h3 class="mt-4 text-3xl leading-tight font-semibold sm:text-4xl">
                   {latestDigest?.data.title ?? "Aurora Digest"}
                 </h3>
-                <p class="mt-4 max-w-xl text-lg leading-8 text-[#72717d] dark:text-white/55">
+                <p class="mt-5 max-w-2xl text-lg leading-8 text-[#72717d] dark:text-white/55">
                   {
                     latestDigest?.data.description ??
                       "Open the digest archive to read the latest Aurora briefing."
@@ -355,19 +294,23 @@ const workflow = [
                   )
                 }
               </div>
-              <div class="aurora-button-arrow flex shrink-0 items-center gap-3 font-semibold group-hover:text-[#080810] dark:group-hover:text-white">
-                <span>{digestDate || "Archive"}</span>
-                <IconArrowRight class="inline-block rtl:-rotate-180" />
+              <div class="flex items-center justify-between gap-4 border-t border-black/10 pt-6 dark:border-white/10">
+                <span class="text-sm font-semibold text-[#72717d] dark:text-white/45">
+                  {digestDate || "Archive"}
+                </span>
+                <span class="aurora-button-arrow flex shrink-0 items-center gap-3 font-semibold group-hover:text-[#080810] dark:group-hover:text-white">
+                  Open digest
+                  <IconArrowRight class="inline-block rtl:-rotate-180" />
+                </span>
               </div>
             </div>
           </a>
         </div>
       </section>
 
-      <section class="bg-[#f6f6f4] dark:bg-[#080810]">
-        <div class="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:px-10">
-          <div class="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-            <div>
+      <section class="flex min-h-screen items-center bg-[#f6f6f4] dark:bg-[#080810]">
+        <div class="mx-auto grid w-full max-w-7xl items-center gap-14 px-5 py-28 sm:px-8 lg:grid-cols-[0.9fr_1fr] lg:px-10">
+          <div class="max-w-2xl">
               <p class="text-sm font-semibold tracking-wide text-[#72717d] uppercase dark:text-white/45">
                 Self-hosted
               </p>
@@ -395,8 +338,8 @@ const workflow = [
                   Open digest archive
                 </a>
               </div>
-            </div>
-            <div class="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-[#111520]">
+          </div>
+          <div class="overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm dark:border-white/10 dark:bg-[#111520]">
               <img
                 src={dashboardImage}
                 alt="Aurora Digest web surface"
@@ -406,7 +349,6 @@ const workflow = [
                 decoding="async"
                 class="w-full object-cover"
               />
-            </div>
           </div>
         </div>
       </section>
