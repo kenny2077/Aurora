@@ -844,6 +844,72 @@
         "year": 2025
       }
     },
+    "title:map multi human value alignment palette": {
+      "cached_at": "2026-06-18T05:22:05.984677+00:00",
+      "data": {
+        "abstract": "Ensuring that generative AI systems align with human values is essential but challenging, especially when considering multiple human values and their potential trade-offs. Since human values can be personalized and dynamically change over time, the desirable levels of value alignment vary across different ethnic groups, industry sectors, and user cohorts. Within existing frameworks, it is hard to define human values and align AI systems accordingly across different directions simultaneously, such as harmlessness, helpfulness, and positiveness. To address this, we develop a novel, first-principle approach called Multi-Human-Value Alignment Palette (MAP), which navigates the alignment across multiple human values in a structured and reliable way. MAP formulates the alignment problem as an optimization task with user-defined constraints, which define human value targets. It can be efficiently solved via a primal-dual approach, which determines whether a user-defined alignment target is achievable and how to achieve it. We conduct a detailed theoretical analysis of MAP by quantifying the trade-offs between values, the sensitivity to constraints, the fundamental connection between multi-value alignment and sequential alignment, and proving that linear weighted rewards are sufficient for multi-value alignment. Extensive experiments demonstrate MAP's ability to align multiple values in a principled manner while delivering strong empirical performance across various tasks.",
+        "authors": [
+          {
+            "authorId": "2154500473",
+            "name": "Xinran Wang"
+          },
+          {
+            "authorId": "2196888402",
+            "name": "Qi Le"
+          },
+          {
+            "authorId": "2374426191",
+            "name": "Ammar Ahmed"
+          },
+          {
+            "authorId": "51298945",
+            "name": "Enmao Diao"
+          },
+          {
+            "authorId": "2328261510",
+            "name": "Yi Zhou"
+          },
+          {
+            "authorId": "2478882",
+            "name": "Nathalie Baracaldo"
+          },
+          {
+            "authorId": "2325532018",
+            "name": "Jie Ding"
+          },
+          {
+            "authorId": "2297772064",
+            "name": "Ali Anwar"
+          }
+        ],
+        "citationCount": 18,
+        "externalIds": {
+          "ArXiv": "2410.19198",
+          "CorpusId": 273638073,
+          "DBLP": "journals/corr/abs-2410-19198",
+          "DOI": "10.48550/arXiv.2410.19198"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2410.19198, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "a84fb42549a5fd8c0e298dc9bad50890a5647539",
+        "title": "MAP: Multi-Human-Value Alignment Palette",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work develops a novel, first-principle approach called Multi-Human-Value Alignment Palette (MAP), which navigates the alignment across multiple human values in a structured and reliable way and proves that linear weighted rewards are sufficient for multi-value alignment."
+        },
+        "url": "https://www.semanticscholar.org/paper/a84fb42549a5fd8c0e298dc9bad50890a5647539",
+        "venue": "International Conference on Learning Representations",
+        "year": 2024
+      }
+    },
     "title:near optimal experiment design in linear non gaussian cyclic models": {
       "cached_at": "2026-06-16T06:09:58.725560+00:00",
       "data": {
@@ -885,6 +951,64 @@
         "tldr": null,
         "url": "https://www.semanticscholar.org/paper/627aee54b3a69adfe5b0be7d6c62cee8d746562b",
         "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:online preference alignment for language models via count based exploration": {
+      "cached_at": "2026-06-18T05:20:40.364987+00:00",
+      "data": {
+        "abstract": "Reinforcement Learning from Human Feedback (RLHF) has shown great potential in fine-tuning Large Language Models (LLMs) to align with human preferences. Existing methods perform preference alignment from a fixed dataset, which can be limited in data coverage, and the resulting reward model is hard to generalize in out-of-distribution responses. Thus, online RLHF is more desirable to empower the LLM to explore outside the support of the initial dataset by iteratively collecting the prompt-response pairs. In this paper, we study the fundamental problem in online RLHF, i.e. \\emph{how to explore} for LLM. We give a theoretical motivation in linear reward assumption to show that an optimistic reward with an upper confidence bound (UCB) term leads to a provably efficient RLHF policy. Then, we reformulate our objective to direct preference optimization with an exploration term, where the UCB-term can be converted to a count-based exploration bonus. We further propose a practical algorithm, named \\emph{Count-based Online Preference Optimization (COPO)}, which leverages a simple coin-flip counting module to estimate the pseudo-count of a prompt-response pair in previously collected data. COPO encourages LLMs to balance exploration and preference optimization in an iterative manner, which enlarges the exploration space and the entire data coverage of iterative LLM policies. We conduct online RLHF experiments on Zephyr and Llama-3 models. The results on instruction-following and standard academic benchmarks show that COPO significantly increases performance.",
+        "authors": [
+          {
+            "authorId": "2320302313",
+            "name": "Chenjia Bai"
+          },
+          {
+            "authorId": "2301230693",
+            "name": "Yang Zhang"
+          },
+          {
+            "authorId": "2399100616",
+            "name": "Shuang Qiu"
+          },
+          {
+            "authorId": "2279764018",
+            "name": "Qiaosheng Zhang"
+          },
+          {
+            "authorId": "2301112904",
+            "name": "Kang Xu"
+          },
+          {
+            "authorId": "2295686463",
+            "name": "Xuelong Li"
+          }
+        ],
+        "citationCount": 31,
+        "externalIds": {
+          "ArXiv": "2501.12735",
+          "CorpusId": 275787972,
+          "DBLP": "conf/iclr/BaiZQZXL25",
+          "DOI": "10.48550/arXiv.2501.12735"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 1,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2501.12735, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c927d4c668339147fdee3353f110b6d254babe0f",
+        "title": "Online Preference Alignment for Language Models via Count-based Exploration",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A practical algorithm, named COPO, which leverages a simple coin-flip counting module to estimate the pseudo-count of a prompt-response pair in previously collected data, and encourages LLMs to balance exploration and preference optimization in an iterative manner, which enlarges the exploration space and the entire data coverage of iterative LLM policies."
+        },
+        "url": "https://www.semanticscholar.org/paper/c927d4c668339147fdee3353f110b6d254babe0f",
+        "venue": "International Conference on Learning Representations",
         "year": 2025
       }
     },
@@ -1090,6 +1214,69 @@
         "year": 2025
       }
     },
+    "title:protein design with dynamic protein vocabulary": {
+      "cached_at": "2026-06-18T05:20:44.317106+00:00",
+      "data": {
+        "abstract": "Protein design is a fundamental challenge in biotechnology, aiming to design novel sequences with specific functions within the vast space of possible proteins. Recent advances in deep generative models have enabled function-based protein design from textual descriptions, yet struggle with structural plausibility. Inspired by classical protein design methods that leverage natural protein structures, we explore whether incorporating fragments from natural proteins can enhance foldability in generative models. Our empirical results show that even random incorporation of fragments improves foldability. Building on this insight, we introduce ProDVa, a novel protein design approach that integrates a text encoder for functional descriptions, a protein language model for designing proteins, and a fragment encoder to dynamically retrieve protein fragments based on textual functional descriptions. Experimental results demonstrate that our approach effectively designs protein sequences that are both functionally aligned and structurally plausible. Compared to state-of-the-art models, ProDVa achieves comparable function alignment using less than 0.04% of the training data, while designing significantly more well-folded proteins, with the proportion of proteins having pLDDT above 70 increasing by 7.38% and those with PAE below 10 increasing by 9.6%.",
+        "authors": [
+          {
+            "authorId": "2323745041",
+            "name": "Nuowei Liu"
+          },
+          {
+            "authorId": "2363498462",
+            "name": "Jiahao Kuang"
+          },
+          {
+            "authorId": "2325779096",
+            "name": "Yanting Liu"
+          },
+          {
+            "authorId": "2293568236",
+            "name": "Changzhi Sun"
+          },
+          {
+            "authorId": "2309500964",
+            "name": "Tao Ji"
+          },
+          {
+            "authorId": "2309669217",
+            "name": "Yuanbin Wu"
+          },
+          {
+            "authorId": "49284832",
+            "name": "Man Lan"
+          }
+        ],
+        "citationCount": 10,
+        "externalIds": {
+          "ArXiv": "2505.18966",
+          "CorpusId": 278905508,
+          "DBLP": "journals/corr/abs-2505-18966",
+          "DOI": "10.48550/arXiv.2505.18966"
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Biology"
+        ],
+        "influentialCitationCount": 5,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2505.18966, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8728223d2918f4e45f06bd0cf1a67c9b506e1a0b",
+        "title": "Protein Design with Dynamic Protein Vocabulary",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "ProDVa is a novel protein design approach that integrates a text encoder for functional descriptions, a protein language model for designing proteins, and a fragment encoder to dynamically retrieve protein fragments based on textual functional descriptions that effectively designs protein sequences that are both functionally aligned and structurally plausible."
+        },
+        "url": "https://www.semanticscholar.org/paper/8728223d2918f4e45f06bd0cf1a67c9b506e1a0b",
+        "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
     "title:q rag long context multi step retrieval via value based embedder training": {
       "cached_at": "2026-06-14T05:18:22.735087+00:00",
       "data": {
@@ -1162,6 +1349,64 @@
         "url": "https://www.semanticscholar.org/paper/b57baae6e74b90ab3e9bcc921ec651121894b8dc",
         "venue": "arXiv.org",
         "year": 2025
+      }
+    },
+    "title:rm bench benchmarking reward models of language models with subtlety and style": {
+      "cached_at": "2026-06-18T05:21:53.701049+00:00",
+      "data": {
+        "abstract": "Reward models are critical in techniques like Reinforcement Learning from Human Feedback (RLHF) and Inference Scaling Laws, where they guide language model alignment and select optimal responses. Despite their importance, existing reward model benchmarks often evaluate models by asking them to distinguish between responses generated by models of varying power. However, this approach fails to assess reward models on subtle but critical content changes and variations in style, resulting in a low correlation with policy model performance. To this end, we introduce RM-Bench, a novel benchmark designed to evaluate reward models based on their sensitivity to subtle content differences and resistance to style biases. Extensive experiments demonstrate that RM-Bench strongly correlates with policy model performance, making it a reliable reference for selecting reward models to align language models effectively. We evaluate nearly 40 reward models on RM-Bench. Our results reveal that even state-of-the-art models achieve an average performance of only 46.6%, which falls short of random-level accuracy (50%) when faced with style bias interference. These findings highlight the significant room for improvement in current reward models. Related code and data are available at https://github.com/THU-KEG/RM-Bench.",
+        "authors": [
+          {
+            "authorId": "2211723524",
+            "name": "Yantao Liu"
+          },
+          {
+            "authorId": "1423719712",
+            "name": "Zijun Yao"
+          },
+          {
+            "authorId": "2327045786",
+            "name": "Rui Min"
+          },
+          {
+            "authorId": "2266430822",
+            "name": "Yixin Cao"
+          },
+          {
+            "authorId": "2284777109",
+            "name": "Lei Hou"
+          },
+          {
+            "authorId": "2294164848",
+            "name": "Juanzi Li"
+          }
+        ],
+        "citationCount": 152,
+        "externalIds": {
+          "ArXiv": "2410.16184",
+          "CorpusId": 273507377,
+          "DBLP": "journals/corr/abs-2410-16184",
+          "DOI": "10.48550/arXiv.2410.16184"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 33,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2410.16184, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "cb6de49a43808a5d15f91ed113d90134b19498b4",
+        "title": "RM-Bench: Benchmarking Reward Models of Language Models with Subtlety and Style",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "RM-Bench is introduced, a novel benchmark designed to evaluate reward models based on their sensitivity to subtle content differences and resistance to style biases, and it is revealed that even state-of-the-art models achieve an average performance, which falls short of random-level accuracy when faced with style bias interference."
+        },
+        "url": "https://www.semanticscholar.org/paper/cb6de49a43808a5d15f91ed113d90134b19498b4",
+        "venue": "International Conference on Learning Representations",
+        "year": 2024
       }
     },
     "title:t regs minimum spanning tree regularization for self supervised learning": {
@@ -1331,6 +1576,80 @@
         },
         "url": "https://www.semanticscholar.org/paper/3b430f665a04e8ccc5fac30ff39b42d4c6cc893d",
         "venue": "arXiv.org",
+        "year": 2025
+      }
+    },
+    "title:unicbe an uniformity driven comparing based evaluation framework with unified multi objective optimization": {
+      "cached_at": "2026-06-18T05:21:09.470288+00:00",
+      "data": {
+        "abstract": "Human preference plays a significant role in measuring large language models and guiding them to align with human values. Unfortunately, current comparing-based evaluation (CBE) methods typically focus on a single optimization objective, failing to effectively utilize scarce yet valuable preference signals. To address this, we delve into key factors that can enhance the accuracy, convergence, and scalability of CBE: suppressing sampling bias, balancing descending process of uncertainty, and mitigating updating uncertainty. Following the derived guidelines, we propose UniCBE, a unified uniformity-driven CBE framework which simultaneously optimize these core objectives by constructing and integrating three decoupled sampling probability matrices, each designed to ensure uniformity in specific aspects. We further ablate the optimal tuple sampling and preference aggregation strategies to achieve efficient CBE. On the AlpacaEval benchmark, UniCBE saves over 17% of evaluation budgets while achieving a Pearson correlation with ground truth exceeding 0.995, demonstrating excellent accuracy and convergence. In scenarios where new models are continuously introduced, UniCBE can even save over 50% of evaluation costs, highlighting its improved scalability.",
+        "authors": [
+          {
+            "authorId": "2253609260",
+            "name": "Peiwen Yuan"
+          },
+          {
+            "authorId": "1519472504",
+            "name": "Shaoxiong Feng"
+          },
+          {
+            "authorId": "2275295939",
+            "name": "Yiwei Li"
+          },
+          {
+            "authorId": "2254837328",
+            "name": "Xinglin Wang"
+          },
+          {
+            "authorId": "2318565828",
+            "name": "Yueqi Zhang"
+          },
+          {
+            "authorId": "2256650286",
+            "name": "Jiayi Shi"
+          },
+          {
+            "authorId": "2319243853",
+            "name": "Chuyi Tan"
+          },
+          {
+            "authorId": "2275135250",
+            "name": "Boyuan Pan"
+          },
+          {
+            "authorId": "2309659583",
+            "name": "Yao Hu"
+          },
+          {
+            "authorId": "2253855196",
+            "name": "Kan Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2502.11454",
+          "CorpusId": 276409021,
+          "DBLP": "conf/iclr/YuanFLWZSTPHL25",
+          "DOI": "10.48550/arXiv.2502.11454"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2502.11454, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "fc9afd6d1b1ca7daa585ed2b8b5ef0545ac52066",
+        "title": "UniCBE: An Uniformity-driven Comparing Based Evaluation Framework with Unified Multi-Objective Optimization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "UniCBE is proposed, a unified uniformity-driven CBE framework which simultaneously optimize these core objectives by constructing and integrating three decoupled sampling probability matrices, each designed to ensure uniformity in specific aspects."
+        },
+        "url": "https://www.semanticscholar.org/paper/fc9afd6d1b1ca7daa585ed2b8b5ef0545ac52066",
+        "venue": "International Conference on Learning Representations",
         "year": 2025
       }
     },
