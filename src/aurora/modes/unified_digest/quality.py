@@ -233,6 +233,17 @@ def _public_text(item: SignalItem) -> str:
         return item.summary or item.why_it_matters or display_tech_news_summary(item)
     if item.type == "paper":
         return format_paper_description(item)
+    if item.type == "repo":
+        return _repo_public_text(item)
+    return raw_repo_value(item)
+
+
+def _repo_public_text(item: SignalItem) -> str:
+    metadata = item.metadata
+    for candidate in (metadata.get("description"), item.summary, item.raw_content):
+        text = " ".join(str(candidate or "").split()).strip()
+        if text:
+            return text
     return raw_repo_value(item)
 
 

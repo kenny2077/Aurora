@@ -6,6 +6,7 @@ from collections import Counter
 from collections.abc import Sequence
 from datetime import datetime, timezone
 from html import escape
+import re
 from typing import Any
 from urllib.parse import urlparse
 
@@ -100,7 +101,7 @@ def render_unified_digest_html(
         if item_type == "repo":
             sections.append(
                 '<section class="aurora-section"><h2>GitHub Repos</h2>'
-                + "".join(render_repo_card(item) for item in items)
+                + "".join(render_unified_repo_card(item) for item in items)
                 + "</section>"
             )
         else:
@@ -134,6 +135,24 @@ def render_repo_card(item: SignalItem) -> str:
         f'<p class="aurora-meta">{escape(stats)}</p>'
         f"{badge_html}"
         f'{_callout("Value", format_repo_value(item), "aurora-callout")}'
+        "</article>"
+    )
+
+
+def render_unified_repo_card(item: SignalItem) -> str:
+    """Return the compact unified-digest repository card."""
+    metadata = item.metadata
+    title = str(metadata.get("full_name") or item.title)
+    stats = _repo_stats_compact(metadata)
+    description = _repo_description(item)
+    badges = _repo_core_tags(metadata)
+    badge_html = "".join(f'<span class="aurora-badge">{escape(badge)}</span>' for badge in badges)
+    return (
+        '<article class="aurora-card aurora-repo-card">'
+        f'<h3><a {link_attrs(str(item.url))}>{escape(title)}</a></h3>'
+        f'<p class="aurora-meta">{escape(stats)}</p>'
+        f"<p>{escape(description)}</p>"
+        f"{badge_html}"
         "</article>"
     )
 
@@ -277,6 +296,15 @@ def _repo_stats(metadata: dict[str, Any]) -> str:
     )
 
 
+def _repo_stats_compact(metadata: dict[str, Any]) -> str:
+    return " | ".join(
+        [
+            f"{format_count(metadata.get('stars'))} stars",
+            f"{format_count(metadata.get('forks'))} forks",
+        ]
+    )
+
+
 def _repo_badges(metadata: dict[str, Any]) -> list[str]:
     badges: list[str] = [_repo_quality_label(metadata)]
     language = str(metadata.get("language") or "").strip()
@@ -289,6 +317,26 @@ def _repo_badges(metadata: dict[str, Any]) -> list[str]:
         if len(badges) >= 4:
             break
     return badges
+
+
+def _repo_core_tags(metadata: dict[str, Any], *, limit: int = 3) -> list[str]:
+    tags: list[str] = []
+    language = str(metadata.get("language") or "").strip()
+    if language:
+        tags.append(f"# {language}")
+    for topic in metadata.get("topics") or []:
+        topic_text = _format_repo_topic(topic)
+        if topic_text and topic_text not in tags:
+            tags.append(topic_text)
+        if len(tags) >= limit:
+            break
+    return tags[:limit]
+
+
+def _format_repo_topic(value: object) -> str:
+    text = str(value or "").strip().replace("-", " ").replace("_", " ")
+    text = " ".join(text.split())
+    return f"# {text}" if text else ""
 
 
 def _repo_quality_label(metadata: dict[str, Any]) -> str:
@@ -317,6 +365,34 @@ def _callout(label: str, value: str, class_name: str) -> str:
     if not text:
         return ""
     return f'<div class="{class_name}"><b>{escape(label)}:</b> {escape(text)}</div>'
+
+
+def _repo_description(item: SignalItem) -> str:
+    metadata = item.metadata
+    for candidate in (
+        metadata.get("description"),
+        item.summary,
+        item.raw_content,
+        item.why_it_matters,
+    ):
+        text = " ".join(str(candidate or "").split()).strip()
+        if text:
+            return _short_repo_description(text)
+    return "Repository for learning practical AI development patterns."
+
+
+def _short_repo_description(value: str, *, limit: int = 180) -> str:
+    text = value.strip()
+    sentences = _split_sentences(text)
+    if sentences:
+        text = sentences[0]
+    if len(text) <= limit:
+        return text
+    return text[: limit - 3].rsplit(" ", 1)[0].rstrip(" ,;:") + "..."
+
+
+def _split_sentences(value: str) -> list[str]:
+    return [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", value) if sentence.strip()]
 
 
 def _top_item(items: Sequence[SignalItem], item_type: str) -> SignalItem | None:

@@ -476,6 +476,7 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
         why_it_matters="org/noisy is worth studying because it has concrete learning evidence.",
         learning_value="Study examples/quickstart.py and pyproject.toml.",
         action_items=["Inspect examples/quickstart.py."],
+        raw_content="Useful repo content",
     )
     paper = _item("paper:1", "paper", "Paper", 8.0)
     news = _item("news:1", "news", "News", 7.0)
@@ -487,17 +488,19 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "### Repo to Study" not in summary
     assert "## GitHub Repos" in summary
     assert "/10" not in summary
-    assert "   - 6k stars | 420 forks | 12 open issues" in summary
+    assert "   - 6k stars | 420 forks" in summary
+    assert "open issues" not in summary
     assert "concrete learning evidence" not in summary
-    assert "   - Value: org/noisy is useful for studying its architecture" in summary
+    assert "   - Description: Useful repo content" in summary
+    assert "   - Tags: # Python, # agents, # mcp" in summary
     assert "   - Why:" not in summary
     assert "   - Study:" not in summary
     assert "license" not in summary
     assert "homepage" not in summary
     assert "   - Evidence:" not in summary
     assert "   - Files:" not in summary
-    assert "Python" not in summary
-    assert "agents" not in summary
+    assert "# Python" in summary
+    assert "# agents" in summary
     assert "   - Watch:" not in summary
     assert "## Research Papers" in summary
     assert "## Tech News" in summary
@@ -511,9 +514,65 @@ def test_unified_rendering_shows_repo_cards_with_evidence_blocks() -> None:
     assert "Python" in str(rendered.metadata["web_html"])
     assert "agents" in str(rendered.metadata["web_html"])
     assert "<b>Why:</b>" not in str(rendered.metadata["web_html"])
-    assert "<b>Value:</b>" in str(rendered.metadata["web_html"])
+    assert "<b>Value:</b>" not in str(rendered.metadata["web_html"])
+    assert "Useful repo content" in str(rendered.metadata["web_html"])
     assert "<b>Study:</b>" not in str(rendered.metadata["web_html"])
     assert "Watch:" not in str(rendered.metadata["web_html"])
+
+
+def test_unified_repo_cards_use_compact_stats_description_and_core_tags() -> None:
+    config = UnifiedDigestModeConfig(
+        max_items_per_type=8,
+        max_total_items=20,
+        section_order=["repo", "paper", "news"],
+    )
+    repo = _item(
+        "repo:org/agent-kit",
+        "repo",
+        "org/agent-kit",
+        9.0,
+        url="https://github.com/org/agent-kit",
+        metadata={
+            "full_name": "org/agent-kit",
+            "stars": 133_400,
+            "forks": 18_300,
+            "open_issues": 77,
+            "language": "Python",
+            "topics": ["ai-agent", "ai-coding-assistant", "workflow"],
+            "description": "The open source coding agent.",
+        },
+        why_it_matters="LLM value should not be needed for the compact repo card.",
+        raw_content="The open source coding agent.",
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [repo],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+    rendered = asyncio.run(
+        UnifiedDigestRenderer(config).render(
+            summary,
+            [repo],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+    web_html = str(rendered.metadata["web_html"])
+
+    assert "133.4k stars | 18.3k forks" in summary
+    assert "open issues" not in summary
+    assert "Description: The open source coding agent." in summary
+    assert "Tags: # Python, # ai agent, # ai coding assistant" in summary
+    assert "Value:" not in summary
+    assert "LLM value should not be needed" not in summary
+    assert "133.4k stars | 18.3k forks" in web_html
+    assert "77 open issues" not in web_html
+    assert "The open source coding agent." in web_html
+    assert "# Python" in web_html
+    assert "# ai agent" in web_html
+    assert "# ai coding assistant" in web_html
+    assert "<b>Value:</b>" not in web_html
 
 
 def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
@@ -738,7 +797,6 @@ def test_public_copy_quality_rejects_visible_digest_slop() -> None:
     assert {reason for result in failures for reason in result.reasons} >= {
         "raw_markdown",
         "source_covers_template",
-        "deterministic_repo_evidence",
         "generic_scholar_fallback",
         "truncated_raw_abstract",
         "duplicated_title_prefix",
@@ -836,6 +894,7 @@ def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
             "repo",
             "org/agent-kit",
             9.0,
+            metadata={"description": "A compact agent workflow toolkit."},
             why_it_matters="This repo teaches a useful agent workflow with clear examples.",
         ),
         _item(
@@ -854,7 +913,6 @@ def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
     )
     payloads = [
         _payload(summary="Polished news explains why the research-agent workflow matters for builders."),
-        _payload(why="org/agent-kit is valuable for learning how agent workflows are packaged and tested."),
         _payload(summary="This paper gives students a practical way to understand agent benchmark design."),
     ]
 
@@ -866,9 +924,9 @@ def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
     )
 
     assert "Polished news explains why the research-agent workflow matters for builders." in summary
-    assert "org/agent-kit is valuable for learning how agent workflows are packaged and tested." in summary
+    assert "A compact agent workflow toolkit." in summary
     assert "This paper gives students a practical way to understand agent benchmark design." in summary
-    assert context.metadata["public_copy_quality"]["polished"] == 3
+    assert context.metadata["public_copy_quality"]["polished"] == 2
     assert context.metadata["public_copy_quality"]["repaired"] == 0
 
 
@@ -1007,6 +1065,7 @@ def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
             "repo",
             "org/repo",
             9.0,
+            metadata={"description": "A compact production AI tooling example."},
             why_it_matters="org/repo is worth studying because it has concrete learning evidence: 57k stars.",
         ),
         _item(
@@ -1029,17 +1088,31 @@ def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
     )
 
     enriched = asyncio.run(
-        UnifiedEnrichStage(client=_FakeAIClient(_repair_payloads())).enrich(items, [], context)
+        UnifiedEnrichStage(
+            client=_FakeAIClient(
+                [
+                    _payload(
+                        summary="Release notes highlight faster and more reliable vLLM serving for production inference."
+                    ),
+                    _payload(
+                        summary=(
+                            "This paper studies streaming reasoning for inputs that arrive over time. "
+                            "It is useful for understanding agents that must react while context is still changing."
+                        )
+                    ),
+                ]
+            )
+        ).enrich(items, [], context)
     )
     summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
 
     assert "Release notes highlight faster and more reliable vLLM serving for production inference." in summary
-    assert "org/repo is useful for learning how production AI tooling is structured" in summary
+    assert "A compact production AI tooling example." in summary
     assert "This paper studies streaming reasoning for inputs that arrive over time" in summary
     assert "updates #" not in summary
     assert "concrete learning evidence" not in summary
     assert context.metadata["unified_selected_item_ids"] == ["news:weak", "repo:weak", "paper:weak"]
-    assert context.metadata["public_copy_quality"]["repaired"] == 3
+    assert context.metadata["public_copy_quality"]["repaired"] == 2
 
 
 def test_unified_enrich_replaces_item_when_repair_still_fails(monkeypatch) -> None:

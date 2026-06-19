@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from datetime import datetime
 
@@ -306,8 +307,9 @@ def _section_item_lines(index: int, item: SignalItem) -> list[str]:
     if item.type == "repo":
         return [
             f"{index}. [{item.title}]({item.url})",
-            f"   - {_repo_stats_text(item.metadata)}",
-            f"   - Value: {_why_text(item)}",
+            f"   - {_repo_stats_compact_text(item.metadata)}",
+            f"   - Description: {_repo_description_text(item)}",
+            f"   - Tags: {_repo_tags_text(item.metadata)}",
         ]
     if item.type == "paper":
         return [
@@ -620,6 +622,54 @@ def _repo_stats_text(metadata: dict) -> str:
             f"{_format_count(metadata.get('open_issues'))} open issues",
         ]
     )
+
+
+def _repo_stats_compact_text(metadata: dict) -> str:
+    return " | ".join(
+        [
+            f"{_format_count(metadata.get('stars'))} stars",
+            f"{_format_count(metadata.get('forks'))} forks",
+        ]
+    )
+
+
+def _repo_description_text(item: SignalItem) -> str:
+    metadata = item.metadata
+    for candidate in (
+        metadata.get("description"),
+        item.summary,
+        item.raw_content,
+        item.why_it_matters,
+    ):
+        text = " ".join(str(candidate or "").split()).strip()
+        if text:
+            return _first_sentence(_excerpt(text, 180))
+    return "Repository for learning practical AI development patterns."
+
+
+def _repo_tags_text(metadata: dict, *, limit: int = 3) -> str:
+    tags: list[str] = []
+    language = str(metadata.get("language") or "").strip()
+    if language:
+        tags.append(f"# {language}")
+    for topic in metadata.get("topics") or []:
+        text = _repo_topic_tag(topic)
+        if text and text not in tags:
+            tags.append(text)
+        if len(tags) >= limit:
+            break
+    return ", ".join(tags[:limit]) or "# repository"
+
+
+def _repo_topic_tag(value: object) -> str:
+    text = str(value or "").strip().replace("-", " ").replace("_", " ")
+    text = " ".join(text.split())
+    return f"# {text}" if text else ""
+
+
+def _first_sentence(value: str) -> str:
+    match = re.split(r"(?<=[.!?])\s+", value.strip(), maxsplit=1)
+    return match[0].strip() if match and match[0].strip() else value.strip()
 
 
 def _format_count(value: object) -> str:

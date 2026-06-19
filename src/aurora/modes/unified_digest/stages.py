@@ -281,6 +281,9 @@ async def _accept_or_repair_public_copy(
     diagnostics["checked"] += 1
     action = "polish_requested" if quality.ok else "repair_requested"
     _record_quality_detail(diagnostics, item, action, quality.reasons)
+    if item.type == "repo" and quality.ok:
+        _record_quality_detail(diagnostics, item, "repo_metadata_public_copy_accepted", [])
+        return item
     polished = await repairer.repair(item, context)
     if polished is None:
         diagnostics["polish_failed"] += 1
