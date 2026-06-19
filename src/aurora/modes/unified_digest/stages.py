@@ -14,7 +14,6 @@ from aurora.modes.unified_digest.quality import (
     PublicCopyRepairer,
     audit_rendered_public_digest,
     public_copy_quality,
-    sanitize_public_copy,
 )
 from aurora.modes.unified_digest.render import section_candidate_order, select_items
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
@@ -285,9 +284,6 @@ async def _accept_or_repair_public_copy(
     polished = await repairer.repair(item, context)
     if polished is None:
         diagnostics["polish_failed"] += 1
-        sanitized = _sanitize_if_valid(item, diagnostics)
-        if sanitized is not None:
-            return sanitized
         if quality.ok:
             _record_quality_detail(diagnostics, item, "polish_skipped_or_failed", quality.reasons)
             return item
@@ -307,9 +303,6 @@ async def _accept_or_repair_public_copy(
         return polished
 
     diagnostics["polish_failed"] += 1
-    sanitized = _sanitize_if_valid(polished, diagnostics)
-    if sanitized is not None:
-        return sanitized
     if quality.ok:
         _record_quality_detail(
             diagnostics,
@@ -390,28 +383,16 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
     return diagnostics
 
 
-def _sanitize_if_valid(item: SignalItem, diagnostics: dict[str, Any]) -> SignalItem | None:
-    sanitized = sanitize_public_copy(item, allow_neutral_fallback=False)
-    sanitized_quality = public_copy_quality(sanitized)
-    if sanitized_quality.ok:
-        diagnostics["sanitized"] += 1
-        _record_quality_detail(diagnostics, item, "sanitized", [])
-        return sanitized
-    _record_quality_detail(
-        diagnostics,
-        item,
-        "sanitize_still_low_quality",
-        sanitized_quality.reasons,
-    )
-    return None
-
-
 def _enforce_public_digest_quality(rendered: RenderedDigest, context: StageContext) -> None:
     web_html = str(rendered.metadata.get("web_html") or "")
     audit = audit_rendered_public_digest(rendered.markdown, web_html)
-    if audit.ok:
-        return
     diagnostics = _quality_diagnostics(context.metadata)
+    reasons = list(audit.reasons)
+    if int(diagnostics.get("failed") or 0) > 0:
+        reasons.append("public_copy_quality_failed")
+    reasons = list(dict.fromkeys(reasons))
+    if not reasons:
+        return
     diagnostics["delivery_blocked"] += 1
     details = diagnostics.setdefault("details", [])
     if isinstance(details, list):
@@ -421,15 +402,15 @@ def _enforce_public_digest_quality(rendered: RenderedDigest, context: StageConte
                 "type": "unified_digest",
                 "title": rendered.title,
                 "action": "delivery_blocked",
-                "reasons": audit.reasons,
+                "reasons": reasons,
             }
         )
     context.metadata.setdefault("warnings", []).append(
         "Public digest delivery blocked because rendered copy failed quality checks: "
-        + ", ".join(audit.reasons)
+        + ", ".join(reasons)
     )
     raise RuntimeError(
-        "public digest delivery blocked by quality gate: " + ", ".join(audit.reasons)
+        "public digest delivery blocked by quality gate: " + ", ".join(reasons)
     )
 
 

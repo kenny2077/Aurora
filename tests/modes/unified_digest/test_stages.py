@@ -766,6 +766,32 @@ def test_rendered_public_digest_audit_blocks_public_slop() -> None:
     }
 
 
+def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:
+    audit = audit_rendered_public_digest(
+        "# Aurora Unified Digest\n\n"
+        "## Tech News\n\n"
+        "1. [AWS update](https://example.com)\n"
+        "   - Source: AWS Machine Learning Blog\n"
+        "   - Summary: The update describes developers building for AR glasses face an infrastructure gap.\n\n"
+        "## GitHub Repos\n\n"
+        "1. [org/repo](https://github.com/org/repo)\n"
+        "   - 12k stars | 800 forks | 10 open issues\n"
+        "   - Value: org/repo is useful for studying how a real project organizes its architecture, examples, and developer workflow.\n\n"
+        "## Research Papers\n\n"
+        "1. [Paper](https://example.com/paper)\n"
+        "   - Source: arxiv 2026 (Preprint)\n"
+        "   - Description: This paper studies Paper and why the idea could matter for practical AI systems.\n",
+        "",
+    )
+
+    assert not audit.ok
+    assert set(audit.reasons) >= {
+        "deterministic_news_template",
+        "deterministic_repo_template",
+        "deterministic_paper_template",
+    }
+
+
 def test_rendered_public_digest_audit_accepts_clean_digest() -> None:
     audit = audit_rendered_public_digest(
         "# Aurora Unified Digest\n\n"
@@ -910,7 +936,7 @@ def test_unified_enrich_replaces_june_16_style_slop_after_failed_polish(monkeypa
     assert context.metadata["public_copy_quality"]["replacement_succeeded"] == 1
 
 
-def test_unified_enrich_sanitizes_weak_public_copy_before_replacement(monkeypatch) -> None:
+def test_unified_enrich_does_not_sanitize_when_visible_llm_polish_fails(monkeypatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
     config = AuroraConfig(
         modes={
@@ -951,8 +977,9 @@ def test_unified_enrich_sanitizes_weak_public_copy_before_replacement(monkeypatc
     summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
 
     assert "Context intelligence and." not in summary
-    assert "The update describes AWS describes context intelligence features" in summary
-    assert context.metadata["public_copy_quality"]["sanitized"] >= 1
+    assert "The update describes AWS describes context intelligence features" not in summary
+    assert context.metadata["public_copy_quality"]["sanitized"] == 0
+    assert context.metadata["public_copy_quality"]["failed"] >= 1
 
 
 def test_unified_enrich_repairs_weak_selected_public_copy(monkeypatch) -> None:
@@ -1116,6 +1143,31 @@ def test_unified_delivery_blocks_failed_public_audit_before_downstream() -> None
         metadata={"selected_item_ids": ["news:weak"], "recommended_repo_ids": []},
     )
     context = StageContext(mode="unified_digest", run_id="test")
+
+    with pytest.raises(RuntimeError, match="public digest delivery blocked"):
+        asyncio.run(
+            UnifiedDeliveryStage(RepoLearningStateStore(Path("/tmp/aurora-test-state.json")), _Deliver(delivered)).deliver(
+                rendered, context
+            )
+        )
+
+    assert delivered == []
+    assert context.metadata["public_copy_quality"]["delivery_blocked"] == 1
+
+
+def test_unified_delivery_blocks_when_public_copy_quality_failed() -> None:
+    delivered: list[str] = []
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Aurora Unified Digest",
+        markdown="# Aurora Unified Digest\n\n## Tech News\n\nClean-looking text.",
+        metadata={"selected_item_ids": ["news:weak"], "recommended_repo_ids": []},
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        metadata={"public_copy_quality": {"failed": 1, "details": []}},
+    )
 
     with pytest.raises(RuntimeError, match="public digest delivery blocked"):
         asyncio.run(

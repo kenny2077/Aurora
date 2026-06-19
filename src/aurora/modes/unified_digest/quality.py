@@ -10,7 +10,7 @@ from typing import Any
 from aurora.ai.ranker import LLMAnalysis, LLMRanker, item_prompt_payload
 from aurora.config import AIConfig
 from aurora.modes.scholar.display import format_paper_description
-from aurora.modes.tech_news.notes import clean_note_text, display_tech_news_summary
+from aurora.modes.tech_news.notes import display_tech_news_summary
 from aurora.models import SignalItem
 from aurora.pipeline import StageContext
 from aurora.public_copy import is_deterministic_repo_evidence, raw_repo_value
@@ -75,6 +75,10 @@ RENDERED_FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("visible_diagnostics", re.compile(r"\b(?:Run diagnostics|Run Summary|Source Health)\b", re.IGNORECASE)),
     ("visible_evidence_block", re.compile(r"\b(?:Evidence|Files|Study|Learn|Connections):", re.IGNORECASE)),
     ("score_visible", re.compile(r"\b\d+(?:\.\d+)?/10\b")),
+    ("deterministic_news_template", re.compile(r"\bThe (?:update describes|release highlights)\b", re.IGNORECASE)),
+    ("deterministic_news_generic", re.compile(r"This item points to a practical AI tooling or research update", re.IGNORECASE)),
+    ("deterministic_repo_template", re.compile(r"is useful for studying how a real project organizes its architecture", re.IGNORECASE)),
+    ("deterministic_paper_template", re.compile(r"This paper studies .+ and why the idea could matter for practical AI systems", re.IGNORECASE)),
 )
 
 
@@ -179,31 +183,6 @@ def apply_public_copy_repair(item: SignalItem, analysis: LLMAnalysis) -> SignalI
             "why_it_matters": why or item.why_it_matters,
         }
     )
-
-
-def sanitize_public_copy(item: SignalItem, *, allow_neutral_fallback: bool = True) -> SignalItem:
-    """Deterministically clean public fields when AI polish is missing or rejected."""
-    if item.type == "news":
-        public = _clean_visible_summary(display_tech_news_summary(item), item.title)
-        if not public or _summary_is_unusable(item, public):
-            public = _news_fallback(item, allow_neutral_fallback=allow_neutral_fallback)
-        if not public:
-            return item
-        return item.model_copy(update={"summary": public, "why_it_matters": public})
-    if item.type == "repo":
-        public = _clean_visible_summary(raw_repo_value(item), item.title)
-        if not public or is_deterministic_repo_evidence(public):
-            title = str(item.metadata.get("full_name") or item.title or "This repository").strip()
-            public = (
-                f"{title} is useful for studying how a real project organizes its "
-                "architecture, examples, and developer workflow."
-            )
-        return item.model_copy(update={"why_it_matters": public})
-    public = _clean_visible_summary(format_paper_description(item), item.title)
-    if not public or _summary_is_unusable(item, public):
-        title = clean_note_text(item.title) or "this paper"
-        public = f"This paper studies {title} and why the idea could matter for practical AI systems."
-    return item.model_copy(update={"summary": public, "why_it_matters": public})
 
 
 def _has_duplicated_title_prefix(item: SignalItem, text: str) -> bool:
@@ -325,43 +304,6 @@ def _repair_prompt(item: SignalItem) -> tuple[str, str]:
 def _clean_public_sentence(value: str) -> str:
     text = re.sub(r"\s+", " ", str(value or "")).strip()
     return text.strip(" \t\r\n-")
-
-
-def _clean_visible_summary(value: str, title: str) -> str:
-    text = clean_note_text(value)
-    text = re.sub(r"\bRelease Notes\b", " ", text, flags=re.IGNORECASE)
-    text = re.sub(r"\*\*([^*]+)\*\*", r"\1", text)
-    text = re.sub(r"(^|\s)[*-]\s+", " ", text)
-    title_text = clean_note_text(title)
-    if title_text:
-        prefix = re.compile(rf"^\s*{re.escape(title_text)}\s*[:\-]\s*", re.IGNORECASE)
-        text = prefix.sub("", text)
-    text = re.sub(r"\s+", " ", text).strip(" \t\r\n#-:;,.")
-    while _has_dangling_fragment(text + ".") and " " in text:
-        text = text.rsplit(" ", 1)[0].strip(" \t\r\n#-:;,.")
-    if text and text[-1] not in ".!?":
-        text = f"{text}."
-    return text
-
-
-def _news_fallback(item: SignalItem, *, allow_neutral_fallback: bool = True) -> str:
-    raw = _clean_visible_summary(item.raw_content or "", item.title)
-    if raw and not _summary_is_unusable(item, raw):
-        if item.source == "github_releases":
-            return f"The release highlights {raw[:1].lower() + raw[1:]}"
-        return f"The update describes {raw[:1].lower() + raw[1:]}"
-    if not allow_neutral_fallback:
-        return ""
-    raw = _clean_visible_summary(item.summary or item.title, item.title)
-    if raw and not _summary_is_unusable(item, raw):
-        return f"The update describes {raw[:1].lower() + raw[1:]}"
-    return "This item points to a practical AI tooling or research update worth checking from the source."
-
-
-def _summary_is_unusable(item: SignalItem, text: str) -> bool:
-    trial = item.model_copy(update={"summary": text, "why_it_matters": text})
-    quality = public_copy_quality(trial)
-    return not quality.ok
 
 
 def _repair_weights():
