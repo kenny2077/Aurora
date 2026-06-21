@@ -87,24 +87,43 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
     text = _public_text(item)
     normalized = " ".join(text.split())
     lowered = normalized.lower()
+    # A news summary can be discarded by the renderer, but malformed source
+    # summaries still need repair before selection. The other news fields are
+    # only checked when they become the rendered text above.
+    source_summary = " ".join(str(item.summary or "").split()) if item.type == "news" else ""
+    quality_texts = tuple(value for value in (normalized, source_summary) if value)
+    quality_lowered = "\n".join(quality_texts).lower()
     reasons: list[str] = []
 
     if len(normalized) < 20:
         reasons.append("too_short")
-    if SOURCE_COVERS_PATTERN.search(normalized):
+    if any(SOURCE_COVERS_PATTERN.search(value) for value in quality_texts):
         reasons.append("source_covers_template")
-    if "updates #" in lowered or MARKDOWN_HEADING_PATTERN.search(normalized):
+    if "updates #" in quality_lowered or any(
+        MARKDOWN_HEADING_PATTERN.search(value) for value in quality_texts
+    ):
         reasons.append("raw_markdown")
-    if MARKDOWN_LINK_PATTERN.search(normalized):
+    if any(MARKDOWN_LINK_PATTERN.search(value) for value in quality_texts):
         reasons.append("broken_markdown")
-    if _has_duplicated_title_prefix(item, normalized):
+    if any(_has_duplicated_title_prefix(item, value) for value in quality_texts):
         reasons.append("duplicated_title_prefix")
-    if _mostly_repeats_title(item, normalized):
+    if any(_mostly_repeats_title(item, value) for value in quality_texts):
         reasons.append("title_restatement")
-    if _has_dangling_fragment(normalized):
+    if any(_has_dangling_fragment(value) for value in quality_texts):
         reasons.append("dangling_fragment")
-    if RELEASE_NOTES_PATTERN.search(normalized) or EMPHASIS_OR_BULLET_PATTERN.search(normalized):
+    if any(
+        RELEASE_NOTES_PATTERN.search(value) or EMPHASIS_OR_BULLET_PATTERN.search(value)
+        for value in quality_texts
+    ):
         reasons.append("release_note_remnant")
+    if item.type == "news" and re.search(
+        r"\bThe (?:update describes|release highlights)\b", quality_lowered, re.IGNORECASE
+    ):
+        reasons.append("deterministic_news_template")
+    if item.type == "news" and (
+        "this item points to a practical ai tooling or research update" in quality_lowered
+    ):
+        reasons.append("deterministic_news_generic")
     if item.type == "repo" and is_deterministic_repo_evidence(normalized):
         reasons.append("deterministic_repo_evidence")
     source_text = " ".join(
@@ -230,7 +249,10 @@ def _normalized_words(value: object) -> str:
 
 def _public_text(item: SignalItem) -> str:
     if item.type == "news":
-        return item.summary or item.why_it_matters or display_tech_news_summary(item)
+        # The renderer applies its own low-quality fallback rules. Validate that
+        # exact public result here so a selected item cannot pass this gate with
+        # stale raw copy and fail only after rendering.
+        return display_tech_news_summary(item)
     if item.type == "paper":
         return format_paper_description(item)
     if item.type == "repo":

@@ -824,6 +824,26 @@ def test_rendered_public_digest_audit_blocks_public_slop() -> None:
     }
 
 
+def test_public_copy_quality_uses_the_rendered_news_fallback() -> None:
+    item = _item(
+        "news:release",
+        "news",
+        "Example v1.2.3",
+        9.0,
+        source="github_releases",
+        summary="Release Notes",
+        raw_content="",
+        why_it_matters="",
+        learning_value="",
+    )
+
+    quality = public_copy_quality(item)
+
+    assert not quality.ok
+    assert quality.text.startswith("The release highlights")
+    assert "deterministic_news_template" in quality.reasons
+
+
 def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:
     audit = audit_rendered_public_digest(
         "# Aurora Unified Digest\n\n"
