@@ -6,6 +6,8 @@ from pathlib import Path
 
 from aurora.cli import main
 from aurora.models import SignalItem
+from aurora.config import AuroraConfig
+from aurora.evaluation import benchmark_llm_fixture
 from aurora.storage.jsonl import write_jsonl
 
 
@@ -79,6 +81,90 @@ def test_eval_compare_reports_selection_and_count_changes(tmp_path: Path, capsys
     assert "added: news:new" in output
     assert "removed: news:old" in output
     assert "unchanged: 2" in output
+
+
+def test_eval_llm_writes_fixture_only_baseline_without_network(tmp_path: Path, capsys) -> None:
+    fixture_path = tmp_path / "fixture.jsonl"
+    output_path = tmp_path / "llm-evaluation.json"
+    write_jsonl(fixture_path, [_item("news:1", "news", "News", 9.0, source="rss")])
+
+    exit_code = main(
+        ["eval", "llm", "--fixture", str(fixture_path), "--output", str(output_path)]
+    )
+
+    assert exit_code == 0
+    assert "eval llm: ok" in capsys.readouterr().out
+    report = json.loads(output_path.read_text(encoding="utf-8"))
+    assert report["live"] is False
+    assert report["deterministic"]["selected_item_ids"] == ["news:1"]
+    assert report["candidates"] == []
+
+
+def test_eval_llm_marks_configured_candidate_not_run_without_live_inference(
+    tmp_path: Path, capsys
+) -> None:
+    fixture_path = tmp_path / "fixture.jsonl"
+    candidate_path = tmp_path / "candidate.json"
+    output_path = tmp_path / "llm-evaluation.json"
+    write_jsonl(fixture_path, [_item("news:1", "news", "News", 9.0, source="rss")])
+    candidate_path.write_text(
+        '{"ai": {"provider": "ollama", "model": "qwen2.5:3b", "local_only": true}}',
+        encoding="utf-8",
+    )
+
+    exit_code = main(
+        [
+            "eval",
+            "llm",
+            "--fixture",
+            str(fixture_path),
+            "--candidate-config",
+            str(candidate_path),
+            "--output",
+            str(output_path),
+        ]
+    )
+
+    assert exit_code == 0
+    report = json.loads(output_path.read_text(encoding="utf-8"))
+    assert report["candidates"] == [
+        {
+            "provider": "ollama",
+            "model": "qwen2.5:3b",
+            "local_only": True,
+            "status": "not_run",
+            "metrics": {
+                "selected_item_overlap": None,
+                "json_validity_rate": None,
+                "summary_quality_failures": None,
+                "public_copy_quality_failures": None,
+                "latency_ms_total": None,
+                "request_count": 0,
+                "fallback_count": 0,
+                "estimated_cloud_cost_usd": 0.0,
+            },
+        }
+    ]
+
+
+def test_live_benchmark_keeps_failed_candidate_in_report(tmp_path: Path, monkeypatch) -> None:
+    fixture_path = tmp_path / "fixture.jsonl"
+    write_jsonl(fixture_path, [_item("news:1", "news", "News", 9.0, source="rss")])
+
+    def fail_candidate(*args, **kwargs):
+        raise RuntimeError("provider unavailable")
+
+    monkeypatch.setattr("aurora.evaluation._run_live_candidate", fail_candidate)
+
+    report = benchmark_llm_fixture(
+        AuroraConfig(),
+        fixture_path,
+        [AuroraConfig(ai={"provider": "ollama", "model": "qwen2.5:3b"})],
+        live=True,
+    )
+
+    assert report["candidates"][0]["status"] == "failed"
+    assert report["candidates"][0]["metrics"]["estimated_cloud_cost_usd"] == 0.0
 
 
 def test_digest_quality_golden_fixtures_replay(tmp_path: Path) -> None:

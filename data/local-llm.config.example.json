@@ -1,0 +1,24 @@
+{
+  "run": {
+    "enabled_modes": ["unified_digest"],
+    "timezone": "Asia/Shanghai",
+    "time_window_hours": 24,
+    "max_items": 50,
+    "dry_run": false,
+    "state_path": "data/aurora_state.json",
+    "cache_dir": "data/cache",
+    "output_dir": "data/runs"
+  },
+  "ai": {
+    "provider": "ollama",
+    "model": "qwen2.5:3b",
+    "task_models": {
+      "repair": "qwen2.5:3b"
+    },
+    "local_only": true,
+    "max_tokens": 900,
+    "max_requests_per_run": 24,
+    "max_tokens_per_run": 150000,
+    "fail_open_on_budget_exceeded": true
+  }
+}

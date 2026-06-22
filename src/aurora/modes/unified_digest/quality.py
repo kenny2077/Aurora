@@ -162,7 +162,7 @@ class PublicCopyRepairer:
     """Repair selected public digest text through the existing bounded AI path."""
 
     def __init__(self, ai_config: AIConfig, *, client: Any | None = None) -> None:
-        self.ranker = LLMRanker(ai_config, weights=_repair_weights(), client=client)
+        self.ranker = LLMRanker(ai_config, weights=_repair_weights(), client=client, task="repair")
 
     async def repair(self, item: SignalItem, context: StageContext) -> SignalItem | None:
         """Return an AI-repaired item, or ``None`` when AI is unavailable/budget-skipped."""

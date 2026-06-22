@@ -29,6 +29,11 @@ def test_readme_quickstart_commands_cover_core_modes() -> None:
     assert "aurora run --mode unified_digest --config data/config.example.json" in readme
     assert "aurora eval replay --fixture tests/fixtures/digest_quality/agents.jsonl" in readme
     assert "aurora eval compare --before" in readme
+    assert "data/local-llm.config.example.json" in readme
+    assert "aurora doctor --config data/local-llm.config.example.json --local-llm" in readme
+    assert "aurora eval llm --fixture" in readme
+    assert "input_cost_per_million_tokens" in readme
+    assert "not_run" in readme
 
 
 def test_interest_docs_document_migration_and_presets() -> None:

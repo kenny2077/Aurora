@@ -182,6 +182,15 @@ def test_example_config_validates() -> None:
     }
 
 
+def test_local_llm_example_config_uses_ollama_without_cloud_access() -> None:
+    config = load_config(Path("data/local-llm.config.example.json"))
+
+    assert config.ai.provider == "ollama"
+    assert config.ai.model == "qwen2.5:3b"
+    assert config.ai.local_only is True
+    assert config.ai.task_models == {"repair": "qwen2.5:3b"}
+
+
 def test_actions_config_enables_email_and_content_window() -> None:
     config = load_config(Path("data/actions.config.json"))
 

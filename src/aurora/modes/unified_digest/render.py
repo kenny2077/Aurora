@@ -6,7 +6,8 @@ import re
 from collections.abc import Sequence
 from datetime import datetime
 
-from aurora.config import UnifiedDigestModeConfig
+from aurora.config import AIConfig, UnifiedDigestModeConfig
+from aurora.ai.summary import UnifiedSummaryRefiner
 from aurora.modes.scholar.display import format_paper_description, format_paper_source_status
 from aurora.modes.tech_news.notes import (
     build_tech_news_notes,
@@ -65,8 +66,17 @@ NEWS_DIVERSE_MIN_SCORE = 5.5
 class UnifiedDigestSummarizer:
     """Create a combined Markdown digest from enriched SignalItems."""
 
-    def __init__(self, config: UnifiedDigestModeConfig) -> None:
+    def __init__(
+        self,
+        config: UnifiedDigestModeConfig,
+        *,
+        ai_config: AIConfig | None = None,
+        client: object | None = None,
+    ) -> None:
         self.config = config
+        self.summary_refiner = (
+            UnifiedSummaryRefiner(ai_config, client=client) if ai_config is not None else None
+        )
 
     async def summarize(self, items: Sequence[SignalItem], context: StageContext) -> str:
         selected = select_items(items, self.config, selected_ids=_locked_selected_ids(context))
@@ -74,6 +84,10 @@ class UnifiedDigestSummarizer:
         if not selected:
             lines.append("No items were available for the unified digest.")
             return "\n".join(lines)
+        if self.summary_refiner is not None:
+            introduction = await self.summary_refiner.refine(selected, context)
+            if introduction:
+                lines.extend([introduction, ""])
         for item_type in self.config.section_order:
             section_items = [item for item in selected if item.type == item_type]
             if not section_items:

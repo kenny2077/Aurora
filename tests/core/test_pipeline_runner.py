@@ -330,15 +330,45 @@ def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
     result = asyncio.run(PipelineRunner(tmp_path).run(_pipeline(calls), context))
 
     run_summary = result.rendered_digest.metadata["run_summary"]
-    assert run_summary["ai_usage"] == {
-        "requested_calls": 3,
-        "succeeded_calls": 1,
-        "failed_calls": 1,
-        "skipped_by_budget": 1,
-        "approx_prompt_tokens": 120,
-        "approx_completion_tokens": 40,
-        "approx_total_tokens": 160,
-    }
+    usage = run_summary["ai_usage"]
+    assert usage["requested_calls"] == 3
+    assert usage["succeeded_calls"] == 1
+    assert usage["failed_calls"] == 1
+    assert usage["skipped_by_budget"] == 1
+    assert usage["approx_prompt_tokens"] == 120
+    assert usage["approx_completion_tokens"] == 40
+    assert usage["approx_total_tokens"] == 160
+    assert usage["latency_ms_total"] == 0
+    assert usage["latency_ms_average"] == 0
+    assert usage["json_failures"] == 0
+    assert usage["deterministic_fallbacks"] == 0
+    assert usage["estimated_cloud_cost_usd"] is None
+
+
+def test_pipeline_runner_includes_configured_cloud_cost_in_run_summary(tmp_path) -> None:
+    calls: list[str] = []
+    context = StageContext(
+        mode="tech_news",
+        run_id="ai-cost",
+        metadata={
+            "ai_usage": {
+                "requested_calls": 1,
+                "succeeded_calls": 1,
+                "failed_calls": 0,
+                "skipped_by_budget": 0,
+                "approx_prompt_tokens": 100,
+                "approx_completion_tokens": 50,
+                "approx_total_tokens": 150,
+                "estimated_cloud_cost_usd": 0.0004,
+            }
+        },
+    )
+
+    result = asyncio.run(PipelineRunner(tmp_path).run(_pipeline(calls), context))
+
+    assert result.rendered_digest.metadata["run_summary"]["ai_usage"][
+        "estimated_cloud_cost_usd"
+    ] == pytest.approx(0.0004)
 
 
 def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -> None:

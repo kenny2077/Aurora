@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Any
 
 from aurora.config import AuroraConfig, ModeName
-from aurora.evaluation import compare_reports, replay_fixture, write_eval_report
+from aurora.ai.diagnostics import diagnose_ai_provider
+from aurora.evaluation import benchmark_llm_fixture, compare_reports, replay_fixture, write_eval_report
 from aurora.modes.repo_learning import build_repo_learning_pipeline
 from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
@@ -121,6 +122,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     doctor_parser = subparsers.add_parser("doctor", help="Check Aurora runtime environment")
     doctor_parser.add_argument("--config", type=Path, default=None)
+    doctor_parser.add_argument("--local-llm", action="store_true")
 
     run_parser = subparsers.add_parser("run", help="Run Aurora")
     run_parser.add_argument("--config", type=Path, default=None)
@@ -132,6 +134,8 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--repo-interest", action="append", default=None)
     run_parser.add_argument("--research-field", action="append", default=None)
     run_parser.add_argument("--skip-llm", action="store_true")
+    run_parser.add_argument("--local-llm", action="store_true")
+    run_parser.add_argument("--free-mode", action="store_true")
     run_parser.add_argument("--skip-delivery", action="store_true")
     run_parser.add_argument("--strict-delivery", action="store_true")
     run_parser.add_argument("--dry-run", action="store_true")
@@ -146,6 +150,12 @@ def _build_parser() -> argparse.ArgumentParser:
     compare_parser.add_argument("--before", type=Path, required=True)
     compare_parser.add_argument("--after", type=Path, required=True)
     compare_parser.add_argument("--output", type=Path, default=None)
+    llm_parser = eval_subparsers.add_parser("llm", help="Benchmark configured LLM candidates from fixtures")
+    llm_parser.add_argument("--config", type=Path, default=None)
+    llm_parser.add_argument("--fixture", type=Path, required=True)
+    llm_parser.add_argument("--candidate-config", type=Path, action="append", default=[])
+    llm_parser.add_argument("--live", action="store_true")
+    llm_parser.add_argument("--output", type=Path, default=None)
 
     return parser
 
@@ -179,6 +189,20 @@ def _handle_doctor(args: argparse.Namespace) -> int:
     print(f"missing required env vars: {', '.join(missing_required) if missing_required else 'none'}")
     optional = _missing_optional_env_vars(config)
     print(f"missing optional env vars: {', '.join(optional) if optional else 'none'}")
+    if args.local_llm:
+        diagnostic = asyncio.run(diagnose_ai_provider(config.ai))
+        print(
+            f"local LLM: {diagnostic.status} ({diagnostic.detail}; "
+            f"{diagnostic.latency_ms}ms)"
+        )
+        if diagnostic.model_available is not None:
+            print(f"local LLM model: {'available' if diagnostic.model_available else 'missing'}")
+        if diagnostic.json_response_valid is not None:
+            print(
+                "local LLM JSON response: "
+                f"{'valid' if diagnostic.json_response_valid else 'invalid'}"
+            )
+        return 0 if diagnostic.status == "ok" else 1
     return 0
 
 
@@ -258,6 +282,17 @@ def _handle_eval(args: argparse.Namespace) -> int:
         if args.output is not None:
             print(f"report: {args.output}")
         return 0
+    if args.eval_command == "llm":
+        config = AuroraConfig() if args.config is None else load_config(args.config)
+        candidates = [load_config(path) for path in args.candidate_config]
+        report = benchmark_llm_fixture(config, args.fixture, candidates, live=args.live)
+        if args.output is not None:
+            write_eval_report(args.output, report)
+        print("eval llm: ok")
+        print(f"candidates: {len(candidates)} ({'live' if args.live else 'fixture-only'})")
+        if args.output is not None:
+            print(f"report: {args.output}")
+        return 0
     raise ValueError(f"unknown eval command: {args.eval_command}")
 
 
@@ -290,8 +325,13 @@ def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> Auro
             {**modes.scholar.model_dump(mode="python"), "fields": args.research_field}
         )
         modes = modes.model_copy(update={"scholar": scholar})
-    if modes is not config.modes:
-        return config.model_copy(update={"modes": modes})
+    ai = config.ai
+    if args.local_llm or args.free_mode:
+        if not ai.is_local_provider():
+            raise ValueError("--local-llm and --free-mode require a configured local provider")
+        ai = type(ai).model_validate({**ai.model_dump(mode="python"), "local_only": True})
+    if modes is not config.modes or ai is not config.ai:
+        return config.model_copy(update={"modes": modes, "ai": ai})
     return config
 
 
@@ -363,10 +403,9 @@ def _missing_required_env_vars(config: AuroraConfig) -> list[str]:
 
 
 def _missing_optional_env_vars(config: AuroraConfig) -> list[str]:
-    names = [
-        config.ai.api_key_env,
-        config.modes.repo_learning.sources.github_search.token_env,
-    ]
+    names = [config.modes.repo_learning.sources.github_search.token_env]
+    if not config.ai.is_local_provider() or config.ai.provider == "anythingllm":
+        names.insert(0, config.ai.api_key_env)
     if config.modes.scholar.sources.semantic_scholar.enabled:
         names.append(config.modes.scholar.sources.semantic_scholar.api_key_env)
     if config.delivery.email.enabled:
@@ -440,7 +479,10 @@ def _print_ai_usage(result: Any) -> None:
         f"{_int_value(usage, 'succeeded_calls')} succeeded, "
         f"{_int_value(usage, 'failed_calls')} failed, "
         f"{_int_value(usage, 'skipped_by_budget')} skipped, "
-        f"~{_int_value(usage, 'approx_total_tokens')} tokens"
+        f"~{_int_value(usage, 'approx_total_tokens')} tokens, "
+        f"{_int_value(usage, 'deterministic_fallbacks')} fallbacks, "
+        f"{_int_value(usage, 'latency_ms_average')}ms average, "
+        f"provider {usage.get('provider', 'unknown')}/{usage.get('model', 'unknown')}"
     )
 
 

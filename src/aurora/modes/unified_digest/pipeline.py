@@ -47,7 +47,7 @@ def build_unified_digest_pipeline(
         deduplicate_stage=UnifiedDeduplicateStage(unified),
         score_stage=UnifiedScoreStage(),
         enrich_stage=UnifiedEnrichStage(),
-        summarize_stage=UnifiedDigestSummarizer(unified),
+        summarize_stage=UnifiedDigestSummarizer(unified, ai_config=config.ai),
         render_stage=UnifiedDigestRenderer(unified),
         deliver_stage=UnifiedDeliveryStage(
             RepoLearningStateStore(config.run.state_path),

@@ -199,6 +199,41 @@ Optional:
 - `GITHUB_TOKEN fallback` is used automatically in GitHub Actions.
 - `SEMANTIC_SCHOLAR_API_KEY` for optional scholar enrichment configuration.
 
+## Local LLMs
+
+Aurora supports local best-effort enrichment through Ollama, LM Studio, other
+OpenAI-compatible endpoints, and AnythingLLM workspaces. Local LLMs affect
+scoring, summaries, tags, and unified-digest public-copy repair only; source
+fetching, deduplication, delivery, and source-health logic remain deterministic.
+
+Start with the Ollama example, then set `ai.model` to any model installed in
+your local Ollama instance. The Qwen model is an example, not a restriction.
+
+```bash
+rtk uv run aurora config validate --config data/local-llm.config.example.json
+rtk uv run aurora doctor --config data/local-llm.config.example.json --local-llm
+rtk uv run aurora run --mode unified_digest --config data/local-llm.config.example.json --local-llm
+```
+
+`ai.task_models` can override the configured default model for `ranking`,
+`summary`, or `repair`. The `summary` task refines the optional opening sentence
+of a unified digest; ranking and repair retain their existing behavior.
+`--free-mode` and `--local-llm` require a local provider and prevent Aurora
+from calling DeepSeek or OpenAI. `--skip-llm` remains fully deterministic.
+
+For LM Studio or another compatible server, use `provider: "lmstudio"` or
+`provider: "openai_compatible"` with its `base_url`. LM Studio defaults to
+`http://127.0.0.1:1234/v1`; an `openai_compatible` provider requires an
+explicit URL.
+
+For AnythingLLM, configure `provider: "anythingllm"`, `base_url`,
+`workspace_slug`, and an API-key environment variable such as
+`ANYTHINGLLM_API_KEY`. Aurora uses the workspace chat API and expects its
+response text to satisfy Aurora's JSON contract. Confirm the endpoint shape
+against the local instance's `/api/docs` before enabling it. `doctor --local-llm`
+checks reachability, configured model/workspace access, authentication, and a
+short JSON response by default.
+
 ## Delivery
 
 By default Aurora writes Markdown/HTML reports to `reports/` and Astro content
@@ -260,6 +295,11 @@ content, source failures, rate limits, or delivery issues.
 for a whole run. When the budget is exhausted, Aurora keeps the digest running
 with deterministic scoring and records AI usage counters in `run_summary.json`.
 Use `--skip-llm` when you want a fully deterministic run.
+`run_summary.json` records the provider/model, request and fallback counts,
+latency, JSON failures, and zero cloud cost for local providers. Cloud cost is
+reported when both `ai.input_cost_per_million_tokens` and
+`ai.output_cost_per_million_tokens` are configured; Aurora does not embed
+volatile provider pricing.
 
 Tech news source packs are opt-in. In addition to Hacker News and explicit RSS
 feeds, config can enable curated RSS groups, Reddit listings, and GitHub
@@ -282,6 +322,18 @@ sections, source mix differences, and internal selection diagnostics:
 ```bash
 rtk uv run aurora eval compare --before /tmp/aurora-before.json --after /tmp/aurora-after.json
 ```
+
+Generate a fixture-only LLM benchmark report without contacting a provider:
+
+```bash
+rtk uv run aurora eval llm --fixture tests/fixtures/digest_quality/agents.jsonl --output /tmp/aurora-llm-eval.json
+```
+
+Add one or more candidate config files and `--live` to run them. Without
+`--live`, candidates are recorded as `not_run` and no provider is contacted.
+The live report includes selection overlap, JSON validity, summary/public-copy
+failures, latency, request and fallback counts, and any available cloud-cost
+estimate.
 
 ## Troubleshooting Empty Sections
 

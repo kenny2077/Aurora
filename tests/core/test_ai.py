@@ -88,15 +88,14 @@ def test_llm_ranker_skips_over_budget_items_without_failing() -> None:
     assert enriched_first.llm_score == 9.0
     assert enriched_second.llm_score is None
     assert enriched_second.final_score == 7.0
-    assert context.metadata["ai_usage"] == {
-        "requested_calls": 2,
-        "succeeded_calls": 1,
-        "failed_calls": 0,
-        "skipped_by_budget": 1,
-        "approx_prompt_tokens": context.metadata["ai_usage"]["approx_prompt_tokens"],
-        "approx_completion_tokens": context.metadata["ai_usage"]["approx_completion_tokens"],
-        "approx_total_tokens": context.metadata["ai_usage"]["approx_total_tokens"],
-    }
+    usage = context.metadata["ai_usage"]
+    assert usage["requested_calls"] == 2
+    assert usage["succeeded_calls"] == 1
+    assert usage["failed_calls"] == 0
+    assert usage["skipped_by_budget"] == 1
+    assert usage["deterministic_fallbacks"] == 1
+    assert usage["provider"] == "deepseek"
+    assert usage["task_models"] == {"ranking": "deepseek-chat"}
     assert context.metadata["ai_usage"]["approx_total_tokens"] > 0
     assert "AI budget exhausted" in context.metadata["warnings"][0]
 

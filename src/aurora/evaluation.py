@@ -8,6 +8,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from aurora.ai.ranker import LLMRanker, item_prompt_payload
 from aurora.config import AuroraConfig
 from aurora.models import SignalItem
 from aurora.modes.unified_digest.render import (
@@ -15,6 +16,7 @@ from aurora.modes.unified_digest.render import (
     UnifiedDigestSummarizer,
     select_items,
 )
+from aurora.modes.unified_digest.quality import public_copy_quality
 from aurora.pipeline import StageContext
 from aurora.storage.jsonl import read_jsonl
 
@@ -22,6 +24,60 @@ from aurora.storage.jsonl import read_jsonl
 def replay_fixture(config: AuroraConfig, fixture_path: Path) -> dict[str, Any]:
     """Replay a saved SignalItem fixture through unified digest selection/rendering."""
     items = [SignalItem.model_validate(row) for row in read_jsonl(fixture_path)]
+    return _replay_items(config, items, fixture_path)
+
+
+def benchmark_llm_fixture(
+    config: AuroraConfig,
+    fixture_path: Path,
+    candidate_configs: list[AuroraConfig],
+    *,
+    live: bool,
+) -> dict[str, Any]:
+    """Compare deterministic replay with explicitly configured LLM candidates."""
+    items = [SignalItem.model_validate(row) for row in read_jsonl(fixture_path)]
+    deterministic = _replay_items(config, items, fixture_path)
+    candidates: list[dict[str, Any]] = []
+    for candidate_config in candidate_configs:
+        candidate = {
+            "provider": candidate_config.ai.provider,
+            "model": candidate_config.ai.model,
+            "local_only": candidate_config.ai.local_only,
+        }
+        if not live:
+            candidates.append(
+                {
+                    **candidate,
+                    "status": "not_run",
+                    "metrics": _empty_benchmark_metrics(candidate_config),
+                }
+            )
+            continue
+        try:
+            candidates.append(
+                _run_live_candidate(candidate_config, items, fixture_path, deterministic, candidate)
+            )
+        except Exception:
+            candidates.append(
+                {
+                    **candidate,
+                    "status": "failed",
+                    "metrics": _empty_benchmark_metrics(candidate_config),
+                }
+            )
+    return {
+        "fixture": str(fixture_path),
+        "live": live,
+        "deterministic": deterministic,
+        "candidates": candidates,
+    }
+
+
+def _replay_items(
+    config: AuroraConfig,
+    items: list[SignalItem],
+    fixture_path: Path,
+) -> dict[str, Any]:
     context = StageContext(
         mode="unified_digest",
         run_id=f"eval-{fixture_path.stem}",
@@ -47,6 +103,75 @@ def replay_fixture(config: AuroraConfig, fixture_path: Path) -> dict[str, Any]:
         "selection_diagnostics": _selection_diagnostics(selected),
         "markdown": rendered.markdown,
     }
+
+
+def _run_live_candidate(
+    config: AuroraConfig,
+    items: list[SignalItem],
+    fixture_path: Path,
+    deterministic: dict[str, Any],
+    candidate: dict[str, Any],
+) -> dict[str, Any]:
+    context = StageContext(mode="unified_digest", run_id=f"eval-llm-{fixture_path.stem}", config=config)
+    ranker = LLMRanker(config.ai, weights=config.pipeline.scoring.default_final_weights)
+    analyses = asyncio.run(ranker.analyze_items(items, _benchmark_prompt, context))
+    enriched = [ranker.apply_analysis(item, analyses.get(item.id)) for item in items]
+    replay = _replay_items(config, enriched, fixture_path)
+    usage = context.metadata.get("ai_usage") if isinstance(context.metadata.get("ai_usage"), dict) else {}
+    selected_ids = set(replay["selected_item_ids"])
+    baseline_ids = set(deterministic["selected_item_ids"])
+    selected_items = [item for item in enriched if item.id in selected_ids]
+    union = selected_ids | baseline_ids
+    requested = _int_metric(usage, "requested_calls")
+    json_failures = _int_metric(usage, "json_failures")
+    status = "failed" if requested and not analyses else "ok"
+    return {
+        **candidate,
+        "status": status,
+        "metrics": {
+            "selected_item_overlap": len(selected_ids & baseline_ids) / len(union) if union else 1.0,
+            "json_validity_rate": (requested - json_failures) / requested if requested else None,
+            "summary_quality_failures": sum(
+                1 for analysis in analyses.values() if not analysis.summary.strip()
+            ),
+            "public_copy_quality_failures": sum(
+                1 for item in selected_items if not public_copy_quality(item).ok
+            ),
+            "latency_ms_total": _int_metric(usage, "latency_ms_total"),
+            "request_count": requested,
+            "fallback_count": _int_metric(usage, "deterministic_fallbacks"),
+            "estimated_cloud_cost_usd": usage.get("estimated_cloud_cost_usd"),
+        },
+        "replay": replay,
+    }
+
+
+def _benchmark_prompt(item: SignalItem) -> tuple[str, str]:
+    return (
+        "Return a JSON object with score, summary, why_it_matters, learning_value, action_items, and tags. "
+        "Use only the supplied source content.",
+        item_prompt_payload(item),
+    )
+
+
+def _empty_benchmark_metrics(config: AuroraConfig) -> dict[str, Any]:
+    return {
+        "selected_item_overlap": None,
+        "json_validity_rate": None,
+        "summary_quality_failures": None,
+        "public_copy_quality_failures": None,
+        "latency_ms_total": None,
+        "request_count": 0,
+        "fallback_count": 0,
+        "estimated_cloud_cost_usd": 0.0 if config.ai.is_local_provider() else None,
+    }
+
+
+def _int_metric(usage: dict[str, Any], key: str) -> int:
+    try:
+        return int(usage.get(key) or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 def write_eval_report(path: Path, report: dict[str, Any]) -> Path:

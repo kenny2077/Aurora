@@ -336,13 +336,13 @@ def _summary_warnings(context_metadata: dict[str, Any] | None) -> list[str]:
     return warnings
 
 
-def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, int]:
+def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, Any]:
     if not isinstance(context_metadata, dict):
         return {}
     usage = context_metadata.get("ai_usage")
     if not isinstance(usage, dict):
         return {}
-    summary: dict[str, int] = {}
+    summary: dict[str, Any] = {}
     for key in (
         "requested_calls",
         "succeeded_calls",
@@ -351,11 +351,38 @@ def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, int]
         "approx_prompt_tokens",
         "approx_completion_tokens",
         "approx_total_tokens",
+        "latency_ms_total",
+        "json_failures",
+        "deterministic_fallbacks",
     ):
         try:
             summary[key] = int(usage.get(key) or 0)
         except (TypeError, ValueError):
             summary[key] = 0
+    call_count = summary["succeeded_calls"] + summary["failed_calls"]
+    summary["latency_ms_average"] = round(summary["latency_ms_total"] / call_count) if call_count else 0
+    provider = usage.get("provider")
+    if isinstance(provider, str) and provider.strip():
+        summary["provider"] = provider.strip()
+    model = usage.get("model")
+    if isinstance(model, str) and model.strip():
+        summary["model"] = model.strip()
+    endpoint_kind = usage.get("endpoint_kind")
+    if endpoint_kind in {"local", "cloud"}:
+        summary["endpoint_kind"] = endpoint_kind
+    summary["local_only"] = bool(usage.get("local_only"))
+    task_models = usage.get("task_models")
+    if isinstance(task_models, dict):
+        summary["task_models"] = {
+            str(task): str(model)
+            for task, model in task_models.items()
+            if str(task) in {"ranking", "summary", "repair"} and str(model).strip()
+        }
+    cost = usage.get("estimated_cloud_cost_usd")
+    if isinstance(cost, (int, float)) and not isinstance(cost, bool):
+        summary["estimated_cloud_cost_usd"] = float(cost)
+    else:
+        summary["estimated_cloud_cost_usd"] = None
     return summary
 
 

@@ -5,6 +5,7 @@ from pathlib import Path
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, StageContext
 from aurora.cli import main
+from aurora.ai.diagnostics import AIProviderDiagnostic
 
 
 def test_config_validate_succeeds_with_defaults(capsys) -> None:
@@ -53,6 +54,41 @@ def test_doctor_reports_environment_without_crashing(tmp_path: Path, capsys, mon
     assert "pages branch: gh-pages" in output
     assert "run summaries: enabled" in output
     assert "email delivery: disabled" in output
+
+
+def test_run_free_mode_rejects_default_cloud_provider(tmp_path: Path, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text('{"run": {"enabled_modes": ["tech_news"]}}', encoding="utf-8")
+
+    exit_code = main(["run", "--dry-run", "--config", str(config_path), "--free-mode"])
+
+    assert exit_code == 1
+    assert "local provider" in capsys.readouterr().err
+
+
+def test_doctor_local_llm_reports_default_json_check(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text(
+        '{"ai": {"provider": "ollama", "model": "qwen2.5:3b", "local_only": true}}',
+        encoding="utf-8",
+    )
+
+    async def fake_diagnose(config):
+        return AIProviderDiagnostic(
+            status="ok",
+            detail="configured model is available",
+            latency_ms=12,
+            model_available=True,
+            json_response_valid=True,
+        )
+
+    monkeypatch.setattr("aurora.cli.diagnose_ai_provider", fake_diagnose)
+
+    assert main(["doctor", "--config", str(config_path), "--local-llm"]) == 0
+    output = capsys.readouterr().out
+    assert "local LLM: ok" in output
+    assert "local LLM model: available" in output
+    assert "local LLM JSON response: valid" in output
 
 
 def test_config_validate_invalid_config_exits_nonzero(tmp_path: Path, capsys) -> None:

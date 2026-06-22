@@ -13,6 +13,16 @@ from aurora.interests import REPO_INTEREST_PRESETS, SCHOLAR_FIELD_PRESETS, clean
 
 ModeName = Literal["tech_news", "scholar", "repo_learning", "unified_digest"]
 SignalSection = Literal["news", "paper", "repo"]
+AIProvider = Literal[
+    "deepseek",
+    "openai",
+    "openai_compatible",
+    "ollama",
+    "lmstudio",
+    "anythingllm",
+]
+AITask = Literal["ranking", "summary", "repair"]
+LOCAL_AI_PROVIDERS = frozenset({"ollama", "lmstudio", "openai_compatible", "anythingllm"})
 
 
 class RunConfig(BaseModel):
@@ -96,30 +106,56 @@ class PipelineConfig(BaseModel):
 
 
 class AIConfig(BaseModel):
-    """AI configuration only; no AI client implementation is part of PR 1."""
+    """Configuration for optional cloud and local LLM enrichment."""
 
     model_config = ConfigDict(extra="forbid")
 
-    provider: str = "deepseek"
+    provider: AIProvider = "deepseek"
     model: str = "deepseek-chat"
     base_url: str | None = None
     api_key_env: str = "DEEPSEEK_API_KEY"
+    task_models: dict[AITask, str] = Field(default_factory=dict)
+    workspace_slug: str | None = None
+    anythingllm_mode: Literal["chat"] = "chat"
+    local_only: bool = False
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_tokens: int = Field(default=4096, ge=1)
     max_requests_per_run: int | None = Field(default=None, ge=0)
     max_tokens_per_run: int | None = Field(default=None, ge=0)
+    input_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
+    output_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
     fail_open_on_budget_exceeded: bool = True
     analysis_concurrency: int = Field(default=2, ge=1)
     enrichment_concurrency: int = Field(default=2, ge=1)
     throttle_sec: float = Field(default=0.0, ge=0.0)
     languages: list[str] = Field(default_factory=lambda: ["en"])
 
-    @field_validator("provider", "model", "api_key_env")
+    @field_validator("model", "api_key_env")
     @classmethod
     def validate_required_text(cls, value: str) -> str:
         if not isinstance(value, str) or not value.strip():
             raise ValueError("value must be a non-empty string")
         return value.strip()
+
+    @field_validator("base_url", "workspace_slug")
+    @classmethod
+    def validate_optional_text(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        if not value.strip():
+            raise ValueError("value must be a non-empty string when provided")
+        return value.strip()
+
+    @field_validator("task_models")
+    @classmethod
+    def validate_task_models(cls, value: dict[AITask, str]) -> dict[AITask, str]:
+        cleaned: dict[AITask, str] = {}
+        for task, model in value.items():
+            text = str(model).strip()
+            if not text:
+                raise ValueError(f"task model for {task} must be a non-empty string")
+            cleaned[task] = text
+        return cleaned
 
     @field_validator("languages")
     @classmethod
@@ -128,6 +164,27 @@ class AIConfig(BaseModel):
         if not cleaned:
             raise ValueError("at least one language is required")
         return cleaned
+
+    @model_validator(mode="after")
+    def validate_provider_settings(self) -> "AIConfig":
+        if self.local_only and not self.is_local_provider():
+            raise ValueError("local_only requires a local provider")
+        if self.provider == "anythingllm":
+            if not self.base_url:
+                raise ValueError("anythingllm requires ai.base_url")
+            if not self.workspace_slug:
+                raise ValueError("anythingllm requires ai.workspace_slug")
+        if self.provider == "openai_compatible" and not self.base_url:
+            raise ValueError("openai_compatible requires ai.base_url")
+        return self
+
+    def is_local_provider(self) -> bool:
+        """Return whether this provider is intended to run on a local endpoint."""
+        return self.provider in LOCAL_AI_PROVIDERS
+
+    def model_for_task(self, task: AITask) -> str:
+        """Return the configured model for an Aurora enrichment task."""
+        return self.task_models.get(task, self.model)
 
 
 class FilesystemDeliveryConfig(BaseModel):
