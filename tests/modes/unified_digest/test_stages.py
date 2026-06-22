@@ -1248,7 +1248,7 @@ def test_unified_delivery_blocks_failed_public_audit_before_downstream() -> None
     assert context.metadata["public_copy_quality"]["delivery_blocked"] == 1
 
 
-def test_unified_delivery_blocks_when_public_copy_quality_failed() -> None:
+def test_unified_delivery_blocks_when_public_copy_remains_unresolved() -> None:
     delivered: list[str] = []
     rendered = RenderedDigest(
         mode="unified_digest",
@@ -1259,7 +1259,7 @@ def test_unified_delivery_blocks_when_public_copy_quality_failed() -> None:
     context = StageContext(
         mode="unified_digest",
         run_id="test",
-        metadata={"public_copy_quality": {"failed": 1, "details": []}},
+        metadata={"public_copy_quality": {"unresolved": 1, "details": []}},
     )
 
     with pytest.raises(RuntimeError, match="public digest delivery blocked"):
@@ -1271,6 +1271,31 @@ def test_unified_delivery_blocks_when_public_copy_quality_failed() -> None:
 
     assert delivered == []
     assert context.metadata["public_copy_quality"]["delivery_blocked"] == 1
+
+
+def test_unified_delivery_allows_recovered_quality_attempt(tmp_path: Path) -> None:
+    delivered: list[str] = []
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Aurora Unified Digest",
+        markdown="# Aurora Unified Digest\n\n## Tech News\n\nClean-looking text.",
+        metadata={"selected_item_ids": ["news:replacement"], "recommended_repo_ids": []},
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        metadata={"public_copy_quality": {"failed": 1, "unresolved": 0, "details": []}},
+    )
+
+    results = asyncio.run(
+        UnifiedDeliveryStage(RepoLearningStateStore(tmp_path / "state.json"), _Deliver(delivered)).deliver(
+            rendered, context
+        )
+    )
+
+    assert delivered == ["unified_digest"]
+    assert results[-1].channel == "test"
+    assert context.metadata["public_copy_quality"]["delivery_blocked"] == 0
 
 
 def test_unified_rendering_prefers_polished_news_notes() -> None:

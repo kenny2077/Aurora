@@ -255,7 +255,7 @@ async def _apply_public_copy_quality_gate(
             diagnostics["replaced"] += 1
             continue
 
-        diagnostics["failed"] += 1
+        diagnostics["unresolved"] += 1
         locked_ids.append(selected_item.id)
         _record_quality_detail(
             diagnostics,
@@ -360,6 +360,7 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
             "repaired": 0,
             "replaced": 0,
             "failed": 0,
+            "unresolved": 0,
             "polished": 0,
             "polish_failed": 0,
             "sanitized": 0,
@@ -376,6 +377,7 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
     diagnostics.setdefault("repaired", 0)
     diagnostics.setdefault("replaced", 0)
     diagnostics.setdefault("failed", 0)
+    diagnostics.setdefault("unresolved", 0)
     diagnostics.setdefault("polished", 0)
     diagnostics.setdefault("polish_failed", 0)
     diagnostics.setdefault("sanitized", 0)
@@ -391,7 +393,7 @@ def _enforce_public_digest_quality(rendered: RenderedDigest, context: StageConte
     audit = audit_rendered_public_digest(rendered.markdown, web_html)
     diagnostics = _quality_diagnostics(context.metadata)
     reasons = list(audit.reasons)
-    if int(diagnostics.get("failed") or 0) > 0:
+    if int(diagnostics.get("unresolved") or 0) > 0:
         reasons.append("public_copy_quality_failed")
     reasons = list(dict.fromkeys(reasons))
     if not reasons:
