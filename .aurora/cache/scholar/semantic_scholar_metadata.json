@@ -75,7 +75,7 @@
       }
     },
     "title:activation control for efficiently eliciting long chain of thought ability of language models": {
-      "cached_at": "2026-06-13T05:07:00.307070+00:00",
+      "cached_at": "2026-06-23T04:43:18.436519+00:00",
       "data": {
         "abstract": "Despite the remarkable reasoning performance, eliciting the long chain-of-thought (CoT) ability in large language models (LLMs) typically requires costly reinforcement learning or supervised fine-tuning on high-quality distilled data. We investigate the internal mechanisms behind this capability and show that a small set of high-impact activations in the last few layers largely governs long-form reasoning attributes, such as output length and self-reflection. By simply amplifying these activations and inserting\"wait\"tokens, we can invoke the long CoT ability without any training, resulting in significantly increased self-reflection rates and accuracy. Moreover, we find that the activation dynamics follow predictable trajectories, with a sharp rise after special tokens and a subsequent exponential decay. Building on these insights, we introduce a general training-free activation control technique. It leverages a few contrastive examples to identify key activations, and employs simple analytic functions to modulate their values at inference time to elicit long CoTs. Extensive experiments confirm the effectiveness of our method in efficiently eliciting long CoT reasoning in LLMs and improving their performance. Additionally, we propose a parameter-efficient fine-tuning method that trains only a last-layer activation amplification module and a few LoRA layers, outperforming full LoRA fine-tuning on reasoning benchmarks with significantly fewer parameters. Our code and data are publicly released.",
         "authors": [
@@ -108,7 +108,7 @@
             "name": "Biwei Huang"
           }
         ],
-        "citationCount": 9,
+        "citationCount": 8,
         "externalIds": {
           "ArXiv": "2505.17697",
           "CorpusId": 278886235,
@@ -335,7 +335,7 @@
       }
     },
     "title:deltaflow an efficient multi frame scene flow estimation method": {
-      "cached_at": "2026-06-14T05:18:08.322497+00:00",
+      "cached_at": "2026-06-23T04:44:05.354591+00:00",
       "data": {
         "abstract": "Previous dominant methods for scene flow estimation focus mainly on input from two consecutive frames, neglecting valuable information in the temporal domain. While recent trends shift towards multi-frame reasoning, they suffer from rapidly escalating computational costs as the number of frames grows. To leverage temporal information more efficiently, we propose DeltaFlow ($\\Delta$Flow), a lightweight 3D framework that captures motion cues via a $\\Delta$ scheme, extracting temporal features with minimal computational cost, regardless of the number of frames. Additionally, scene flow estimation faces challenges such as imbalanced object class distributions and motion inconsistency. To tackle these issues, we introduce a Category-Balanced Loss to enhance learning across underrepresented classes and an Instance Consistency Loss to enforce coherent object motion, improving flow accuracy. Extensive evaluations on the Argoverse 2, Waymo and nuScenes datasets show that $\\Delta$Flow achieves state-of-the-art performance with up to 22% lower error and $2\\times$ faster inference compared to the next-best multi-frame supervised method, while also demonstrating a strong cross-domain generalization ability. The code is open-sourced at https://github.com/Kin-Zhang/DeltaFlow along with trained model weights.",
         "authors": [
@@ -564,7 +564,7 @@
       }
     },
     "title:diversity aware policy optimization for large language model reasoning": {
-      "cached_at": "2026-06-13T05:07:10.314131+00:00",
+      "cached_at": "2026-06-23T04:43:30.332285+00:00",
       "data": {
         "abstract": "The reasoning capabilities of large language models (LLMs) have advanced rapidly, particularly following the release of DeepSeek R1, which has inspired a surge of research into data quality and reinforcement learning (RL) algorithms. Despite the pivotal role diversity plays in RL, its influence on LLM reasoning remains largely underexplored. To bridge this gap, this work presents a systematic investigation into the impact of diversity in RL-based training for LLM reasoning, and proposes a novel diversity-aware policy optimization method. Across evaluations on 12 LLMs, we observe a strong positive correlation between the solution diversity and Potential at k (a novel metric quantifying an LLM's reasoning potential) in high-performing models. This finding motivates our method to explicitly promote diversity during RL training. Specifically, we design a token-level diversity and reformulate it into a practical objective, then we selectively apply it to positive samples. Integrated into the R1-zero training framework, our method achieves a 3.5 percent average improvement across four mathematical reasoning benchmarks, while generating more diverse and robust solutions.",
         "authors": [
@@ -618,7 +618,7 @@
       }
     },
     "title:enhancing generative auto bidding with offline reward evaluation and policy search": {
-      "cached_at": "2026-06-13T05:06:57.931574+00:00",
+      "cached_at": "2026-06-23T04:43:07.828308+00:00",
       "data": {
         "abstract": "Auto-bidding is a critical tool for advertisers to improve advertising performance. Recent progress has demonstrated that AI-Generated Bidding (AIGB), which learns a conditional generative planner from offline data, achieves superior performance compared to typical offline reinforcement learning (RL)-based auto-bidding methods. However, existing AIGB methods still face a performance bottleneck due to their inherent inability to explore beyond the static dataset with feedback. To address this, we propose \\textbf{AIGB-Pearl} (\\emph{\\textbf{P}lanning with \\textbf{E}valu\\textbf{A}tor via \\textbf{RL}}), a novel method that integrates generative planning and policy optimization. The core of AIGB-Pearl lies in constructing a trajectory evaluator to assess the quality of generated scores and designing a provably sound KL-Lipschitz-constrained score-maximization scheme to ensure safe and efficient exploration beyond the offline dataset. A practical algorithm that incorporates the synchronous coupling technique is further developed to ensure the model regularity required by the proposed scheme. Extensive experiments on both simulated and real-world advertising systems demonstrate the state-of-the-art performance of our approach.",
         "authors": [
@@ -757,7 +757,7 @@
       }
     },
     "title:escaping saddle points without lipschitz smoothness the power of nonlinear preconditioning": {
-      "cached_at": "2026-06-14T05:18:20.345313+00:00",
+      "cached_at": "2026-06-23T04:44:30.181118+00:00",
       "data": {
         "abstract": "We study generalized smoothness in nonconvex optimization, focusing on $(L_0, L_1)$-smoothness and anisotropic smoothness. The former was empirically derived from practical neural network training examples, while the latter arises naturally in the analysis of nonlinearly preconditioned gradient methods. We introduce a new sufficient condition that encompasses both notions, reveals their close connection, and holds in key applications such as phase retrieval and matrix factorization. Leveraging tools from dynamical systems theory, we then show that nonlinear preconditioning -- including gradient clipping -- preserves the saddle point avoidance property of classical gradient descent. Crucially, the assumptions required for this analysis are actually satisfied in these applications, unlike in classical results that rely on restrictive Lipschitz smoothness conditions. We further analyze a perturbed variant that efficiently attains second-order stationarity with only logarithmic dependence on dimension, matching similar guarantees of classical gradient methods.",
         "authors": [
@@ -797,7 +797,7 @@
       }
     },
     "title:fire frobenius isometry reinitialization for balancing the stability plasticity tradeoff": {
-      "cached_at": "2026-06-14T05:18:25.390809+00:00",
+      "cached_at": "2026-06-23T04:44:44.939929+00:00",
       "data": {
         "abstract": "Deep neural networks trained on nonstationary data must balance stability (i.e., retaining prior knowledge) and plasticity (i.e., adapting to new tasks). Standard reinitialization methods, which reinitialize weights toward their original values, are widely used but difficult to tune: conservative reinitializations fail to restore plasticity, while aggressive ones erase useful knowledge. We propose FIRE, a principled reinitialization method that explicitly balances the stability-plasticity tradeoff. FIRE quantifies stability through Squared Frobenius Error (SFE), measuring proximity to past weights, and plasticity through Deviation from Isometry (DfI), reflecting weight isotropy. The reinitialization point is obtained by solving a constrained optimization problem, minimizing SFE subject to DfI being zero, which is efficiently approximated by Newton-Schulz iteration. FIRE is evaluated on continual visual learning (CIFAR-10 with ResNet-18), language modeling (OpenWebText with GPT-0.1B), and reinforcement learning (HumanoidBench with SAC and Atari games with DQN). Across all domains, FIRE consistently outperforms both naive training without intervention and standard reinitialization methods, demonstrating effective balancing of the stability-plasticity tradeoff.",
         "authors": [
@@ -1221,7 +1221,7 @@
       }
     },
     "title:klass kl guided fast inference in masked diffusion models": {
-      "cached_at": "2026-06-13T05:07:12.545001+00:00",
+      "cached_at": "2026-06-23T04:43:41.676422+00:00",
       "data": {
         "abstract": "Masked diffusion models have demonstrated competitive results on various tasks including language generation. However, due to its iterative refinement process, the inference is often bottlenecked by slow and static sampling speed. To overcome this problem, we introduce `KL-Adaptive Stability Sampling'(KLASS), a fast yet effective sampling method that exploits token-level KL divergence to identify stable, high-confidence predictions. By unmasking multiple tokens in each iteration without any additional model training, our approach speeds up generation significantly while maintaining sample quality. On reasoning benchmarks, KLASS achieves up to $2.78\\times$ wall-clock speedups while improving performance over standard greedy decoding, attaining state-of-the-art results among diffusion-based samplers. We further validate KLASS across diverse domains, including text, image, and molecular generation, showing its effectiveness as a broadly applicable sampler across different models.",
         "authors": [
@@ -1246,7 +1246,7 @@
             "name": "Se-Young Yun"
           }
         ],
-        "citationCount": 28,
+        "citationCount": 29,
         "externalIds": {
           "ArXiv": "2511.05664",
           "CorpusId": 282911486,
@@ -1536,7 +1536,7 @@
       }
     },
     "title:opencua open foundations for computer use agents": {
-      "cached_at": "2026-06-14T05:18:18.043934+00:00",
+      "cached_at": "2026-06-23T04:44:15.845834+00:00",
       "data": {
         "abstract": "Vision-language models have demonstrated impressive capabilities as computer-use agents (CUAs) capable of automating diverse computer tasks. As their commercial potential grows, critical details of the most capable CUA systems remain closed. As these agents will increasingly mediate digital interactions and execute consequential decisions on our behalf, the research community needs access to open CUA frameworks to study their capabilities, limitations, and risks. To bridge this gap, we propose OpenCUA, a comprehensive open-source framework for scaling CUA data and foundation models. Our framework consists of: (1) an annotation infrastructure that seamlessly captures human computer-use demonstrations; (2) AgentNet, the first large-scale computer-use task dataset spanning 3 operating systems and 200+ applications and websites; (3) a scalable pipeline that transforms demonstrations into state-action pairs with reflective long Chain-of-Thought reasoning that sustain robust performance gains as data scales. Our end-to-end agent models demonstrate strong performance across CUA benchmarks. In particular, OpenCUA-72B achieves an average success rate of 45.0% on OSWorld-Verified, establishing a new state-of-the-art (SOTA) among open-source models. Further analysis confirms that our approach generalizes well across domains and benefits significantly from increased test-time computation. We release our annotation tool, datasets, code, and models to build open foundations for further CUA research.",
         "authors": [
@@ -1709,7 +1709,7 @@
             "name": "Tao Yu"
           }
         ],
-        "citationCount": 91,
+        "citationCount": 93,
         "externalIds": {
           "ArXiv": "2508.09123",
           "CorpusId": 280635573,
@@ -1719,7 +1719,7 @@
         "fieldsOfStudy": [
           "Computer Science"
         ],
-        "influentialCitationCount": 21,
+        "influentialCitationCount": 22,
         "openAccessPdf": {
           "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2508.09123, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
           "license": null,
