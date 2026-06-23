@@ -364,6 +364,8 @@ def test_ranker_records_local_task_model_and_json_fallback() -> None:
         "local_only": False,
         "task_models": {"repair": "mistral:7b"},
         "requested_calls": 1,
+        "network_attempts": 1,
+        "retried_calls": 0,
         "succeeded_calls": 0,
         "failed_calls": 1,
         "skipped_by_budget": 0,
@@ -373,6 +375,7 @@ def test_ranker_records_local_task_model_and_json_fallback() -> None:
         "latency_ms_total": context.metadata["ai_usage"]["latency_ms_total"],
         "json_failures": 1,
         "deterministic_fallbacks": 1,
+        "failure_categories": {"invalid_response": 1},
         "estimated_cloud_cost_usd": 0.0,
     }
 

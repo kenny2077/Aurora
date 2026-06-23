@@ -317,12 +317,15 @@ def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
         metadata={
             "ai_usage": {
                 "requested_calls": 3,
+                "network_attempts": 4,
+                "retried_calls": 1,
                 "succeeded_calls": 1,
                 "failed_calls": 1,
                 "skipped_by_budget": 1,
                 "approx_prompt_tokens": 120,
                 "approx_completion_tokens": 40,
                 "approx_total_tokens": 160,
+                "failure_categories": {"rate_limit": 1},
             }
         },
     )
@@ -332,6 +335,8 @@ def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
     run_summary = result.rendered_digest.metadata["run_summary"]
     usage = run_summary["ai_usage"]
     assert usage["requested_calls"] == 3
+    assert usage["network_attempts"] == 4
+    assert usage["retried_calls"] == 1
     assert usage["succeeded_calls"] == 1
     assert usage["failed_calls"] == 1
     assert usage["skipped_by_budget"] == 1
@@ -342,6 +347,7 @@ def test_pipeline_runner_includes_ai_usage_in_run_summary(tmp_path) -> None:
     assert usage["latency_ms_average"] == 0
     assert usage["json_failures"] == 0
     assert usage["deterministic_fallbacks"] == 0
+    assert usage["failure_categories"] == {"rate_limit": 1}
     assert usage["estimated_cloud_cost_usd"] is None
 
 
@@ -379,9 +385,13 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
         metadata={
             "public_copy_quality": {
                 "checked": 5,
+                "selected_items": 3,
+                "accepted": 1,
+                "repair_attempted": 2,
                 "repaired": 2,
                 "replaced": 1,
                 "failed": 1,
+                "unresolved_selected": 0,
                 "sanitized": 1,
                 "delivery_blocked": 0,
                 "details": [
@@ -402,10 +412,14 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
     run_summary = result.rendered_digest.metadata["run_summary"]
     assert run_summary["public_copy_quality"] == {
         "checked": 5,
+        "selected_items": 3,
+        "accepted": 1,
+        "repair_attempted": 2,
         "polished": 0,
         "repaired": 2,
         "replaced": 1,
         "failed": 1,
+        "unresolved_selected": 0,
         "polish_failed": 0,
         "sanitized": 1,
         "replacement_attempted": 0,

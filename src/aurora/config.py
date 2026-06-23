@@ -121,6 +121,7 @@ class AIConfig(BaseModel):
     temperature: float = Field(default=0.2, ge=0.0, le=2.0)
     max_tokens: int = Field(default=4096, ge=1)
     max_requests_per_run: int | None = Field(default=None, ge=0)
+    max_network_attempts_per_run: int | None = Field(default=None, ge=0)
     max_tokens_per_run: int | None = Field(default=None, ge=0)
     input_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
     output_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
@@ -128,6 +129,8 @@ class AIConfig(BaseModel):
     analysis_concurrency: int = Field(default=2, ge=1)
     enrichment_concurrency: int = Field(default=2, ge=1)
     throttle_sec: float = Field(default=0.0, ge=0.0)
+    transient_retry_attempts: int = Field(default=0, ge=0)
+    retry_backoff_sec: float = Field(default=1.0, ge=0.0)
     languages: list[str] = Field(default_factory=lambda: ["en"])
 
     @field_validator("model", "api_key_env")
@@ -389,6 +392,7 @@ class TechNewsFiltersConfig(BaseModel):
             "python",
         ]
     )
+    require_include_keyword: bool = False
     exclude_keywords: list[str] = Field(default_factory=list)
 
     @field_validator("include_keywords", "exclude_keywords")
@@ -707,6 +711,7 @@ class UnifiedDigestModeConfig(BaseModel):
     section_limits: dict[SignalSection, int] = Field(
         default_factory=lambda: {"news": 5, "repo": 3, "paper": 3}
     )
+    minimum_section_items: dict[SignalSection, int] = Field(default_factory=dict)
     cross_mode_clusters: bool = True
     section_order: list[SignalSection] = Field(default_factory=lambda: ["news", "repo", "paper"])
 
@@ -737,6 +742,17 @@ class UnifiedDigestModeConfig(BaseModel):
             if limit < 1:
                 raise ValueError("section_limits values must be at least 1")
         return values
+
+    @model_validator(mode="after")
+    def validate_minimum_section_items(self) -> "UnifiedDigestModeConfig":
+        for section, minimum in self.minimum_section_items.items():
+            if section not in {"news", "paper", "repo"}:
+                raise ValueError("minimum_section_items keys must be news, paper, or repo")
+            if minimum < 0:
+                raise ValueError("minimum_section_items values must be at least 0")
+            if minimum > self.section_limits.get(section, self.max_items_per_type):
+                raise ValueError("minimum_section_items may not exceed section_limits")
+        return self
 
 
 class ModesConfig(BaseModel):

@@ -115,6 +115,27 @@ def test_scoring_increases_with_engagement_recency_and_keywords() -> None:
     assert strong_score.tags == ["hackernews", "ai", "agent"]
 
 
+def test_scoring_excludes_unmatched_high_engagement_news_when_required() -> None:
+    scorer = TechNewsScorer(
+        TechNewsFiltersConfig(include_keywords=["ai", "agent"], require_include_keyword=True),
+        TechNewsScoringConfig(),
+    )
+    off_topic = _item(
+        "news:spacex",
+        "SpaceX drops $400B in market value",
+        "https://example.com/spacex",
+        source="hackernews",
+        published_at=datetime(2026, 5, 26, tzinfo=timezone.utc),
+        metadata={"score": 1400, "descendants": 500},
+    )
+
+    result = asyncio.run(scorer.score([off_topic], _context()))[0]
+
+    assert result.final_score == 0.0
+    assert result.reason == "excluded by missing required keyword"
+    assert result.tags == ["hackernews"]
+
+
 def test_default_scoring_prioritizes_timely_high_engagement_news() -> None:
     scorer = TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig())
     popular_timely = _item(

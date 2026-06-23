@@ -44,6 +44,29 @@ def reserve_ai_budget(
     return True
 
 
+def reserve_ai_network_attempt(config: AIConfig, context: StageContext, task: AITask) -> bool:
+    """Reserve one outbound attempt without double-counting prompt tokens."""
+    usage = ai_usage(config, context, task)
+    limit = config.max_network_attempts_per_run
+    attempts = int(usage.get("network_attempts") or 0)
+    if limit is not None and attempts >= limit:
+        usage["skipped_by_budget"] += 1
+        usage["deterministic_fallbacks"] += 1
+        warning = "AI network-attempt budget exhausted; remaining items use deterministic scoring."
+        warnings = context.metadata.setdefault("warnings", [])
+        if isinstance(warnings, list) and warning not in warnings:
+            warnings.append(warning)
+        return False
+    usage["network_attempts"] = attempts + 1
+    return True
+
+
+def record_ai_retry(config: AIConfig, context: StageContext, task: AITask) -> None:
+    """Record a transient completion retry."""
+    usage = ai_usage(config, context, task)
+    usage["retried_calls"] += 1
+
+
 def record_ai_success(
     config: AIConfig,
     context: StageContext,
@@ -67,6 +90,7 @@ def record_ai_failure(
     latency_ms: int,
     *,
     json_failure: bool = False,
+    failure_category: str = "unknown",
 ) -> None:
     """Record a recoverable task failure and its deterministic fallback."""
     usage = ai_usage(config, context, task)
@@ -75,6 +99,12 @@ def record_ai_failure(
     usage["deterministic_fallbacks"] += 1
     if json_failure:
         usage["json_failures"] += 1
+    categories = usage.setdefault("failure_categories", {})
+    if not isinstance(categories, dict):
+        categories = {}
+        usage["failure_categories"] = categories
+    category = str(failure_category or "unknown")
+    categories[category] = int(categories.get(category) or 0) + 1
 
 
 def ai_usage(config: AIConfig, context: StageContext, task: AITask) -> dict[str, Any]:
@@ -89,6 +119,8 @@ def ai_usage(config: AIConfig, context: StageContext, task: AITask) -> dict[str,
             "local_only": config.local_only,
             "task_models": {task: config.model},
             "requested_calls": 0,
+            "network_attempts": 0,
+            "retried_calls": 0,
             "succeeded_calls": 0,
             "failed_calls": 0,
             "skipped_by_budget": 0,
@@ -98,6 +130,7 @@ def ai_usage(config: AIConfig, context: StageContext, task: AITask) -> dict[str,
             "latency_ms_total": 0,
             "json_failures": 0,
             "deterministic_fallbacks": 0,
+            "failure_categories": {},
             "estimated_cloud_cost_usd": default_cost,
         },
     )
@@ -119,6 +152,8 @@ def ai_usage(config: AIConfig, context: StageContext, task: AITask) -> dict[str,
         usage.setdefault("estimated_cloud_cost_usd", _configured_cost_default(config))
     for key in (
         "requested_calls",
+        "network_attempts",
+        "retried_calls",
         "succeeded_calls",
         "failed_calls",
         "skipped_by_budget",
@@ -133,6 +168,15 @@ def ai_usage(config: AIConfig, context: StageContext, task: AITask) -> dict[str,
             usage[key] = int(usage.get(key) or 0)
         except (TypeError, ValueError):
             usage[key] = 0
+    categories = usage.get("failure_categories")
+    if not isinstance(categories, dict):
+        usage["failure_categories"] = {}
+    else:
+        usage["failure_categories"] = {
+            str(category): max(0, int(count or 0))
+            for category, count in categories.items()
+            if str(category).strip()
+        }
     return usage
 
 

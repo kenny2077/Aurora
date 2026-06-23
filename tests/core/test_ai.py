@@ -3,6 +3,8 @@ from __future__ import annotations
 import asyncio
 from datetime import datetime, timezone
 
+import httpx
+
 from aurora.ai.json import parse_json_object
 from aurora.ai.ranker import LLMAnalysis, LLMRanker
 from aurora.ai.scoring import combine_scores
@@ -119,6 +121,48 @@ def test_llm_ranker_uses_suggested_learning_path_and_tags() -> None:
     assert "benchmarks" in enriched.tags
 
 
+def test_llm_ranker_retries_transient_failures_and_records_attempts() -> None:
+    item = _item("news:retry")
+    client = _RetryingClient(transient_failures=2)
+    context = StageContext(mode="test", run_id="retry")
+    ranker = LLMRanker(
+        AIConfig(
+            api_key_env="AURORA_TEST_KEY",
+            transient_retry_attempts=2,
+            retry_backoff_sec=0,
+            max_network_attempts_per_run=3,
+        ),
+        weights=FinalScoreWeights(),
+        client=client,
+    )
+
+    analyses = asyncio.run(ranker.analyze_items([item], _prompt, context))
+
+    assert set(analyses) == {"news:retry"}
+    assert client.calls == 3
+    assert context.metadata["ai_usage"]["requested_calls"] == 1
+    assert context.metadata["ai_usage"]["network_attempts"] == 3
+    assert context.metadata["ai_usage"]["retried_calls"] == 2
+    assert context.metadata["ai_usage"]["failed_calls"] == 0
+
+
+def test_llm_ranker_does_not_retry_authentication_failures() -> None:
+    item = _item("news:auth")
+    client = _AuthenticationFailureClient()
+    context = StageContext(mode="test", run_id="auth")
+    ranker = LLMRanker(
+        AIConfig(api_key_env="AURORA_TEST_KEY", transient_retry_attempts=2, retry_backoff_sec=0),
+        weights=FinalScoreWeights(),
+        client=client,
+    )
+
+    analyses = asyncio.run(ranker.analyze_items([item], _prompt, context))
+
+    assert analyses == {}
+    assert client.calls == 1
+    assert context.metadata["ai_usage"]["failure_categories"] == {"authentication": 1}
+
+
 def _prompt(item: SignalItem) -> tuple[str, str]:
     return "system", item.id
 
@@ -150,3 +194,32 @@ class _FakeClient:
             learning_value="LLM learning",
             action_items=["Read the source"],
         ).model_dump()
+
+
+class _RetryingClient:
+    def __init__(self, transient_failures: int) -> None:
+        self.transient_failures = transient_failures
+        self.calls = 0
+
+    def is_configured(self) -> bool:
+        return True
+
+    async def complete_json(self, system_prompt: str, user_prompt: str) -> dict:
+        self.calls += 1
+        if self.calls <= self.transient_failures:
+            raise httpx.ReadTimeout("timed out")
+        return LLMAnalysis(score=9.0, summary="Recovered response").model_dump()
+
+
+class _AuthenticationFailureClient:
+    def __init__(self) -> None:
+        self.calls = 0
+
+    def is_configured(self) -> bool:
+        return True
+
+    async def complete_json(self, system_prompt: str, user_prompt: str) -> dict:
+        self.calls += 1
+        request = httpx.Request("POST", "https://example.com/chat/completions")
+        response = httpx.Response(401, request=request)
+        raise httpx.HTTPStatusError("unauthorized", request=request, response=response)

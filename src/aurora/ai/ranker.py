@@ -11,6 +11,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from aurora.ai.client import AIClient, AIResponseFormatError
+from aurora.ai.retry import classify_ai_failure, complete_json_with_retries
 from aurora.ai.scoring import combine_scores
 from aurora.ai.usage import approx_tokens, record_ai_failure, record_ai_success, reserve_ai_budget
 from aurora.config import AIConfig, AITask, FinalScoreWeights
@@ -84,7 +85,16 @@ class LLMRanker:
                         return item.id, None
                 started = perf_counter()
                 try:
-                    payload = await self.client.complete_json(system_prompt, user_prompt)
+                    payload = await complete_json_with_retries(
+                        self.client,
+                        self.config,
+                        context,
+                        self.task,
+                        system_prompt,
+                        user_prompt,
+                    )
+                    if payload is None:
+                        return item.id, None
                     analysis = LLMAnalysis.model_validate(payload)
                     async with budget_lock:
                         record_ai_success(
@@ -98,12 +108,25 @@ class LLMRanker:
                 except (AIResponseFormatError, ValidationError):
                     failed_count += 1
                     async with budget_lock:
-                        record_ai_failure(self.config, context, self.task, _elapsed_ms(started), json_failure=True)
+                        record_ai_failure(
+                            self.config,
+                            context,
+                            self.task,
+                            _elapsed_ms(started),
+                            json_failure=True,
+                            failure_category="invalid_response",
+                        )
                     return item.id, None
-                except Exception:
+                except Exception as exc:
                     failed_count += 1
                     async with budget_lock:
-                        record_ai_failure(self.config, context, self.task, _elapsed_ms(started))
+                        record_ai_failure(
+                            self.config,
+                            context,
+                            self.task,
+                            _elapsed_ms(started),
+                            failure_category=classify_ai_failure(exc),
+                        )
                     return item.id, None
 
         results = await asyncio.gather(*(analyze(item) for item in items))

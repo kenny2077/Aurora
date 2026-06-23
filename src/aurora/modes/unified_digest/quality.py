@@ -97,6 +97,8 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
 
     if len(normalized) < 20:
         reasons.append("too_short")
+    if item.type == "news" and _has_incomplete_source_sentence(item.summary):
+        reasons.append("incomplete_source_sentence")
     if any(SOURCE_COVERS_PATTERN.search(value) for value in quality_texts):
         reasons.append("source_covers_template")
     if "updates #" in quality_lowered or any(
@@ -227,6 +229,12 @@ def _has_dangling_fragment(text: str) -> bool:
     if words and len(words[-1]) <= 2 and words[-1] not in ALLOWED_SHORT_FINAL_WORDS:
         return True
     return lowered.endswith((" vs.", " e.g.", " i.e."))
+
+
+def _has_incomplete_source_sentence(value: object) -> bool:
+    text = str(value or "").strip()
+    words = re.findall(r"[A-Za-z0-9]+", text)
+    return len(words) >= 5 and not text.endswith((".", "!", "?"))
 
 
 def _mostly_repeats_title(item: SignalItem, text: str) -> bool:

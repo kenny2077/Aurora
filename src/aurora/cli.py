@@ -479,6 +479,8 @@ def _print_ai_usage(result: Any) -> None:
         f"{_int_value(usage, 'succeeded_calls')} succeeded, "
         f"{_int_value(usage, 'failed_calls')} failed, "
         f"{_int_value(usage, 'skipped_by_budget')} skipped, "
+        f"{_int_value(usage, 'network_attempts')} network attempts, "
+        f"{_int_value(usage, 'retried_calls')} retries, "
         f"~{_int_value(usage, 'approx_total_tokens')} tokens, "
         f"{_int_value(usage, 'deterministic_fallbacks')} fallbacks, "
         f"{_int_value(usage, 'latency_ms_average')}ms average, "
@@ -495,12 +497,12 @@ def _print_public_copy_quality(result: Any) -> None:
         return
     print(
         f"{result.mode}: public copy "
-        f"{_int_value(quality, 'checked')} checked, "
-        f"{_int_value(quality, 'polished')} polished, "
+        f"{_int_value(quality, 'selected_items')} selected, "
+        f"{_int_value(quality, 'accepted')} accepted, "
+        f"{_int_value(quality, 'repair_attempted')} repair requested, "
         f"{_int_value(quality, 'repaired')} repaired, "
-        f"{_int_value(quality, 'sanitized')} sanitized, "
         f"{_int_value(quality, 'replaced')} replaced, "
-        f"{_int_value(quality, 'failed')} failed, "
+        f"{_int_value(quality, 'unresolved_selected')} unresolved, "
         f"{_int_value(quality, 'delivery_blocked')} delivery blocked"
     )
 

@@ -535,11 +535,11 @@ def test_run_prints_ai_usage_and_public_copy_quality(tmp_path: Path, monkeypatch
     assert exit_code == 0
     assert (
         "unified_digest: ai requests 12 requested, 10 succeeded, 1 failed, "
-        "1 skipped, ~4200 tokens"
+        "1 skipped, 13 network attempts, 1 retries, ~4200 tokens"
     ) in output
     assert (
-        "unified_digest: public copy 11 checked, 9 polished, 1 repaired, "
-        "1 sanitized, 1 replaced, 1 failed, 0 delivery blocked"
+        "unified_digest: public copy 11 selected, 8 accepted, 2 repair requested, "
+        "1 repaired, 1 replaced, 1 unresolved, 0 delivery blocked"
     ) in output
 
 
@@ -603,6 +603,8 @@ class _ObservabilityEnrich:
     async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
         context.metadata["ai_usage"] = {
             "requested_calls": 12,
+            "network_attempts": 13,
+            "retried_calls": 1,
             "succeeded_calls": 10,
             "failed_calls": 1,
             "skipped_by_budget": 1,
@@ -612,11 +614,14 @@ class _ObservabilityEnrich:
         }
         context.metadata["public_copy_quality"] = {
             "checked": 11,
-            "polished": 9,
+            "selected_items": 11,
+            "accepted": 8,
+            "repair_attempted": 2,
             "repaired": 1,
             "sanitized": 1,
             "replaced": 1,
             "failed": 1,
+            "unresolved_selected": 1,
             "delivery_blocked": 0,
             "details": [],
         }

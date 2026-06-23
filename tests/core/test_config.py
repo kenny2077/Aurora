@@ -201,12 +201,17 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.password_env == "EMAIL_PASSWORD"
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
     assert config.ai.max_tokens == 650
-    assert config.ai.max_requests_per_run == 42
+    assert config.ai.max_requests_per_run == 12
+    assert config.ai.max_network_attempts_per_run == 18
     assert config.ai.max_tokens_per_run == 240000
     assert config.ai.fail_open_on_budget_exceeded is True
-    assert config.modes.tech_news.llm_analysis_top_n == 6
-    assert config.modes.scholar.llm_analysis_top_n == 10
-    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 8
+    assert config.ai.analysis_concurrency == 2
+    assert config.ai.transient_retry_attempts == 2
+    assert config.ai.retry_backoff_sec == 1.0
+    assert config.modes.tech_news.filters.require_include_keyword is True
+    assert config.modes.tech_news.llm_analysis_top_n == 0
+    assert config.modes.scholar.llm_analysis_top_n == 0
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 0
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
     assert config.modes.tech_news.sources.reddit.enabled is True
@@ -226,4 +231,17 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.modes.repo_learning.sources.github_search.min_stars == 100
     assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]
     assert config.modes.unified_digest.section_limits == {"news": 5, "repo": 3, "paper": 3}
+    assert config.modes.unified_digest.minimum_section_items == {"news": 5, "repo": 3, "paper": 3}
     assert config.modes.unified_digest.max_total_items == 11
+
+
+def test_unified_digest_rejects_minimum_section_count_above_limit() -> None:
+    with pytest.raises(ValidationError, match="minimum_section_items"):
+        AuroraConfig(
+            modes={
+                "unified_digest": {
+                    "section_limits": {"news": 1, "repo": 1, "paper": 1},
+                    "minimum_section_items": {"news": 2, "repo": 1, "paper": 1},
+                }
+            }
+        )

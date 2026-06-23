@@ -66,6 +66,15 @@ class TechNewsScorer:
                 score_breakdown={"excluded": 0.0},
                 reason="excluded by keyword",
             )
+        if self.filters.require_include_keyword and not matched_keywords:
+            return ScoreResult(
+                item_id=item.id,
+                deterministic_score=0.0,
+                final_score=0.0,
+                score_breakdown={"missing_required_keyword": 0.0},
+                reason="excluded by missing required keyword",
+                tags=[item.source],
+            )
 
         breakdown = {
             "source_authority": _source_authority(item),

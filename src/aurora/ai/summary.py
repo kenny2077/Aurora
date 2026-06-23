@@ -9,6 +9,7 @@ from typing import Any, Sequence
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from aurora.ai.client import AIClient, AIResponseFormatError
+from aurora.ai.retry import classify_ai_failure, complete_json_with_retries
 from aurora.ai.usage import approx_tokens, record_ai_failure, record_ai_success, reserve_ai_budget
 from aurora.config import AIConfig
 from aurora.models import SignalItem
@@ -57,7 +58,16 @@ class UnifiedSummaryRefiner:
             return ""
         started = perf_counter()
         try:
-            payload = await self.client.complete_json(system_prompt, user_prompt)
+            payload = await complete_json_with_retries(
+                self.client,
+                self.config,
+                context,
+                "summary",
+                system_prompt,
+                user_prompt,
+            )
+            if payload is None:
+                return ""
             response = SummaryResponse.model_validate(payload)
             summary = " ".join(response.summary.split())
             if not summary:
@@ -71,9 +81,22 @@ class UnifiedSummaryRefiner:
             )
             return summary
         except (AIResponseFormatError, ValidationError):
-            record_ai_failure(self.config, context, "summary", _elapsed_ms(started), json_failure=True)
-        except Exception:
-            record_ai_failure(self.config, context, "summary", _elapsed_ms(started))
+            record_ai_failure(
+                self.config,
+                context,
+                "summary",
+                _elapsed_ms(started),
+                json_failure=True,
+                failure_category="invalid_response",
+            )
+        except Exception as exc:
+            record_ai_failure(
+                self.config,
+                context,
+                "summary",
+                _elapsed_ms(started),
+                failure_category=classify_ai_failure(exc),
+            )
         context.metadata.setdefault("warnings", []).append(
             "LLM summary refinement failed; deterministic digest used."
         )

@@ -31,13 +31,20 @@
   },
   "ai": {
     "max_tokens": 650,
-    "max_requests_per_run": 42,
+    "max_requests_per_run": 12,
+    "max_network_attempts_per_run": 18,
     "max_tokens_per_run": 240000,
-    "fail_open_on_budget_exceeded": true
+    "fail_open_on_budget_exceeded": true,
+    "analysis_concurrency": 2,
+    "transient_retry_attempts": 2,
+    "retry_backoff_sec": 1.0
   },
   "modes": {
     "tech_news": {
-      "llm_analysis_top_n": 6,
+      "llm_analysis_top_n": 0,
+      "filters": {
+        "require_include_keyword": true
+      },
       "sources": {
         "hackernews": {
           "enabled": true,
@@ -113,7 +120,7 @@
       "fields": ["ml", "agents"],
       "max_candidates": 200,
       "final_item_count": 10,
-      "llm_analysis_top_n": 10,
+      "llm_analysis_top_n": 0,
       "score_threshold": 5.5,
       "sources": {
         "arxiv": {
@@ -152,7 +159,7 @@
       "ranking": {
         "final_item_count": 6,
         "enrich_top_n": 12,
-        "llm_analysis_top_n": 8,
+        "llm_analysis_top_n": 0,
         "history_lookback_days": 14
       }
     },
@@ -162,6 +169,11 @@
       "max_items_per_type": 8,
       "max_total_items": 11,
       "section_limits": {
+        "news": 5,
+        "repo": 3,
+        "paper": 3
+      },
+      "minimum_section_items": {
         "news": 5,
         "repo": 3,
         "paper": 3

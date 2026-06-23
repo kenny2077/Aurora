@@ -71,6 +71,8 @@ def display_tech_news_source(item: SignalItem) -> str:
 
 def display_tech_news_summary(item: SignalItem) -> str:
     """Return the public one-sentence summary for a news item."""
+    if _has_incomplete_source_sentence(item.summary):
+        return ""
     if not is_low_quality_note(item.summary):
         return _public_sentence(clean_note_text(item.summary), item.title)
     return display_tech_news_why(item)
@@ -277,3 +279,10 @@ def _has_dangling_end(value: str) -> bool:
         return True
     words = re.findall(r"[a-z0-9]+", lowered)
     return bool(words and len(words[-1]) <= 2 and words[-1] not in {"ai", "ml", "rl", "ui", "ux", "os", "go", "js", "m3"})
+
+
+def _has_incomplete_source_sentence(value: str) -> bool:
+    """Reject substantial source excerpts that end without a sentence boundary."""
+    text = html.unescape(value or "").strip()
+    words = re.findall(r"[A-Za-z0-9]+", text)
+    return len(words) >= 5 and not text.endswith((".", "!", "?"))

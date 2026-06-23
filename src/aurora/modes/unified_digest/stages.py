@@ -68,6 +68,11 @@ class UnifiedFetchStage:
             context.metadata.setdefault("unified_child_run_summaries", []).extend(
                 child_run_summaries
             )
+        if child_run_summaries or failures:
+            context.metadata["unified_source_health"] = _aggregate_child_source_health(
+                child_run_summaries,
+                failures,
+            )
         return collected
 
 
@@ -226,6 +231,7 @@ async def _apply_public_copy_quality_gate(
     locked_ids: list[str] = []
     repairer = PublicCopyRepairer(context.config.ai, client=client)
     diagnostics = _quality_diagnostics(context.metadata)
+    diagnostics["selected_items"] += len(selected)
 
     for selected_item in selected:
         accepted = await _accept_or_repair_public_copy(
@@ -256,11 +262,12 @@ async def _apply_public_copy_quality_gate(
             continue
 
         diagnostics["unresolved"] += 1
+        diagnostics["unresolved_selected"] += 1
         locked_ids.append(selected_item.id)
         _record_quality_detail(
             diagnostics,
             selected_item,
-            "published_after_quality_failure",
+            "unresolved_selected",
             public_copy_quality(selected_item).reasons,
         )
         context.metadata.setdefault("warnings", []).append(
@@ -279,17 +286,15 @@ async def _accept_or_repair_public_copy(
 ) -> SignalItem | None:
     quality = public_copy_quality(item)
     diagnostics["checked"] += 1
-    action = "polish_requested" if quality.ok else "repair_requested"
-    _record_quality_detail(diagnostics, item, action, quality.reasons)
-    if item.type == "repo" and quality.ok:
-        _record_quality_detail(diagnostics, item, "repo_metadata_public_copy_accepted", [])
+    if quality.ok:
+        diagnostics["accepted"] += 1
+        _record_quality_detail(diagnostics, item, "accepted", [])
         return item
+
+    diagnostics["repair_attempted"] += 1
+    _record_quality_detail(diagnostics, item, "repair_requested", quality.reasons)
     polished = await repairer.repair(item, context)
     if polished is None:
-        diagnostics["polish_failed"] += 1
-        if quality.ok:
-            _record_quality_detail(diagnostics, item, "polish_skipped_or_failed", quality.reasons)
-            return item
         diagnostics["failed"] += 1
         _record_quality_detail(diagnostics, item, "repair_skipped_or_failed", quality.reasons)
         return None
@@ -297,23 +302,9 @@ async def _accept_or_repair_public_copy(
     polished_quality = public_copy_quality(polished)
     diagnostics["checked"] += 1
     if polished_quality.ok:
-        if quality.ok:
-            diagnostics["polished"] += 1
-            _record_quality_detail(diagnostics, item, "polished", quality.reasons)
-        else:
-            diagnostics["repaired"] += 1
-            _record_quality_detail(diagnostics, item, "repaired", quality.reasons)
+        diagnostics["repaired"] += 1
+        _record_quality_detail(diagnostics, item, "repaired", quality.reasons)
         return polished
-
-    diagnostics["polish_failed"] += 1
-    if quality.ok:
-        _record_quality_detail(
-            diagnostics,
-            item,
-            "polish_still_low_quality_original_kept",
-            polished_quality.reasons,
-        )
-        return item
 
     diagnostics["failed"] += 1
     _record_quality_detail(
@@ -357,10 +348,14 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
         "public_copy_quality",
         {
             "checked": 0,
+            "selected_items": 0,
+            "accepted": 0,
+            "repair_attempted": 0,
             "repaired": 0,
             "replaced": 0,
             "failed": 0,
             "unresolved": 0,
+            "unresolved_selected": 0,
             "polished": 0,
             "polish_failed": 0,
             "sanitized": 0,
@@ -374,10 +369,14 @@ def _quality_diagnostics(metadata: dict[str, Any]) -> dict[str, Any]:
         diagnostics = {}
         metadata["public_copy_quality"] = diagnostics
     diagnostics.setdefault("checked", 0)
+    diagnostics.setdefault("selected_items", 0)
+    diagnostics.setdefault("accepted", 0)
+    diagnostics.setdefault("repair_attempted", 0)
     diagnostics.setdefault("repaired", 0)
     diagnostics.setdefault("replaced", 0)
     diagnostics.setdefault("failed", 0)
     diagnostics.setdefault("unresolved", 0)
+    diagnostics.setdefault("unresolved_selected", 0)
     diagnostics.setdefault("polished", 0)
     diagnostics.setdefault("polish_failed", 0)
     diagnostics.setdefault("sanitized", 0)
@@ -393,6 +392,7 @@ def _enforce_public_digest_quality(rendered: RenderedDigest, context: StageConte
     audit = audit_rendered_public_digest(rendered.markdown, web_html)
     diagnostics = _quality_diagnostics(context.metadata)
     reasons = list(audit.reasons)
+    reasons.extend(_missing_required_sections(rendered, context))
     if int(diagnostics.get("unresolved") or 0) > 0:
         reasons.append("public_copy_quality_failed")
     reasons = list(dict.fromkeys(reasons))
@@ -417,6 +417,24 @@ def _enforce_public_digest_quality(rendered: RenderedDigest, context: StageConte
     raise RuntimeError(
         "public digest delivery blocked by quality gate: " + ", ".join(reasons)
     )
+
+
+def _missing_required_sections(rendered: RenderedDigest, context: StageContext) -> list[str]:
+    if context.config is None:
+        return []
+    required = context.config.modes.unified_digest.minimum_section_items
+    counts = rendered.metadata.get("item_counts")
+    if not isinstance(counts, dict):
+        counts = {}
+    missing: list[str] = []
+    for section, minimum in required.items():
+        try:
+            available = int(counts.get(section) or 0)
+        except (TypeError, ValueError):
+            available = 0
+        if available < minimum:
+            missing.append(f"insufficient required section coverage: {section}")
+    return missing
 
 
 def _record_quality_detail(
@@ -494,6 +512,46 @@ def _child_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
         for key in ("skip_llm", "skip_delivery", "strict_delivery", "ai_usage")
         if key in metadata
     }
+
+
+def _aggregate_child_source_health(
+    child_summaries: Sequence[dict[str, Any]], mode_failures: Sequence[dict[str, str]] = ()
+) -> dict[str, Any]:
+    sources: list[dict[str, Any]] = []
+    totals = {"total": 0, "ok": 0, "failed": 0, "rate_limited": 0}
+    for summary in child_summaries:
+        mode = str(summary.get("mode") or "unknown").strip() or "unknown"
+        child_sources = summary.get("sources")
+        if not isinstance(child_sources, list):
+            continue
+        for source in child_sources:
+            if not isinstance(source, dict):
+                continue
+            row = {"mode": mode, **source}
+            sources.append(row)
+            totals["total"] += 1
+            if bool(row.get("ok")):
+                totals["ok"] += 1
+            else:
+                totals["failed"] += 1
+            if bool(row.get("rate_limited")):
+                totals["rate_limited"] += 1
+    for failure in mode_failures:
+        mode = str(failure.get("mode") or "unknown").strip() or "unknown"
+        sources.append(
+            {
+                "mode": mode,
+                "source": mode,
+                "stage": "child_pipeline",
+                "ok": False,
+                "failed_count": 1,
+                "rate_limited": False,
+                "error": str(failure.get("error") or "child pipeline failed"),
+            }
+        )
+        totals["total"] += 1
+        totals["failed"] += 1
+    return {**totals, "sources": sources}
 
 
 def _ensure_ai_usage(metadata: dict[str, Any]) -> None:

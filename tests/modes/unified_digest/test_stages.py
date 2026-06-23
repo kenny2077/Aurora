@@ -62,6 +62,30 @@ def test_unified_fetch_collects_enriched_items_without_sub_delivery(tmp_path: Pa
         "tech_news",
         "scholar",
     ]
+    assert context.metadata["unified_source_health"] == {
+        "total": 2,
+        "ok": 2,
+        "failed": 0,
+        "rate_limited": 0,
+        "sources": [
+            {
+                "mode": "tech_news",
+                "source": "static",
+                "stage": "fetch",
+                "ok": True,
+                "fetched_count": 1,
+                "rate_limited": False,
+            },
+            {
+                "mode": "scholar",
+                "source": "static",
+                "stage": "fetch",
+                "ok": True,
+                "fetched_count": 1,
+                "rate_limited": False,
+            },
+        ],
+    }
 
 
 def test_cross_mode_dedup_collapses_url_title_paper_and_repo_duplicates() -> None:
@@ -844,6 +868,22 @@ def test_public_copy_quality_uses_the_rendered_news_fallback() -> None:
     assert "deterministic_news_template" in quality.reasons
 
 
+def test_public_copy_quality_rejects_incomplete_source_sentence() -> None:
+    item = _item(
+        "news:truncated",
+        "news",
+        "Show HN: Oak, a Git alternative",
+        9.0,
+        source="hackernews",
+        summary="Oak is useful for teams that need a Git alternative but lacks Windo",
+    )
+
+    quality = public_copy_quality(item)
+
+    assert not quality.ok
+    assert "incomplete_source_sentence" in quality.reasons
+
+
 def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:
     audit = audit_rendered_public_digest(
         "# Aurora Unified Digest\n\n"
@@ -891,7 +931,7 @@ def test_rendered_public_digest_audit_accepts_clean_digest() -> None:
     assert audit.ok
 
 
-def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
+def test_unified_enrich_skips_llm_polish_for_clean_selected_public_copy(monkeypatch) -> None:
     monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
     config = AuroraConfig(
         modes={
@@ -931,22 +971,20 @@ def test_unified_enrich_polishes_all_selected_public_copy(monkeypatch) -> None:
         config=config,
         metadata={"ai_usage": _empty_ai_usage()},
     )
-    payloads = [
-        _payload(summary="Polished news explains why the research-agent workflow matters for builders."),
-        _payload(summary="This paper gives students a practical way to understand agent benchmark design."),
-    ]
+    client = _FakeAIClient([])
 
     enriched = asyncio.run(
-        UnifiedEnrichStage(client=_FakeAIClient(payloads)).enrich(items, [], context)
+        UnifiedEnrichStage(client=client).enrich(items, [], context)
     )
     summary = asyncio.run(
         UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context)
     )
 
-    assert "Polished news explains why the research-agent workflow matters for builders." in summary
+    assert "AWS shows a practical pattern for context-rich research agents." in summary
     assert "A compact agent workflow toolkit." in summary
-    assert "This paper gives students a practical way to understand agent benchmark design." in summary
-    assert context.metadata["public_copy_quality"]["polished"] == 2
+    assert "This paper explains a practical benchmark for testing AI agents." in summary
+    assert client.calls == 0
+    assert context.metadata["public_copy_quality"]["polished"] == 0
     assert context.metadata["public_copy_quality"]["repaired"] == 0
 
 
@@ -1271,6 +1309,38 @@ def test_unified_delivery_blocks_when_public_copy_remains_unresolved() -> None:
 
     assert delivered == []
     assert context.metadata["public_copy_quality"]["delivery_blocked"] == 1
+
+
+def test_unified_delivery_blocks_when_required_section_is_incomplete(tmp_path: Path) -> None:
+    delivered: list[str] = []
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+                "minimum_section_items": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    rendered = RenderedDigest(
+        mode="unified_digest",
+        title="Aurora Unified Digest",
+        markdown="# Aurora Unified Digest\n\n## Tech News\n\nClean-looking text.",
+        metadata={
+            "selected_item_ids": ["news:1", "repo:1"],
+            "recommended_repo_ids": [],
+            "item_counts": {"news": 1, "repo": 1, "paper": 0},
+        },
+    )
+    context = StageContext(mode="unified_digest", run_id="test", config=config)
+
+    with pytest.raises(RuntimeError, match="insufficient required section coverage: paper"):
+        asyncio.run(
+            UnifiedDeliveryStage(RepoLearningStateStore(tmp_path / "state.json"), _Deliver(delivered)).deliver(
+                rendered, context
+            )
+        )
+
+    assert delivered == []
 
 
 def test_unified_delivery_allows_recovered_quality_attempt(tmp_path: Path) -> None:
@@ -1891,6 +1961,31 @@ def test_unified_fetch_keeps_successful_modes_when_one_mode_fails(tmp_path: Path
     assert context.metadata["unified_mode_failures"] == [
         {"mode": "scholar", "error": "scholar mode is disabled"}
     ]
+    assert context.metadata["unified_source_health"] == {
+        "total": 2,
+        "ok": 1,
+        "failed": 1,
+        "rate_limited": 0,
+        "sources": [
+            {
+                "mode": "tech_news",
+                "source": "static",
+                "stage": "fetch",
+                "ok": True,
+                "fetched_count": 1,
+                "rate_limited": False,
+            },
+            {
+                "mode": "scholar",
+                "source": "scholar",
+                "stage": "child_pipeline",
+                "ok": False,
+                "failed_count": 1,
+                "rate_limited": False,
+                "error": "scholar mode is disabled",
+            },
+        ],
+    }
 
 
 def test_unified_fetch_collects_cached_scholar_papers(tmp_path: Path) -> None:
@@ -2114,11 +2209,13 @@ def _payload(*, summary: str = "", why: str = "", learning: str = "") -> dict:
 class _FakeAIClient:
     def __init__(self, payloads: list[dict]) -> None:
         self.payloads = list(payloads)
+        self.calls = 0
 
     def is_configured(self) -> bool:
         return True
 
     async def complete_json(self, system_prompt: str, user_prompt: str) -> dict:
+        self.calls += 1
         if not self.payloads:
             raise AssertionError("unexpected AI repair call")
         return self.payloads.pop(0)

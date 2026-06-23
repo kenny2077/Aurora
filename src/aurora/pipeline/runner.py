@@ -263,6 +263,13 @@ def _run_summary(
         },
         "sources": [_source_status_summary(status) for status in source_statuses],
     }
+    unified_source_health = _unified_source_health_summary(context_metadata)
+    if unified_source_health:
+        summary["source_health"] = {
+            key: unified_source_health[key]
+            for key in ("total", "ok", "failed", "rate_limited")
+        }
+        summary["sources"] = unified_source_health["sources"]
     if delivery_results is not None:
         summary["delivery_results"] = [
             result.model_dump(mode="json") for result in delivery_results
@@ -345,6 +352,8 @@ def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, Any]
     summary: dict[str, Any] = {}
     for key in (
         "requested_calls",
+        "network_attempts",
+        "retried_calls",
         "succeeded_calls",
         "failed_calls",
         "skipped_by_budget",
@@ -378,11 +387,45 @@ def _ai_usage_summary(context_metadata: dict[str, Any] | None) -> dict[str, Any]
             for task, model in task_models.items()
             if str(task) in {"ranking", "summary", "repair"} and str(model).strip()
         }
+    failure_categories = usage.get("failure_categories")
+    if isinstance(failure_categories, dict):
+        summary["failure_categories"] = {
+            str(category): max(0, int(count or 0))
+            for category, count in failure_categories.items()
+            if str(category).strip()
+        }
+    else:
+        summary["failure_categories"] = {}
     cost = usage.get("estimated_cloud_cost_usd")
     if isinstance(cost, (int, float)) and not isinstance(cost, bool):
         summary["estimated_cloud_cost_usd"] = float(cost)
     else:
         summary["estimated_cloud_cost_usd"] = None
+    return summary
+
+
+def _unified_source_health_summary(context_metadata: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(context_metadata, dict):
+        return {}
+    value = context_metadata.get("unified_source_health")
+    if not isinstance(value, dict):
+        return {}
+    sources = value.get("sources")
+    if not isinstance(sources, list):
+        return {}
+    summary: dict[str, Any] = {"sources": []}
+    for key in ("total", "ok", "failed", "rate_limited"):
+        try:
+            summary[key] = max(0, int(value.get(key) or 0))
+        except (TypeError, ValueError):
+            summary[key] = 0
+    for source in sources:
+        if not isinstance(source, dict):
+            continue
+        row = {str(key): value for key, value in source.items()}
+        if "error" in row:
+            row["error"] = _redact_secret_like_text(str(row["error"]))
+        summary["sources"].append(row)
     return summary
 
 
@@ -395,10 +438,14 @@ def _public_copy_quality_summary(context_metadata: dict[str, Any] | None) -> dic
     summary: dict[str, Any] = {}
     for key in (
         "checked",
+        "selected_items",
+        "accepted",
+        "repair_attempted",
         "polished",
         "repaired",
         "replaced",
         "failed",
+        "unresolved_selected",
         "polish_failed",
         "sanitized",
         "replacement_attempted",
