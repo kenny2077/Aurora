@@ -471,7 +471,7 @@
       }
     },
     "title:direct fisher score estimation for likelihood maximization": {
-      "cached_at": "2026-06-14T05:18:43.626979+00:00",
+      "cached_at": "2026-06-24T04:49:29.268165+00:00",
       "data": {
         "abstract": "We study the problem of likelihood maximization when the likelihood function is intractable but model simulations are readily available. We propose a sequential, gradient-based optimization method that directly models the Fisher score based on a local score matching technique which uses simulations from a localized region around each parameter iterate. By employing a linear parameterization to the surrogate score model, our technique admits a closed-form, least-squares solution. This approach yields a fast, flexible, and efficient approximation to the Fisher score, effectively smoothing the likelihood objective and mitigating the challenges posed by complex likelihood landscapes. We provide theoretical guarantees for our score estimator, including bounds on the bias introduced by the smoothing. Empirical results on a range of synthetic and real-world problems demonstrate the superior performance of our method compared to existing benchmarks.",
         "authors": [
@@ -696,7 +696,7 @@
       }
     },
     "title:errortrace a black box traceability mechanism based on model family error space": {
-      "cached_at": "2026-06-14T05:18:46.031319+00:00",
+      "cached_at": "2026-06-24T04:49:32.415095+00:00",
       "data": {
         "abstract": null,
         "authors": [
@@ -733,7 +733,7 @@
             "name": "Shanqing Guo"
           }
         ],
-        "citationCount": 1,
+        "citationCount": 2,
         "externalIds": {
           "CorpusId": 288614062
         },
@@ -855,7 +855,7 @@
       }
     },
     "title:generalized linear mode connectivity for transformers": {
-      "cached_at": "2026-06-14T05:18:30.518426+00:00",
+      "cached_at": "2026-06-24T04:48:49.252830+00:00",
       "data": {
         "abstract": "Understanding the geometry of neural network loss landscapes is a central question in deep learning, with implications for generalization and optimization. A striking phenomenon is linear mode connectivity (LMC), where independently trained models can be connected by low- or zero-loss paths despite appearing to lie in separate loss basins. However, this is often obscured by symmetries in parameter space -- such as neuron permutations -- which make functionally equivalent models appear dissimilar. Prior work has predominantly focused on neuron reordering through permutations, but such approaches are limited in scope and fail to capture the richer symmetries exhibited by modern architectures such as Transformers. In this work, we introduce a unified framework that captures four symmetry classes -- permutations, semi-permutations, orthogonal transformations, and general invertible maps -- broadening the set of valid reparameterizations and subsuming many previous approaches as special cases. Crucially, this generalization enables, for the first time, the discovery of low- and zero-barrier linear interpolation paths between independently trained Vision Transformers and GPT-2 models. Furthermore, our framework extends beyond pairwise alignment to multi-model and width-heterogeneous settings, enabling alignment across architectures of different sizes. These results reveal deeper structure in the loss landscape and underscore the importance of symmetry-aware analysis for understanding model space geometry.",
         "authors": [
@@ -873,7 +873,7 @@
           },
           {
             "authorId": "2326112647",
-            "name": "Antonio Orvieto"
+            "name": "A. Orvieto"
           },
           {
             "authorId": "24319781",
@@ -914,7 +914,7 @@
       }
     },
     "title:generating informative samples for risk averse fine tuning of downstream tasks": {
-      "cached_at": "2026-06-14T05:18:35.572230+00:00",
+      "cached_at": "2026-06-24T04:49:02.973120+00:00",
       "data": {
         "abstract": null,
         "authors": [
@@ -959,7 +959,7 @@
       }
     },
     "title:how do transformers learn implicit reasoning": {
-      "cached_at": "2026-06-14T05:18:38.643730+00:00",
+      "cached_at": "2026-06-24T04:49:06.180502+00:00",
       "data": {
         "abstract": "Recent work suggests that large language models (LLMs) can perform multi-hop reasoning implicitly -- producing correct answers without explicitly verbalizing intermediate steps -- but the underlying mechanisms remain poorly understood. In this paper, we study how such implicit reasoning emerges by training transformers from scratch in a controlled symbolic environment. Our analysis reveals a three-stage developmental trajectory: early memorization, followed by in-distribution generalization, and eventually cross-distribution generalization. We find that training with atomic triples is not necessary but accelerates learning, and that second-hop generalization relies on query-level exposure to specific compositional structures. To interpret these behaviors, we introduce two diagnostic tools: cross-query semantic patching, which identifies semantically reusable intermediate representations, and a cosine-based representational lens, which reveals that successful reasoning correlates with the cosine-base clustering in hidden space. This clustering phenomenon in turn provides a coherent explanation for the behavioral dynamics observed across training, linking representational structure to reasoning capability. These findings provide new insights into the interpretability of implicit multi-hop reasoning in LLMs, helping to clarify how complex reasoning processes unfold internally and offering pathways to enhance the transparency of such models.",
         "authors": [
@@ -1801,7 +1801,7 @@
       }
     },
     "title:q rag long context multi step retrieval via value based embedder training": {
-      "cached_at": "2026-06-14T05:18:22.735087+00:00",
+      "cached_at": "2026-06-24T04:48:12.298683+00:00",
       "data": {
         "abstract": "Retrieval-Augmented Generation (RAG) methods enhance LLM performance by efficiently filtering relevant context for LLMs, reducing hallucinations and inference cost. However, most existing RAG methods focus on single-step retrieval, which is often insufficient for answering complex questions that require multi-step search. Recently, multi-step retrieval approaches have emerged, typically involving the fine-tuning of small LLMs to perform multi-step retrieval. This type of fine-tuning is highly resource-intensive and does not enable the use of larger LLMs. In this work, we propose Q-RAG, a novel approach that fine-tunes the Embedder model for multi-step retrieval using reinforcement learning (RL). Q-RAG offers a competitive, resource-efficient alternative to existing multi-step retrieval methods for open-domain question answering and achieves state-of-the-art results on the popular long-context benchmarks BabiLong and RULER for contexts up to 10M tokens. Code is available at https://github.com/griver/Q-RAG",
         "authors": [
@@ -2248,7 +2248,7 @@
       }
     },
     "title:twilight adaptive attention sparsity with hierarchical top p pruning": {
-      "cached_at": "2026-06-14T05:18:33.057733+00:00",
+      "cached_at": "2026-06-24T04:48:59.380485+00:00",
       "data": {
         "abstract": "Leveraging attention sparsity to accelerate long-context large language models (LLMs) has been a hot research topic. However, current algorithms such as sparse attention or key-value (KV) cache compression tend to use a fixed budget, which presents a significant challenge during deployment because it fails to account for the dynamic nature of real-world scenarios, where the optimal balance between accuracy and efficiency can vary greatly. In this paper, we find that borrowing top-$p$ sampling (nucleus sampling) to sparse attention can surprisingly achieve adaptive budgeting. Based on this, we propose Twilight, a framework to bring adaptive sparsity to any existing sparse attention algorithm without sacrificing their accuracy. Empirical results show that Twilight can adaptively prune at most 98% of redundant tokens, leading to $15.4\\times$ acceleration in self-attention operations and $3.9\\times$ acceleration in end-to-end per token latency in long context LLM decoding.",
         "authors": [
@@ -2510,7 +2510,7 @@
       }
     },
     "title:webdevjudge evaluating m llms as critiques for web development quality": {
-      "cached_at": "2026-06-14T05:18:05.728692+00:00",
+      "cached_at": "2026-06-24T04:48:02.162361+00:00",
       "data": {
         "abstract": "The paradigm of LLM-as-a-judge is emerging as a scalable and efficient alternative to human evaluation, demonstrating strong performance on well-defined tasks. However, its reliability in open-ended tasks with dynamic environments and complex interactions remains unexplored. To bridge the gap, we introduce WebDevJudge, a systematic benchmark for assessing LLM-as-a-judge performance in web development, with support for both non-interactive evaluation based on static observations and continuous interactive evaluation with a dynamic web environment. WebDevJudge comprises human preference labels over paired web implementations, annotated with structured and query-grounded rubrics to ensure high-quality ground truth. Using this benchmark, we comprehensively evaluate various evaluators, including LLMs, MLLMs, and agentic workflows. We systematically investigate the impact of different paradigms and guidance mechanisms. Our experiments reveal a significant gap between LLM judges and human experts. In-depth analysis indicates this gap stems from fundamental model limitations, including failures in recognizing functional equivalence, verifying task feasibility, and mitigating bias. Overall, WebDevJudge presents a challenge to LLM-as-a-judge, offering insights to guide future research toward developing more reliable and capable automated evaluators for complicated scenarios. Code and data are available at https://github.com/lcy2723/WebDevJudge.",
         "authors": [
@@ -2547,7 +2547,7 @@
             "name": "Han Hu"
           }
         ],
-        "citationCount": 8,
+        "citationCount": 9,
         "externalIds": {
           "ArXiv": "2510.18560",
           "CorpusId": 282246709,
@@ -2576,7 +2576,7 @@
       }
     },
     "title:why dpo is a misspecified estimator and how to fix it": {
-      "cached_at": "2026-06-14T05:18:27.821668+00:00",
+      "cached_at": "2026-06-24T04:48:23.247073+00:00",
       "data": {
         "abstract": "Direct alignment algorithms such as Direct Preference Optimization (DPO) fine-tune models based on preference data, using only supervised learning instead of two-stage reinforcement learning with human feedback (RLHF). We show that DPO encodes a statistical estimation problem over reward functions induced by a parametric policy class. When the true reward function that generates preferences cannot be realized via the policy class, DPO becomes misspecified, resulting in failure modes such as preference order reversal, worsening of policy reward, and high sensitivity to the input preference data distribution. On the other hand, we study the local behavior of two-stage RLHF for a parametric class and relate it to a natural gradient step in policy space. Our fine-grained geometric characterization allows us to propose AuxDPO, which introduces additional auxiliary variables in the DPO loss function to help move towards the RLHF solution in a principled manner and mitigate the misspecification in DPO. We empirically demonstrate the superior performance of AuxDPO on didactic bandit settings as well as LLM alignment tasks.",
         "authors": [
