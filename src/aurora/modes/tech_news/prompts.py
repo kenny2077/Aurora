@@ -9,7 +9,9 @@ from aurora.models import SignalItem
 TECH_NEWS_ANALYSIS_SYSTEM = """
 You rank timely technology news. Return only JSON with:
 {"score": number, "summary": string, "why_it_matters": string, "learning_value": string, "action_items": [string]}
-Favor broad impact, high engagement, and freshness over niche topic matching.
+Favor concrete AI learning value for builders, researchers, and students. Penalize broad
+business, security, developer, or market stories unless the supplied source text explains a
+specific AI model, agent, evaluation, dataset, infrastructure, or tooling change.
 """.strip()
 
 

@@ -77,6 +77,7 @@ RENDERED_FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("score_visible", re.compile(r"\b\d+(?:\.\d+)?/10\b")),
     ("deterministic_news_template", re.compile(r"\bThe (?:update describes|release highlights)\b", re.IGNORECASE)),
     ("deterministic_news_generic", re.compile(r"This item points to a practical AI tooling or research update", re.IGNORECASE)),
+    ("generic_hackernews_template", re.compile(r"This Hacker News story is drawing .+ developer attention", re.IGNORECASE)),
     ("deterministic_repo_template", re.compile(r"is useful for studying how a real project organizes its architecture", re.IGNORECASE)),
     ("deterministic_paper_template", re.compile(r"This paper studies .+ and why the idea could matter for practical AI systems", re.IGNORECASE)),
 )
@@ -126,6 +127,12 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
         "this item points to a practical ai tooling or research update" in quality_lowered
     ):
         reasons.append("deterministic_news_generic")
+    if item.type == "news" and re.search(
+        r"\bThis Hacker News story is drawing\b.+\bdeveloper attention\b",
+        quality_lowered,
+        re.IGNORECASE,
+    ):
+        reasons.append("generic_hackernews_template")
     if item.type == "repo" and is_deterministic_repo_evidence(normalized):
         reasons.append("deterministic_repo_evidence")
     source_text = " ".join(

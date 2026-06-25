@@ -152,6 +152,7 @@ class PipelineRunner:
 
         summary = await pipeline.summarize_stage.summarize(enriched_items, context)
         rendered_digest = await pipeline.render_stage.render(summary, enriched_items, context)
+        _copy_render_metadata_to_context(rendered_digest.metadata, context)
         rendered_digest = rendered_digest.model_copy(
             update={"metadata": {**rendered_digest.metadata, "run_summary": run_summary}}
         )
@@ -286,10 +287,44 @@ def _run_summary(
     public_copy_quality = _public_copy_quality_summary(context_metadata)
     if public_copy_quality:
         summary["public_copy_quality"] = public_copy_quality
+    release_counts = _release_gate_counts(context_metadata)
+    if release_counts:
+        summary.update(release_counts)
     warnings = _summary_warnings(context_metadata)
     if warnings:
         summary["warnings"] = warnings
     return summary
+
+
+def _copy_render_metadata_to_context(metadata: dict[str, Any], context: StageContext) -> None:
+    item_counts = metadata.get("item_counts")
+    if isinstance(item_counts, dict):
+        context.metadata["item_counts"] = item_counts
+    if context.config is not None and context.mode == "unified_digest":
+        context.metadata["minimum_section_items"] = (
+            context.config.modes.unified_digest.minimum_section_items
+        )
+
+
+def _release_gate_counts(context_metadata: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(context_metadata, dict):
+        return {}
+    payload: dict[str, Any] = {}
+    item_counts = context_metadata.get("item_counts")
+    if isinstance(item_counts, dict):
+        payload["item_counts"] = {
+            str(section): max(0, int(count or 0))
+            for section, count in item_counts.items()
+            if str(section) in {"news", "repo", "paper"}
+        }
+    minimums = context_metadata.get("minimum_section_items")
+    if isinstance(minimums, dict):
+        payload["minimum_section_items"] = {
+            str(section): max(0, int(minimum or 0))
+            for section, minimum in minimums.items()
+            if str(section) in {"news", "repo", "paper"}
+        }
+    return payload
 
 
 def _source_status_summary(status: SourceStatus) -> dict[str, Any]:

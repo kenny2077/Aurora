@@ -884,6 +884,25 @@ def test_public_copy_quality_rejects_incomplete_source_sentence() -> None:
     assert "incomplete_source_sentence" in quality.reasons
 
 
+def test_public_copy_quality_rejects_generic_hackernews_engagement_fallback() -> None:
+    item = _item(
+        "news:hn-generic",
+        "news",
+        "The Coming Loop",
+        9.0,
+        source="hackernews",
+        metadata={"score": 500, "descendants": 120},
+        summary="",
+        why_it_matters="",
+        learning_value="",
+    )
+
+    quality = public_copy_quality(item)
+
+    assert not quality.ok
+    assert "generic_hackernews_template" in quality.reasons
+
+
 def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:
     audit = audit_rendered_public_digest(
         "# Aurora Unified Digest\n\n"

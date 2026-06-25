@@ -17,6 +17,8 @@ Supported modes:
 Current polishing stage:
 
 - Keep the visible unified digest simple: 5 tech news, 3 repos, 3 papers.
+- Scheduled production delivery is fail-closed: required clean-section coverage,
+  public-copy quality, and rendered-digest audit failures block email and Pages.
 - Keep visible diagnostics, source-health internals, and connection metadata out
   of email/Pages output unless explicitly requested.
 - Keep diagnostics in CLI output, Actions logs, and `run_summary.json`.
@@ -175,6 +177,22 @@ Typecheck/lint:
   - `news: 5`
   - `repo: 3`
   - `paper: 3`
+- `minimum_section_items` is optional for general configs. Actions config sets it
+  to `5/3/3`; if filtering, repair, or source outages leave a section below its
+  minimum, Aurora must block delivery rather than publish a reduced digest.
+- Scheduled tech news sets `require_include_keyword: true`. Items without a
+  configured include-keyword match are excluded before LLM analysis and unified
+  selection, regardless of source engagement.
+- Public news copy must retain a complete source sentence. Incomplete excerpts,
+  malformed Markdown, raw abstracts, and deterministic templates must be
+  repaired or replaced; unresolved selected copy blocks delivery. Do not send
+  already-valid selected copy to the LLM merely to polish it.
+- Scheduled Actions run deterministic selection first (`llm_analysis_top_n: 0`
+  per child mode). LLM use is reserved for failed selected-copy repair and the
+  bounded unified-summary refiner.
+- Actions config enables the persisted release gate at
+  `data/cache/release_gate.json`; only scheduled runs count toward the current
+  seven-clean-run readiness target.
 - Do not reintroduce these blocks into user-facing unified email/Pages output:
   - generated-time/KPI strip
   - `Today's Learning Path`
@@ -197,6 +215,30 @@ Typecheck/lint:
   - `agents_harness -> agents`
   - `computer_vision -> cv`
 - Do not combine `--topic` with `--repo-interest` or `--research-field`.
+
+## Local LLM And Reliability
+
+- `AIConfig.provider` supports `deepseek`, `openai`, `openai_compatible`,
+  `ollama`, `lmstudio`, and `anythingllm`. Model selection is configuration
+  driven; Ollama accepts any installed model tag and must never be restricted to
+  a hardcoded Qwen model list.
+- `task_models` may override `ranking`, `summary`, and `repair`; otherwise each
+  task uses `model`. Local providers may omit an API key, while cloud providers
+  still require their configured key. `local_only` must reject cloud providers.
+- AnythingLLM requires configured `base_url` and `workspace_slug` and uses its
+  workspace chat API. Keep its failures best-effort and parse its response
+  through Aurora's strict JSON contract.
+- `--local-llm` and `--free-mode` require an explicitly configured local
+  provider. GitHub Actions continues to use DeepSeek and must never attempt to
+  reach a developer Mac's Ollama or AnythingLLM instance.
+- LLM retries apply only to transient timeout, transport, 429, 408, and 5xx
+  failures. Respect `max_requests_per_run` for logical requests and
+  `max_network_attempts_per_run` for outbound attempts. Record retries,
+  classified failure categories, task models, fallbacks, and latency in
+  `run_summary.json`; redact secrets from all diagnostics.
+- Aggregate child-mode source health into unified run summaries. Optional source
+  outages, including Semantic Scholar rate limits, may degrade only when each
+  required clean section remains covered; otherwise delivery is blocked.
 
 ## Files And Directories To Avoid
 

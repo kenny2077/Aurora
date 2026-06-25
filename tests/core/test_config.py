@@ -208,7 +208,14 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.ai.analysis_concurrency == 2
     assert config.ai.transient_retry_attempts == 2
     assert config.ai.retry_backoff_sec == 1.0
+    assert config.release_gate.enabled is True
+    assert config.release_gate.required_clean_runs == 7
     assert config.modes.tech_news.filters.require_include_keyword is True
+    assert "agent" in config.modes.tech_news.filters.include_keywords
+    assert "llm" in config.modes.tech_news.filters.include_keywords
+    assert "developer" not in config.modes.tech_news.filters.include_keywords
+    assert "security" not in config.modes.tech_news.filters.include_keywords
+    assert "python" not in config.modes.tech_news.filters.include_keywords
     assert config.modes.tech_news.llm_analysis_top_n == 0
     assert config.modes.scholar.llm_analysis_top_n == 0
     assert config.modes.repo_learning.ranking.llm_analysis_top_n == 0

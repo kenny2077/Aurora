@@ -29,19 +29,56 @@ class OpenAICompatibleProvider:
         system_prompt: str,
         user_prompt: str,
     ) -> dict[str, Any]:
+        content = await self._chat_completion(
+            client,
+            system_prompt,
+            user_prompt,
+            json_mode=True,
+        )
+        if not content.strip():
+            content = await self._chat_completion(
+                client,
+                system_prompt,
+                user_prompt,
+                json_mode=True,
+            )
+        try:
+            return _parse_response(content)
+        except AIResponseFormatError:
+            content = await self._chat_completion(
+                client,
+                (
+                    f"{system_prompt}\n\nReturn only valid JSON. Do not include prose, "
+                    "Markdown fences, or explanation."
+                ),
+                user_prompt,
+                json_mode=False,
+            )
+            return _parse_response(content)
+
+    async def _chat_completion(
+        self,
+        client: httpx.AsyncClient,
+        system_prompt: str,
+        user_prompt: str,
+        *,
+        json_mode: bool,
+    ) -> str:
+        body: dict[str, Any] = {
+            "model": self.config.model,
+            "temperature": self.config.temperature,
+            "max_tokens": self.config.max_tokens,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+        }
+        if json_mode:
+            body["response_format"] = {"type": "json_object"}
         response = await client.post(
             f"{self.base_url}/chat/completions",
             headers=self.headers,
-            json={
-                "model": self.config.model,
-                "temperature": self.config.temperature,
-                "max_tokens": self.config.max_tokens,
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                "response_format": {"type": "json_object"},
-            },
+            json=body,
         )
         response.raise_for_status()
         try:
@@ -49,7 +86,7 @@ class OpenAICompatibleProvider:
             content = payload["choices"][0]["message"]["content"]
         except (IndexError, KeyError, TypeError, ValueError) as exc:
             raise AIResponseFormatError("AI response format is invalid") from exc
-        return _parse_response(str(content))
+        return str(content or "")
 
 
 class AnythingLLMProvider:

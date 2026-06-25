@@ -91,6 +91,28 @@ def test_doctor_local_llm_reports_default_json_check(tmp_path: Path, monkeypatch
     assert "local LLM JSON response: valid" in output
 
 
+def test_doctor_llm_accepts_cloud_provider_diagnostics(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    config_path.write_text('{"ai": {"provider": "deepseek", "api_key_env": "AURORA_TEST_KEY"}}', encoding="utf-8")
+
+    async def fake_diagnose(config, *, require_local=True):
+        assert require_local is False
+        return AIProviderDiagnostic(
+            status="ok",
+            detail="provider endpoint is reachable",
+            latency_ms=34,
+            model_available=None,
+            json_response_valid=True,
+        )
+
+    monkeypatch.setattr("aurora.cli.diagnose_ai_provider", fake_diagnose)
+
+    assert main(["doctor", "--config", str(config_path), "--llm"]) == 0
+    output = capsys.readouterr().out
+    assert "LLM: ok" in output
+    assert "LLM JSON response: valid" in output
+
+
 def test_config_validate_invalid_config_exits_nonzero(tmp_path: Path, capsys) -> None:
     config_path = tmp_path / "bad.json"
     config_path.write_text('{"run": {"max_items": 0}}', encoding="utf-8")
@@ -511,6 +533,32 @@ def test_run_prints_run_summary_warnings(tmp_path: Path, monkeypatch, capsys) ->
     ) in output
 
 
+def test_run_prints_aggregated_unified_source_health(tmp_path: Path, monkeypatch, capsys) -> None:
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["unified_digest"]}}', encoding="utf-8")
+    monkeypatch.setattr("aurora.cli.build_unified_digest_pipeline", _source_health_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "unified_digest",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--run-id",
+            "test-run",
+        ]
+    )
+
+    output = capsys.readouterr().out
+    assert exit_code == 0
+    assert "unified_digest: sources 3 ok, 1 failed, 1 rate limited" in output
+    assert "unified_digest: source scholar:semantic_scholar failed - 429 token=[REDACTED]" in output
+
+
 def test_run_prints_ai_usage_and_public_copy_quality(tmp_path: Path, monkeypatch, capsys) -> None:
     config_path = tmp_path / "config.json"
     output_dir = tmp_path / "runs"
@@ -599,6 +647,28 @@ class _WarningEnrich:
         return [items[0].model_copy(update={"final_score": 8.0})]
 
 
+class _SourceHealthEnrich:
+    async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
+        context.metadata["unified_source_health"] = {
+            "total": 4,
+            "ok": 3,
+            "failed": 1,
+            "rate_limited": 1,
+            "sources": [
+                {"source": "tech_news:rss", "ok": True},
+                {"source": "repo_learning:github_search", "ok": True},
+                {"source": "scholar:arxiv", "ok": True},
+                {
+                    "source": "scholar:semantic_scholar",
+                    "ok": False,
+                    "rate_limited": True,
+                    "error": "429 token=secret",
+                },
+            ],
+        }
+        return [items[0].model_copy(update={"final_score": 8.0})]
+
+
 class _ObservabilityEnrich:
     async def enrich(self, items, score_results, context: StageContext) -> list[SignalItem]:
         context.metadata["ai_usage"] = {
@@ -683,6 +753,21 @@ def _warning_pipeline(config) -> ModePipeline:
         deduplicate_stage=pipeline.deduplicate_stage,
         score_stage=pipeline.score_stage,
         enrich_stage=_WarningEnrich(),
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=pipeline.render_stage,
+        deliver_stage=pipeline.deliver_stage,
+    )
+
+
+def _source_health_pipeline(config) -> ModePipeline:
+    pipeline = _mode_pipeline("unified_digest", "news")
+    return ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=_SourceHealthEnrich(),
         summarize_stage=pipeline.summarize_stage,
         render_stage=pipeline.render_stage,
         deliver_stage=pipeline.deliver_stage,

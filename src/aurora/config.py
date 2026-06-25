@@ -105,6 +105,17 @@ class PipelineConfig(BaseModel):
     enrichment: EnrichmentConfig = Field(default_factory=EnrichmentConfig)
 
 
+class ReleaseGateConfig(BaseModel):
+    """Persisted final-release readiness gate settings."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    enabled: bool = False
+    ledger_path: Path = Path("data/cache/release_gate.json")
+    required_clean_runs: int = Field(default=7, ge=1)
+    retain_runs: int = Field(default=14, ge=1)
+
+
 class AIConfig(BaseModel):
     """Configuration for optional cloud and local LLM enrichment."""
 
@@ -774,5 +785,6 @@ class AuroraConfig(BaseModel):
     run: RunConfig = Field(default_factory=RunConfig)
     pipeline: PipelineConfig = Field(default_factory=PipelineConfig)
     ai: AIConfig = Field(default_factory=AIConfig)
+    release_gate: ReleaseGateConfig = Field(default_factory=ReleaseGateConfig)
     delivery: DeliveryConfig = Field(default_factory=DeliveryConfig)
     modes: ModesConfig = Field(default_factory=ModesConfig)

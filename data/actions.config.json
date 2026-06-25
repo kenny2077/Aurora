@@ -39,11 +39,37 @@
     "transient_retry_attempts": 2,
     "retry_backoff_sec": 1.0
   },
+  "release_gate": {
+    "enabled": true,
+    "ledger_path": "data/cache/release_gate.json",
+    "required_clean_runs": 7,
+    "retain_runs": 14
+  },
   "modes": {
     "tech_news": {
       "llm_analysis_top_n": 0,
       "filters": {
-        "require_include_keyword": true
+        "require_include_keyword": true,
+        "include_keywords": [
+          "ai",
+          "ml",
+          "llm",
+          "agent",
+          "agents",
+          "open source ai",
+          "model",
+          "models",
+          "inference",
+          "reasoning",
+          "benchmark",
+          "dataset",
+          "evaluation",
+          "rag",
+          "mcp",
+          "computer vision",
+          "multimodal",
+          "local llm"
+        ]
       },
       "sources": {
         "hackernews": {

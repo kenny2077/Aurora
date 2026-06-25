@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
 import os
+import re
 import sys
 from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
@@ -20,6 +22,7 @@ from aurora.modes.tech_news import build_tech_news_pipeline
 from aurora.modes.unified_digest import build_unified_digest_pipeline
 from aurora.models import DeliveryResult, RenderedDigest, ScoreResult, SignalItem
 from aurora.pipeline import ModePipeline, PipelineRunner, StageContext
+from aurora.release_gate import load_release_gate_status, record_release_gate_run
 from aurora.storage.config_loader import load_config
 
 
@@ -103,6 +106,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _handle_run(args)
         if args.command == "eval":
             return _handle_eval(args)
+        if args.command == "release-status":
+            return _handle_release_status(args)
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -123,6 +128,11 @@ def _build_parser() -> argparse.ArgumentParser:
     doctor_parser = subparsers.add_parser("doctor", help="Check Aurora runtime environment")
     doctor_parser.add_argument("--config", type=Path, default=None)
     doctor_parser.add_argument("--local-llm", action="store_true")
+    doctor_parser.add_argument("--llm", action="store_true")
+
+    release_parser = subparsers.add_parser("release-status", help="Show Aurora release-gate status")
+    release_parser.add_argument("--config", type=Path, default=None)
+    release_parser.add_argument("--json", action="store_true")
 
     run_parser = subparsers.add_parser("run", help="Run Aurora")
     run_parser.add_argument("--config", type=Path, default=None)
@@ -160,6 +170,26 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _handle_release_status(args: argparse.Namespace) -> int:
+    config = AuroraConfig() if args.config is None else load_config(args.config)
+    status = load_release_gate_status(config.release_gate)
+    if args.json:
+        print(json.dumps(status, indent=2, sort_keys=True))
+        return 0 if status.get("ready") else 1
+    print(f"release gate: {'ready' if status.get('ready') else 'not ready'}")
+    print(f"enabled: {'yes' if status.get('enabled') else 'no'}")
+    print(
+        "clean scheduled runs: "
+        f"{status.get('consecutive_clean_runs', 0)}/{status.get('required_clean_runs', 0)}"
+    )
+    latest = status.get("latest")
+    if isinstance(latest, dict):
+        blockers = latest.get("blockers")
+        print(f"latest run: {latest.get('run_id') or 'unknown'}")
+        print(f"latest blockers: {_format_list(blockers) if isinstance(blockers, list) else 'none'}")
+    return 0 if status.get("ready") else 1
+
+
 def _handle_config(args: argparse.Namespace) -> int:
     config = AuroraConfig() if args.config is None else load_config(args.config)
     print("config: ok")
@@ -189,17 +219,22 @@ def _handle_doctor(args: argparse.Namespace) -> int:
     print(f"missing required env vars: {', '.join(missing_required) if missing_required else 'none'}")
     optional = _missing_optional_env_vars(config)
     print(f"missing optional env vars: {', '.join(optional) if optional else 'none'}")
-    if args.local_llm:
-        diagnostic = asyncio.run(diagnose_ai_provider(config.ai))
+    if args.local_llm or args.llm:
+        diagnostic = asyncio.run(
+            diagnose_ai_provider(config.ai, require_local=False)
+            if args.llm
+            else diagnose_ai_provider(config.ai)
+        )
+        label = "LLM" if args.llm else "local LLM"
         print(
-            f"local LLM: {diagnostic.status} ({diagnostic.detail}; "
+            f"{label}: {diagnostic.status} ({diagnostic.detail}; "
             f"{diagnostic.latency_ms}ms)"
         )
         if diagnostic.model_available is not None:
-            print(f"local LLM model: {'available' if diagnostic.model_available else 'missing'}")
+            print(f"{label} model: {'available' if diagnostic.model_available else 'missing'}")
         if diagnostic.json_response_valid is not None:
             print(
-                "local LLM JSON response: "
+                f"{label} JSON response: "
                 f"{'valid' if diagnostic.json_response_valid else 'invalid'}"
             )
         return 0 if diagnostic.status == "ok" else 1
@@ -246,6 +281,7 @@ def _handle_run(args: argparse.Namespace) -> int:
         )
 
     for result in results:
+        _record_release_gate_if_needed(config, result)
         run_dir = config.run.output_dir / result.run_id / result.mode
         print(f"{result.mode}: ok ({run_dir})")
         _print_source_health(result)
@@ -437,6 +473,24 @@ def _is_writable_target(path: Path) -> bool:
 
 
 def _print_source_health(result: Any) -> None:
+    run_summary = _run_summary_for_result(result)
+    if isinstance(run_summary, dict):
+        health = run_summary.get("source_health")
+        sources = run_summary.get("sources")
+        if isinstance(health, dict) and isinstance(sources, list):
+            ok_count = _int_value(health, "ok")
+            failed_count = _int_value(health, "failed")
+            rate_limited_count = _int_value(health, "rate_limited")
+            print(
+                f"{result.mode}: sources {ok_count} ok, "
+                f"{failed_count} failed, {rate_limited_count} rate limited"
+            )
+            for source in sources:
+                if not isinstance(source, dict) or source.get("ok") is not False:
+                    continue
+                suffix = f" - {_redact_secret_like_text(str(source.get('error')))}" if source.get("error") else ""
+                print(f"{result.mode}: source {source.get('source', 'unknown')} failed{suffix}")
+            return
     statuses = list(result.source_statuses)
     if not statuses:
         return
@@ -449,12 +503,60 @@ def _print_source_health(result: Any) -> None:
     )
     for status in statuses:
         if not status.ok:
-            suffix = f" - {status.error}" if status.error else ""
+            suffix = f" - {_redact_secret_like_text(status.error)}" if status.error else ""
             print(f"{result.mode}: source {status.source} failed{suffix}")
 
 
-def _print_run_warnings(result: Any) -> None:
+def _record_release_gate_if_needed(config: AuroraConfig, result: Any) -> None:
+    if result.mode != "unified_digest" or not config.release_gate.enabled:
+        return
+    run_summary = _run_summary_for_result(result)
+    if not isinstance(run_summary, dict):
+        return
+    status = record_release_gate_run(
+        config.release_gate,
+        run_summary,
+        scheduled=_is_scheduled_run(),
+    )
+    print(
+        f"{result.mode}: release gate "
+        f"{status.get('consecutive_clean_runs', 0)}/{status.get('required_clean_runs', 0)} "
+        f"clean scheduled runs"
+    )
+
+
+def _run_summary_for_result(result: Any) -> dict[str, Any] | None:
+    output_paths = getattr(result, "output_paths", None)
+    if isinstance(output_paths, dict):
+        path = output_paths.get("run_summary")
+        if isinstance(path, Path) and path.exists():
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                if isinstance(payload, dict):
+                    return payload
+            except (OSError, json.JSONDecodeError):
+                pass
     run_summary = result.rendered_digest.metadata.get("run_summary")
+    return run_summary if isinstance(run_summary, dict) else None
+
+
+def _is_scheduled_run() -> bool:
+    return os.getenv("GITHUB_EVENT_NAME") == "schedule" or os.getenv("AURORA_SCHEDULED_RUN") == "true"
+
+
+def _redact_secret_like_text(value: str) -> str:
+    patterns = [
+        r"(?i)(authorization:\s*bearer\s+)[^\s]+",
+        r"(?i)([a-z0-9_]*(?:token|key|secret|password)[a-z0-9_]*=)[^\s]+",
+    ]
+    redacted = value
+    for pattern in patterns:
+        redacted = re.sub(pattern, r"\1[REDACTED]", redacted)
+    return redacted
+
+
+def _print_run_warnings(result: Any) -> None:
+    run_summary = _run_summary_for_result(result)
     if not isinstance(run_summary, dict):
         return
     warnings = run_summary.get("warnings")
@@ -467,7 +569,7 @@ def _print_run_warnings(result: Any) -> None:
 
 
 def _print_ai_usage(result: Any) -> None:
-    run_summary = result.rendered_digest.metadata.get("run_summary")
+    run_summary = _run_summary_for_result(result)
     if not isinstance(run_summary, dict):
         return
     usage = run_summary.get("ai_usage")
@@ -489,7 +591,7 @@ def _print_ai_usage(result: Any) -> None:
 
 
 def _print_public_copy_quality(result: Any) -> None:
-    run_summary = result.rendered_digest.metadata.get("run_summary")
+    run_summary = _run_summary_for_result(result)
     if not isinstance(run_summary, dict):
         return
     quality = run_summary.get("public_copy_quality")

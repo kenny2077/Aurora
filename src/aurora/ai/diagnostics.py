@@ -25,13 +25,22 @@ class AIProviderDiagnostic:
 async def diagnose_ai_provider(
     config: AIConfig,
     *,
+    require_local: bool = True,
     http_client: httpx.AsyncClient | None = None,
 ) -> AIProviderDiagnostic:
     """Fully validate a local provider without exposing URLs or credentials."""
-    if not config.is_local_provider():
+    if require_local and not config.is_local_provider():
         return AIProviderDiagnostic(
             status="invalid_config",
             detail="configured provider is not local",
+            latency_ms=0,
+            model_available=None,
+            json_response_valid=None,
+        )
+    if not AIClient(config).is_configured():
+        return AIProviderDiagnostic(
+            status="authentication_failed",
+            detail="configured authentication is missing",
             latency_ms=0,
             model_available=None,
             json_response_valid=None,

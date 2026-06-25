@@ -37,6 +37,13 @@ on:
         options:
           - "false"
           - "true"
+      llm_diagnostic:
+        description: Run provider LLM doctor before Aurora
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -120,6 +127,11 @@ jobs:
               exit 1
             fi
           done
+      - name: LLM diagnostic
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.llm_diagnostic == 'true' }}
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: uv run aurora doctor --config data/actions.config.json --llm
       - name: Run Aurora
         timeout-minutes: 25
         env:

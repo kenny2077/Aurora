@@ -84,6 +84,60 @@ def test_ollama_uses_openai_compatible_endpoint_without_auth_header() -> None:
     }
 
 
+def test_openai_compatible_retries_empty_json_mode_response_with_json_mode() -> None:
+    observed_bodies: list[dict[str, object]] = []
+
+    async def run() -> dict:
+        responses = [
+            httpx.Response(200, json={"choices": [{"message": {"content": ""}}]}),
+            httpx.Response(200, json={"choices": [{"message": {"content": '{"score": 8}'}}]}),
+        ]
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            observed_bodies.append(json.loads(request.content))
+            return responses.pop(0)
+
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+            return await AIClient(
+                AIConfig(provider="ollama", model="qwen2.5:3b"),
+                http_client=http_client,
+            ).complete_json("system", "user")
+
+    assert asyncio.run(run()) == {"score": 8}
+    assert len(observed_bodies) == 2
+    assert observed_bodies[0]["response_format"] == {"type": "json_object"}
+    assert observed_bodies[1]["response_format"] == {"type": "json_object"}
+
+
+def test_openai_compatible_falls_back_to_plain_json_after_malformed_json_mode_response(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    observed_bodies: list[dict[str, object]] = []
+    monkeypatch.setenv("AURORA_TEST_KEY", "test-key")
+
+    async def run() -> dict:
+        responses = [
+            httpx.Response(200, json={"choices": [{"message": {"content": "not JSON"}}]}),
+            httpx.Response(200, json={"choices": [{"message": {"content": '{"score": 9}'}}]}),
+        ]
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            observed_bodies.append(json.loads(request.content))
+            return responses.pop(0)
+
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as http_client:
+            return await AIClient(
+                AIConfig(provider="deepseek", api_key_env="AURORA_TEST_KEY"),
+                http_client=http_client,
+            ).complete_json("system", "user")
+
+    assert asyncio.run(run()) == {"score": 9}
+    assert len(observed_bodies) == 2
+    assert observed_bodies[0]["response_format"] == {"type": "json_object"}
+    assert "response_format" not in observed_bodies[1]
+    assert "valid JSON" in str(observed_bodies[1]["messages"][0]["content"])
+
+
 @pytest.mark.parametrize(
     ("provider", "base_url", "expected_url"),
     [
