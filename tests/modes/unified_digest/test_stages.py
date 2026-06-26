@@ -657,7 +657,7 @@ def test_unified_rendering_uses_polished_news_summary_fallback() -> None:
     )
 
     assert "   - Source: GitHub Releases" in summary
-    assert "The release highlights" in summary
+    assert "Release v0.23.0 adds" in summary
     assert "updates #" not in summary
     assert "faster inference paths" in summary
     assert "github_releases" not in summary
@@ -864,8 +864,8 @@ def test_public_copy_quality_uses_the_rendered_news_fallback() -> None:
     quality = public_copy_quality(item)
 
     assert not quality.ok
-    assert quality.text.startswith("The release highlights")
-    assert "deterministic_news_template" in quality.reasons
+    assert quality.text == "Example v1.2.3 ships a new project release."
+    assert set(quality.reasons) >= {"title_restatement", "release_note_remnant"}
 
 
 def test_public_copy_quality_rejects_incomplete_source_sentence() -> None:
@@ -901,6 +901,28 @@ def test_public_copy_quality_rejects_generic_hackernews_engagement_fallback() ->
 
     assert not quality.ok
     assert "generic_hackernews_template" in quality.reasons
+
+
+def test_public_copy_quality_accepts_concrete_rss_source_sentence() -> None:
+    item = _item(
+        "news:rss-concrete",
+        "news",
+        "Agentic overlays for legacy services",
+        8.0,
+        source="rss",
+        metadata={"feed_name": "AWS Machine Learning Blog"},
+        summary="",
+        why_it_matters="",
+        raw_content=(
+            "AWS shows how agentic overlays can add AI workflows to legacy enterprise "
+            "services without rebuilding the underlying systems."
+        ),
+    )
+
+    quality = public_copy_quality(item)
+
+    assert quality.ok
+    assert "AWS shows how agentic overlays" in quality.text
 
 
 def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:
@@ -1068,6 +1090,64 @@ def test_unified_enrich_replaces_june_16_style_slop_after_failed_polish(monkeypa
     assert "who need." not in summary
     assert context.metadata["unified_selected_item_ids"][0] == "news:replacement"
     assert context.metadata["public_copy_quality"]["replacement_attempted"] >= 1
+    assert context.metadata["public_copy_quality"]["replacement_succeeded"] == 1
+
+
+def test_unified_enrich_replaces_generic_hackernews_copy_with_concrete_news(monkeypatch) -> None:
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+    config = AuroraConfig(
+        modes={
+            "unified_digest": {
+                "section_order": ["news", "repo", "paper"],
+                "section_limits": {"news": 1, "repo": 1, "paper": 1},
+            }
+        }
+    )
+    generic_hn = _item(
+        "news:hn-generic",
+        "news",
+        "The Coming Loop",
+        10.0,
+        source="hackernews",
+        metadata={"score": 600, "descendants": 140},
+        summary="",
+        why_it_matters="",
+        learning_value="",
+    )
+    concrete_rss = _item(
+        "news:concrete-rss",
+        "news",
+        "Agent evaluation toolkit release",
+        8.0,
+        source="rss",
+        metadata={"feed_name": "OpenAI News"},
+        summary="OpenAI describes how teams can compare agent behavior before release.",
+    )
+    items = [
+        generic_hn,
+        concrete_rss,
+        _item("repo:1", "repo", "Repo", 8.0, why_it_matters="This repo teaches a useful agent workflow."),
+        _item("paper:1", "paper", "Paper", 8.0, summary="This paper explains a practical benchmark for AI agents."),
+    ]
+    context = StageContext(
+        mode="unified_digest",
+        run_id="test",
+        config=config,
+        metadata={"ai_usage": _empty_ai_usage()},
+    )
+
+    enriched = asyncio.run(
+        UnifiedEnrichStage(client=_FakeAIClient([_payload(summary="The Coming Loop.")])).enrich(
+            items,
+            [],
+            context,
+        )
+    )
+    summary = asyncio.run(UnifiedDigestSummarizer(config.modes.unified_digest).summarize(enriched, context))
+
+    assert "Agent evaluation toolkit release" in summary
+    assert "The Coming Loop" not in summary
+    assert context.metadata["unified_selected_item_ids"][0] == "news:concrete-rss"
     assert context.metadata["public_copy_quality"]["replacement_succeeded"] == 1
 
 

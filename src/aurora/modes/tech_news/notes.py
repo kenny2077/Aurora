@@ -149,7 +149,7 @@ def _rss_notes(item: SignalItem) -> TechNewsNotes:
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = clean_note_text(item.title)
-    why = _prefixed_public_sentence("The update describes", excerpt, item.title)
+    why = _source_public_sentence(excerpt, item.title)
     learning = f"Use it to understand the concrete change: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -167,7 +167,7 @@ def _github_release_notes(item: SignalItem) -> TechNewsNotes:
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = f"{title} ships a new project release."
-    why = _prefixed_public_sentence("The release highlights", excerpt, item.title)
+    why = _source_public_sentence(excerpt, item.title)
     learning = f"Use it to identify the practical release changes: {_truncate(excerpt, 180)}."
     return TechNewsNotes(
         why_it_matters=why,
@@ -215,21 +215,11 @@ def _truncate(value: str, limit: int) -> str:
     return value[: limit - 3].rstrip() + "..."
 
 
-def _sentence_fragment(value: str, limit: int) -> str:
-    text = _truncate(value, limit).strip()
-    if not text:
-        return "a practical technology update"
-    if len(text) > 1 and text[:2].isupper():
-        return text.rstrip(".")
-    return text[:1].lower() + text[1:].rstrip(".")
-
-
-def _prefixed_public_sentence(prefix: str, value: str, title: str) -> str:
+def _source_public_sentence(value: str, title: str) -> str:
     text = _public_sentence(_strip_title_prefix(value, title), "")
-    text = _sentence_fragment(text, 180)
     if not text or _has_dangling_end(text):
         return "This item points to a practical AI tooling or research update worth checking from the source."
-    return f"{prefix} {text}."
+    return text
 
 
 def _public_sentence(value: str, title: str) -> str:

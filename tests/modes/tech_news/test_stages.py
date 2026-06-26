@@ -354,7 +354,7 @@ def test_enricher_generates_clean_rss_learning_notes() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("The update describes")
+    assert enriched.why_it_matters.startswith("Nvidia's new workstation targets")
     assert "local inference" in enriched.learning_value
     for value in (enriched.why_it_matters, enriched.learning_value):
         assert "<p>" not in value
@@ -385,7 +385,7 @@ def test_enricher_generates_mature_rss_fallback_summary() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("The update describes")
+    assert enriched.why_it_matters.startswith("Agent-EvalKit helps teams")
     assert "repeatable benchmarks" in enriched.why_it_matters
     assert "covers" not in enriched.why_it_matters
     assert "flagged this" not in enriched.why_it_matters
@@ -412,7 +412,7 @@ def test_github_release_uses_public_source_label_and_release_summary() -> None:
 
     assert "GitHub Releases" in summary
     assert "github_releases" not in summary
-    assert enriched.why_it_matters.startswith("The release highlights")
+    assert enriched.why_it_matters.startswith("Release v0.23.0 adds")
     assert "faster inference paths" in enriched.why_it_matters
     assert "Release Notes" not in enriched.why_it_matters
     assert "updates #" not in enriched.why_it_matters
@@ -437,7 +437,7 @@ def test_deterministic_news_fallback_removes_title_prefix_and_dangling_fragments
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert enriched.why_it_matters.startswith("The update describes")
+    assert enriched.why_it_matters.startswith("AWS describes context-aware")
     assert "Context intelligence in AWS Developer tools:" not in enriched.why_it_matters
     assert not enriched.why_it_matters.endswith("and.")
 
