@@ -1,7 +1,7 @@
 {
   "entries": {
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
-      "cached_at": "2026-06-14T05:18:48.768036+00:00",
+      "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
         "abstract": "Search-augmented LLMs often struggle with complex reasoning tasks due to ineffective multi-hop retrieval and limited reasoning ability. We propose AceSearcher, a cooperative self-play framework that trains a single large language model (LLM) to alternate between two roles: a decomposer that breaks down complex queries and a solver that integrates retrieved contexts for answer generation. AceSearcher couples supervised fine-tuning on a diverse mixture of search, reasoning, and decomposition tasks with reinforcement fine-tuning optimized for final answer accuracy, eliminating the need for intermediate annotations. Extensive experiments on three reasoning-intensive tasks across 10 datasets show that AceSearcher outperforms state-of-the-art baselines, achieving an average exact match improvement of 7.6%. Remarkably, on document-level finance reasoning tasks, AceSearcher-32B matches the performance of the DeepSeek-V3 model using less than 5% of its parameters. Even at smaller scales (1.5B and 8B), AceSearcher often surpasses existing search-augmented LLMs with up to 9x more parameters, highlighting its exceptional efficiency and effectiveness in tackling complex reasoning tasks. Our code will be published at https://github.com/ritaranx/AceSearcher and https://huggingface.co/AceSearcher.",
         "authors": [
@@ -261,7 +261,7 @@
       }
     },
     "title:common corpus the largest collection of ethical data for llm pre training": {
-      "cached_at": "2026-06-14T05:18:51.104424+00:00",
+      "cached_at": "2026-06-29T05:15:23.965182+00:00",
       "data": {
         "abstract": "Large Language Models (LLMs) are pre-trained on large amounts of data from different sources and domains. Such datasets often contain trillions of tokens, including large portions of copyrighted or proprietary content, which raises questions about the legal use of such models. This underscores the need for truly open pre-training data that complies with data security regulations. In this paper, we introduce Common Corpus, the largest open dataset for LLM pre-training. The data assembled in Common Corpus are either uncopyrighted or under open licenses, totaling about two trillion tokens. The dataset contains a wide variety of languages, ranging from the high-resource European languages to some low-resource languages rarely represented in pre-training datasets. In addition, it includes a large amount of code data. The diversity of data sources in terms of covered domains and time periods opens up the paths for both research and entrepreneurial needs across diverse areas of knowledge. In this paper, we present the detailed provenance of data assembling and the details of dataset filtering and curation. We train two small language models on Common Corpus and find that they perform comparably to other models of their size, indicating that our dataset is suitable for multilingual pretraining. Common Corpus represents a key contribution to the ecosystem for open science research on Large Language Models.",
         "authors": [
@@ -332,6 +332,84 @@
         "url": "https://www.semanticscholar.org/paper/9aff73d0ddf6badbecee2979782003376020cf93",
         "venue": "arXiv.org",
         "year": 2025
+      }
+    },
+    "title:cve factory scaling expert level agentic tasks for code security vulnerability": {
+      "cached_at": "2026-06-29T05:14:38.050359+00:00",
+      "data": {
+        "abstract": "Evaluating and improving the security capabilities of code agents requires high-quality, executable vulnerability tasks. However, existing works rely on costly, unscalable manual reproduction and suffer from outdated data distributions. To address these, we present CVE-Factory, the first multi-agent framework to achieve expert-level quality in automatically transforming sparse CVE metadata into fully executable agentic tasks. Cross-validation against human expert reproductions shows that CVE-Factory achieves 95\\% solution correctness and 96\\% environment fidelity, confirming its expert-level quality. It is also evaluated on the latest realistic vulnerabilities and achieves a 66.2\\% verified success. This automation enables two downstream contributions. First, we construct LiveCVEBench, a continuously updated benchmark of 190 tasks spanning 14 languages and 153 repositories that captures emerging threats including AI-tooling vulnerabilities. Second, we synthesize over 1,000 executable training environments, the first large-scale scaling of agentic tasks in code security. Fine-tuned Qwen3-32B improves from 5.3\\% to 35.8\\% on LiveCVEBench, surpassing Claude 4.5 Sonnet, with gains generalizing to Terminal Bench (12.5\\% to 31.3\\%). We open-source CVE-Factory, LiveCVEBench, Abacus-cve (fine-tuned model), training dataset, and leaderboard. All resources are available at https://github.com/livecvebench/CVE-Factory .",
+        "authors": [
+          {
+            "authorId": "2284814458",
+            "name": "Xianzhen Luo"
+          },
+          {
+            "authorId": "2108122803",
+            "name": "Jingyuan Zhang"
+          },
+          {
+            "authorId": "2364692639",
+            "name": "Shiqi Zhou"
+          },
+          {
+            "authorId": "2409458908",
+            "name": "Rain Huang"
+          },
+          {
+            "authorId": "2330392877",
+            "name": "Chuan Xiao"
+          },
+          {
+            "authorId": "2283927956",
+            "name": "Qingfu Zhu"
+          },
+          {
+            "authorId": "2362631539",
+            "name": "Zhiyuan Ma"
+          },
+          {
+            "authorId": "2283865454",
+            "name": "X. Yue"
+          },
+          {
+            "authorId": "2355001493",
+            "name": "Yang Yue"
+          },
+          {
+            "authorId": "2358197518",
+            "name": "Wencong Zeng"
+          },
+          {
+            "authorId": "2283920108",
+            "name": "Wanxiang Che"
+          }
+        ],
+        "citationCount": 2,
+        "externalIds": {
+          "ArXiv": "2602.03012",
+          "CorpusId": 285275216,
+          "DBLP": "journals/corr/abs-2602-03012",
+          "DOI": "10.48550/arXiv.2602.03012"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2602.03012, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8a91350c9406116f4b229802068116c83d545514",
+        "title": "CVE-Factory: Scaling Expert-Level Agentic Tasks for Code Security Vulnerability",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "CVE-Factory is presented, the first multi-agent framework to achieve expert-level quality in automatically transforming sparse CVE metadata into fully executable agentic tasks, and synthesize over 1,000 executable training environments, the first large-scale scaling of agentic tasks in code security."
+        },
+        "url": "https://www.semanticscholar.org/paper/8a91350c9406116f4b229802068116c83d545514",
+        "venue": "arXiv.org",
+        "year": 2026
       }
     },
     "title:deltaflow an efficient multi frame scene flow estimation method": {
@@ -1481,7 +1559,7 @@
       }
     },
     "title:near optimal experiment design in linear non gaussian cyclic models": {
-      "cached_at": "2026-06-16T06:09:58.725560+00:00",
+      "cached_at": "2026-06-29T05:15:52.575304+00:00",
       "data": {
         "abstract": "We study the problem of causal structure learning from a combination of observational and interventional data generated by a linear non-Gaussian structural equation model that might contain cycles. Recent results show that using mere observational data identifies the causal graph only up to a permutation-equivalence class. We obtain a combinatorial characterization of this class by showing that each graph in an equivalence class corresponds to a perfect matching in a bipartite graph. This bipartite representation allows us to analyze how interventions modify or constrain the matchings. Specifically, we show that each atomic intervention reveals one edge of the true matching and eliminates all incompatible causal graphs. Consequently, we formalize the optimal experiment design task as an adaptive stochastic optimization problem over the set of equivalence classes with a natural reward function that quantifies how many graphs are eliminated from the equivalence class by an intervention. We show that this reward function is adaptive submodular and provide a greedy policy with a provable near-optimal performance guarantee. A key technical challenge is to efficiently estimate the reward function without having to explicitly enumerate all the graphs in the equivalence class. We propose a sampling-based estimator using random matchings and analyze its bias and concentration behavior. Our simulation results show that performing a small number of interventions guided by our stochastic optimization framework recovers the true underlying causal structure.",
         "authors": [
@@ -1921,6 +1999,72 @@
         "year": 2025
       }
     },
+    "title:quantifying frontier llm capabilities for container sandbox escape": {
+      "cached_at": "2026-06-29T05:14:54.889011+00:00",
+      "data": {
+        "abstract": "Large language models (LLMs) increasingly act as autonomous agents, using tools to execute code, read and write files, and access networks, creating novel security risks. To mitigate these risks, agents are commonly deployed and evaluated in isolated\"sandbox\"environments, often implemented using Docker/OCI containers. We introduce SANDBOXESCAPEBENCH, an open benchmark that safely measures an LLM's capacity to break out of these sandboxes. The benchmark is implemented as an Inspect AI Capture the Flag (CTF) evaluation utilising a nested sandbox architecture with the outer layer containing the flag and no known vulnerabilities. Following a threat model of a motivated adversarial agent with shell access inside a container, SANDBOXESCAPEBENCH covers a spectrum of sandboxescape mechanisms spanning misconfiguration, privilege allocation mistakes, kernel flaws, and runtime/orchestration weaknesses. We find that, when vulnerabilities are added, LLMs are able to identify and exploit them, showing that use of evaluation like SANDBOXESCAPEBENCH is needed to ensure sandboxing continues to provide the encapsulation needed for highly-capable models.",
+        "authors": [
+          {
+            "authorId": "2376394490",
+            "name": "Rahul Marchand"
+          },
+          {
+            "authorId": "3069953",
+            "name": "Art \u00d3 Cath\u00e1in"
+          },
+          {
+            "authorId": "2325727363",
+            "name": "Jerome Wynne"
+          },
+          {
+            "authorId": "2421690657",
+            "name": "P. Giavridis"
+          },
+          {
+            "authorId": "2362368526",
+            "name": "Sam Deverett"
+          },
+          {
+            "authorId": "2056940946",
+            "name": "John Wilkinson"
+          },
+          {
+            "authorId": "1414040061",
+            "name": "J. Gwartz"
+          },
+          {
+            "authorId": "2043233315",
+            "name": "H. Coppock"
+          }
+        ],
+        "citationCount": 5,
+        "externalIds": {
+          "ArXiv": "2603.02277",
+          "CorpusId": 286229141,
+          "DBLP": "journals/corr/abs-2603-02277",
+          "DOI": "10.48550/arXiv.2603.02277"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2603.02277, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "f0b042d54ccc16c51a193a5a81c7cc8768235f5a",
+        "title": "Quantifying Frontier LLM Capabilities for Container Sandbox Escape",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "SANDBOXESCAPEBENCH is introduced, an open benchmark that safely measures an LLM's capacity to break out of isolated sandboxes and finds that, when vulnerabilities are added, LLMs are able to identify and exploit them, showing that use of evaluation like SANDBOXESCAPEBENCH is needed to ensure sandboxing continues to provide the encapsulation needed for highly-capable models."
+        },
+        "url": "https://www.semanticscholar.org/paper/f0b042d54ccc16c51a193a5a81c7cc8768235f5a",
+        "venue": "arXiv.org",
+        "year": 2026
+      }
+    },
     "title:rewarding progress scaling automated process verifiers for llm reasoning": {
       "cached_at": "2026-06-19T05:35:40.358043+00:00",
       "data": {
@@ -2245,7 +2389,7 @@
       }
     },
     "title:the structure of relation decoding linear operators in large language models": {
-      "cached_at": "2026-06-14T05:18:53.669810+00:00",
+      "cached_at": "2026-06-29T05:15:35.856940+00:00",
       "data": {
         "abstract": "This paper investigates the structure of linear operators introduced in Hernandez et al. [2023] that decode specific relational facts in transformer language models. We extend their single-relation findings to a collection of relations and systematically chart their organization. We show that such collections of relation decoders can be highly compressed by simple order-3 tensor networks without significant loss in decoding accuracy. To explain this surprising redundancy, we develop a cross-evaluation protocol, in which we apply each linear decoder operator to the subjects of every other relation. Our results reveal that these linear maps do not encode distinct relations, but extract recurring, coarse-grained semantic properties (e.g., country of capital city and country of food are both in the country-of-X property). This property-centric structure clarifies both the operators'compressibility and highlights why they generalize only to new relations that are semantically close. Our findings thus interpret linear relational decoding in transformer language models as primarily property-based, rather than relation-specific.",
         "authors": [
@@ -2292,6 +2436,58 @@
         "url": "https://www.semanticscholar.org/paper/c01dd96803eb95ffd3bb4472d6dcf313fe4d675d",
         "venue": "arXiv.org",
         "year": 2025
+      }
+    },
+    "title:towards efficient llms annealing with principled sample selection": {
+      "cached_at": "2026-06-29T05:15:26.275844+00:00",
+      "data": {
+        "abstract": "The annealing phase is a pivotal convergence stage in LLM pre-training that ultimately determines final model quality. However, effectively selecting training data during this phase remains a key challenge. Current strategies rely on empirical heuristics, such as domain filtering or context extension, which lack a principled grounding in optimization theory. In this work, we characterize the annealing phase through the lens of the loss landscape's spectral geometry. We argue that optimal convergence requires gradient updates to satisfy heterogeneous constraints across different eigen-directions. Building on this insight, we formulate data selection as a problem of satisfying these directional constraints. To this end, we propose DiReCT (Directionally-Restrained Constrained Training), a novel framework that reformulates sample selection in the annealing stage as a constrained optimization problem. By imposing explicit directional constraints on per-sample gradients based on the spectral properties of the Hessian, DiReCT identifies samples that align with the optimal curvature-aware descent path. Extensive experiments across various model scales demonstrate that DiReCT consistently achieves state-of-the-art performance. For future research, code is available at https://github.com/xuyj233/Direct.",
+        "authors": [
+          {
+            "authorId": "2316442416",
+            "name": "Yuanjian Xu"
+          },
+          {
+            "authorId": "2365044309",
+            "name": "Jianing Hao"
+          },
+          {
+            "authorId": "2329169864",
+            "name": "Wanbo Zhang"
+          },
+          {
+            "authorId": "2265481567",
+            "name": "Zhong Li"
+          },
+          {
+            "authorId": "2316557060",
+            "name": "Guang Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2605.31175",
+          "CorpusId": 288814877
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2605.31175, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "e4f98826aeffb73eed2a547ead80ad09d82614ef",
+        "title": "Towards Efficient LLMs Annealing with Principled Sample Selection",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work describes the annealing phase through the lens of the loss landscape's spectral geometry and proposes DiReCT (Directionally-Restrained Constrained Training), a novel framework that reformulates sample selection in the annealing stage as a constrained optimization problem."
+        },
+        "url": "https://www.semanticscholar.org/paper/e4f98826aeffb73eed2a547ead80ad09d82614ef",
+        "venue": "",
+        "year": 2026
       }
     },
     "title:twilight adaptive attention sparsity with hierarchical top p pruning": {
