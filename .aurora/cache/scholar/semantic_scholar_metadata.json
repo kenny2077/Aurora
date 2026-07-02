@@ -1,5 +1,49 @@
 {
   "entries": {
+    "arxiv:2606.29354": {
+      "cached_at": "2026-07-02T04:42:13.373018+00:00",
+      "data": {
+        "abstract": "Chain-of-Thought (CoT) improves large language models (LLMs) on difficult reasoning tasks, but it often incurs long natural-language rationales that are poorly aligned with efficient machine reasoning. We propose Communicative Language Symbolism Routing (CLSR), a test-time framework in which multiple LLM agents autonomously invent, evolve, and share compact Language Symbolism Frameworks (LSFs), while a latent-free router adaptively selects and composes these languages per query to optimize the accuracy-token trade-off. Unlike prompt optimization that refines surface instructions, CLSR treats each LSF as a reusable symbolic protocol with compact symbols, usage rules, and a message-passing contract, and improves it through an evolutionary loop driven by correctness and token cost. At inference time, the router may invoke a single low-cost LSF call, ensemble multiple LSFs, or execute a multi-round LSF composition protocol on harder queries. Across challenging benchmarks, CLSR reduces latency-oriented generated token completion by $3\\sim 6\\times$ compared to standard CoT while maintaining accuracy. We further derive an information-theoretic lower bound on token cost under arbitrary symbolism and show that, under an interpreter-realizability premise, multi-round LSF protocols conditionally subsume program-execution pipelines. Code is publicly available (https://github.com/pzqpzq/LSF_MDia).",
+        "authors": [
+          {
+            "authorId": "116406922",
+            "name": "Zhengqi Pei"
+          },
+          {
+            "authorId": "2256640224",
+            "name": "Qingming Huang"
+          },
+          {
+            "authorId": "2319173985",
+            "name": "Shuhui Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2606.29354",
+          "CorpusId": 289683492
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2606.29354, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "aba891328c15fc74ff719a1810f161b69c46388f",
+        "title": "When LLMs Develop Languages: Symbolic Communication for Efficient Multi-Agent Reasoning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Communicative Language Symbolism Routing (CLSR) is proposed, a test-time framework in which multiple LLM agents autonomously invent, evolve, and share compact Language Symbolism Frameworks (LSFs), while a latent-free router adaptively selects and composes these languages per query to optimize the accuracy-token trade-off."
+        },
+        "url": "https://www.semanticscholar.org/paper/aba891328c15fc74ff719a1810f161b69c46388f",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
