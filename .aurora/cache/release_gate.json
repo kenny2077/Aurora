@@ -76,7 +76,18 @@
       "clean": false,
       "mode": "unified_digest",
       "run_id": "run-20260703T042651Z"
+    },
+    {
+      "blockers": [
+        "llm_failed_calls",
+        "llm_json_failures",
+        "deterministic_fallbacks"
+      ],
+      "checked_at": "2026-07-04T04:24:16.130210+00:00",
+      "clean": false,
+      "mode": "unified_digest",
+      "run_id": "run-20260704T042124Z"
     }
   ],
-  "updated_at": "2026-07-03T04:29:09.885478+00:00"
+  "updated_at": "2026-07-04T04:24:16.130298+00:00"
 }

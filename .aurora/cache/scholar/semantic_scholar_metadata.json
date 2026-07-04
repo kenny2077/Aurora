@@ -44,6 +44,555 @@
         "year": 2026
       }
     },
+    "arxiv:2607.01651": {
+      "cached_at": "2026-07-04T04:22:40.957721+00:00",
+      "data": {
+        "abstract": "Learning effective robot control policies on physical hardware is challenging due to costly data collection and the difficulty of reward specification. Prior work has incorporated demonstrations into reinforcement learning (RL), yet existing approaches either require large numbers of demonstrations or depend on continuous human intervention during training. To address these limitations, we present AutoSERL, a framework that leverages a single demonstration to fully automate the intervention process in real-world robot RL. The framework includes three complementary mechanisms to accomplish certain tasks: a sliding window intervention mechanism that continuously guides exploration to prevent local optima and unsafe deviations, a safety recovery mechanism that detects and corrects failure states via predefined trajectory recovery points, and an intervention termination criterion that automatically disables guidance once the policy can independently complete the task, preserving its exploration advantage. We evaluate AutoSERL on six contact-intensive manipulation tasks across two robot platforms, spanning insertion, hanging, and hinge-based tasks. AutoSERL consistently outperforms SERL initialized with 20 demonstrations, behavior cloning, and MILES -- a dedicated one-shot imitation learning baseline -- across all tasks while matching HIL-SERL, achieves 100% success rate on insertion tasks, and demonstrates improved robustness to positional variations, all from a single demonstration. Code and videos are available on our project website: https://autoserl.github.io/.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yuwan Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Hongze Yu"
+          },
+          {
+            "authorId": null,
+            "name": "Song Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Yuhan Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Junge Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Yaodong Yang"
+          },
+          {
+            "authorId": "2261728034",
+            "name": "Yuanpei Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Ceyao Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.01651",
+          "CorpusId": 289748476
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.01651, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "63b555e18257ca8cd4e8774e8b14f74b7ea3d8a4",
+        "title": "One Demonstration Is Enough for Real-World Robotic Reinforcement Learning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "AutoSERL is presented, a framework that leverages a single demonstration to fully automate the intervention process in real-world robot RL, and achieves 100% success rate on insertion tasks, and demonstrates improved robustness to positional variations, all from a single demonstration."
+        },
+        "url": "https://www.semanticscholar.org/paper/63b555e18257ca8cd4e8774e8b14f74b7ea3d8a4",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.01721": {
+      "cached_at": "2026-07-04T04:22:38.775608+00:00",
+      "data": {
+        "abstract": "Reward design remains a central challenge in reinforcement learning (RL). Hand-crafted rewards are often difficult to specify and may lead to suboptimal policies, while learned rewards from preferences can suffer from inefficiency and unstable training. Inspired by the dual nature of human learning explored in cognitive science, we decompose rewards into two complementary components: Formal Rewards (FR), explicitly designed based on task knowledge, and Residual Rewards (RR), learned from observations to capture implicit and nuanced preferences. Based on this decomposition, we propose CoRe, a hybrid framework that integrates FR and RR with vision-language models (VLMs) feedback to achieve preference-aligned policies without human involvement. Our contributions are twofold: (1) We propose a Formal Reward Module (FRM) that leverages VLMs to iteratively design and optimize FR based on task knowledge and preference feedback, enabling the continual improvement of policy during training; (2) We introduce a Residual Reward Module (RRM) that learns RR from video-level preference by employing VLMs to generate preference labels and capturing nuanced rewards that complement FR, ensuring alignment with human intent. Through the synergy of FRM and RRM, CoRe enables the automatic construction of reliable rewards that are efficient and preference-aligned. Extensive experiments demonstrate that CoRe outperforms existing approaches in terms of policy learning effectiveness and efficiency on ten robotic manipulation tasks in simulation and five real-worlds. Videos can be found on our project website: https://core-2026.github.io/",
+        "authors": [
+          {
+            "authorId": "2445701392",
+            "name": "H. Ni"
+          },
+          {
+            "authorId": "2113487392",
+            "name": "Tao Lu"
+          },
+          {
+            "authorId": "2230979",
+            "name": "Yinghao Cai"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.01721",
+          "CorpusId": 289748983
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.01721, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4dea3abea0decadad6a44dd9378ab04c1a0c63fa",
+        "title": "CoRe: Combined Rewards with Vision-Language Model Feedback for Preference-Aligned Reinforcement Learning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "CoRe is a hybrid framework that integrates FR and RR with vision-language models (VLMs) feedback to achieve preference-aligned policies without human involvement, and outperforms existing approaches in terms of policy learning effectiveness and efficiency."
+        },
+        "url": "https://www.semanticscholar.org/paper/4dea3abea0decadad6a44dd9378ab04c1a0c63fa",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.01757": {
+      "cached_at": "2026-07-04T04:22:01.219201+00:00",
+      "data": {
+        "abstract": "Deep-learning features excel in visual matching, yet their practical value in tightly coupled visual-inertial SLAM (VI-SLAM) remains insufficiently characterized. We present DL-VINS-Factory, a unified framework that integrates learned feature extractors (ALIKED, RaCo, SuperPoint, XFeat) with either Lucas--Kanade (LK) optical-flow tracking or LightGlue (LG) descriptor matching. All front-ends share a sliding-window Ceres back-end, with optional AnyLoc DINOv2-VLAD loop closure, and 4-DoF pose-graph optimization. We benchmark the system across the four datasets covering indoor, unstructured outdoor, aggressive-motion, and visually degraded conditions. Results show that learned front-ends are viable for real-time embedded VI-SLAM, but are not universally superior to classical tracking. Relative to the corresponding GFTT+LK baseline, ALIKED+LG reduces EuRoC ATE by $5\\%$ in monocular odometry and by $7\\%$ in stereo with loop-closure. On NTU-VIRAL, where aggressive aerial motion increases inter-frame viewpoint change, ALIKED+LG stereo reduces loop-closed ATE by $12\\%$. In Botanic Garden dataset, optical-flow tracking remains preferable, but learned keypoints still improve over the baseline GFTT, in which SuperPoint+LK reduces grayscale camera ATE by $29\\%$, while RaCo+LK reduces RGB camera ATE by $38\\%$. On SubT-MRS, learned front-ends display varying degree of improvement based on individual cases. With TensorRT acceleration on a Jetson AGX Orin, all valid configurations run in real time between $29$--$47$ FPS in monocular mode and $18$--$33$ FPS in stereo mode for the EuRoC and NTU-VIRAL datasets. AnyLoc further confirms roughly $2$--$7\\times$ more valid loops than BRIEF+DBoW2. The implementation is open-sourced at https://github.com/limshoonkit/DL-VINS-Factory-ROS2/.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Shoon Kit Lim"
+          },
+          {
+            "authorId": "2378059426",
+            "name": "Melissa Jia Ying Chong"
+          },
+          {
+            "authorId": "2366076194",
+            "name": "Ting Yang Ling"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.01757",
+          "CorpusId": 289748666
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.01757, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5cfe85247b81cc2d636de4855cd802838f93812f",
+        "title": "DL-VINS-Factory: A Modular Framework for Learned Visual Front-Ends in Visual-Inertial SLAM",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "DL-VINS-Factory is presented, a unified framework that integrates learned feature extractors with either Lucas--Kanade optical-flow tracking or LightGlue descriptor matching, and results show that learned front-ends are viable for real-time embedded VI-SLAM, but are not universally superior to classical tracking."
+        },
+        "url": "https://www.semanticscholar.org/paper/5cfe85247b81cc2d636de4855cd802838f93812f",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.01925": {
+      "cached_at": "2026-07-04T04:21:59.026214+00:00",
+      "data": {
+        "abstract": "Offline reinforcement learning (RL) holds significant potential for crowd robot navigation in human-robot coexistence applications. However, the inherent complexity of pedestrian motion renders the design of effective reward functions for promoting socially compliant robot behaviors a persistent challenge. This paper proposes a Social Preference Learning for Crowd Robot Navigation (SPLC) algorithm to eliminate the need for detailed reward design. Its core innovation lies in the introduction of a social preference feedback mechanism to automatically generate preference data through principled preference evaluation criteria. By explicitly accounting for the intricacies of pedestrian dynamics, the pipeline mitigates the reward bias and facilitates the systematic quantification of broad social norms, thereby fostering socially compliant behaviors. Extensive experiments integrating SPLC with offline RL methods demonstrate consistent improvements over state-of-the-art baselines across standard performance metrics. Furthermore, real-world experiments on the TurtleBot4 further validate the effectiveness of SPLC in practical human-robot coexistence settings. Our code and video demos are available at https://github.com/sklus949/SPLC.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Zixuan Chen"
+          },
+          {
+            "authorId": "2362312508",
+            "name": "Hao Fu"
+          },
+          {
+            "authorId": null,
+            "name": "Haiwen Hu"
+          },
+          {
+            "authorId": "2446889440",
+            "name": "Shiquan Zheng"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.01925",
+          "CorpusId": 289748440
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.01925, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d293d7972ca2630b295522ec6d3aa356f9420c26",
+        "title": "SPLC: Social Preference Learning for Crowd Robot Navigation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A Social Preference Learning for Crowd Robot Navigation (SPLC) algorithm to eliminate the need for detailed reward design and introduce a social preference feedback mechanism to automatically generate preference data through principled preference evaluation criteria."
+        },
+        "url": "https://www.semanticscholar.org/paper/d293d7972ca2630b295522ec6d3aa356f9420c26",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.01978": {
+      "cached_at": "2026-07-04T04:22:19.907759+00:00",
+      "data": {
+        "abstract": "Online multimodal knowledge editing requires injecting a continual stream of visual-textual corrections into multimodal large language models (MLLMs) with bounded overhead and minimal disruption to unrelated behaviors. Existing editors mainly emphasize edit reliability and long-horizon stability, but rarely control the semantic boundary of each edit. Our pilot analyses of post-edit behaviors and internal neuronal activities reveal a scope gap behind reliable edits: instance-level success neither guarantees transfer to valid cross-modal variants nor prevents leakage to unrelated inputs, while edit-related cross-modal responses concentrate in deeper semantic layers. Therefore, we formulate Edit-Scoped Generalization, reframing online MLLM editing from merely correcting an instance to controlling the propagation boundary of each edit. To this end, we propose ScopeEdit, a scope-aware online editor that decomposes each update into a modality-local absorption branch and an evidence-gated shared generalization branch. The local branch supports stable edit absorption, whereas the shared branch enables cross-modal propagation only when visual and textual evidence are sufficiently aligned. Both branches perform scope-separated write geometries in orthogonal low-rank spaces and maintain branch-wise preconditioners via Sherman--Morrison recursions, yielding constant per-edit overhead. Extensive experiments across diverse benchmarks, long-horizon edit streams, MLLM backbones, real-world VLKEB scenarios, and complex vision-language architectures show that ScopeEdit consistently improves the trade-off between in-scope cross-modal transfer and out-of-scope locality, while preserving edit reliability, stability and online efficiency. Our code is available at https://github.com/lab-klc/ScopeEdit.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Siyuan Li"
+          },
+          {
+            "authorId": null,
+            "name": "Youyuan Zhang"
+          },
+          {
+            "authorId": "2408777037",
+            "name": "Ruitong Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Junxi Wang"
+          },
+          {
+            "authorId": "2363417462",
+            "name": "Jing Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.01978",
+          "CorpusId": 289749644
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.01978, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "85a3f3b1e34692f35fa8ea7ece051e18b7416c78",
+        "title": "Multimodal Knowledge Edit-Scoped Generalization for Online Recursive MLLM Editing",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "ScopeEdit is proposed, a scope-aware online editor that decomposes each update into a modality-local absorption branch and an evidence-gated shared generalization branch that consistently improves the trade-off between in-scope cross-modal transfer and out-of-scope locality, while preserving edit reliability, stability and online efficiency."
+        },
+        "url": "https://www.semanticscholar.org/paper/85a3f3b1e34692f35fa8ea7ece051e18b7416c78",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02262": {
+      "cached_at": "2026-07-04T04:22:10.591996+00:00",
+      "data": {
+        "abstract": "Reasoning Language Models (RLMs) have significantly improved performance on complex tasks by extending the reasoning chain. However, these chains are prone to containing factual errors, particularly in knowledge-intensive tasks. To address this issue, we propose CheckRLM, a framework that improves the reliability of the reasoning process through Retrieval-Augmented Generation (RAG) by timely checking and correcting factual errors. Specifically, CheckRLM extracts factual claims from the reasoning chain to identify and localize subtle knowledge inconsistencies during inference. Upon detection of errors, a refinement mechanism performs minimal-cost yet precise corrections by leveraging external knowledge, ensuring coherence between the reasoning chain and correct knowledge. Extensive experiments demonstrate that CheckRLM substantially outperforms existing baselines, exhibiting a strong capability to mitigate error accumulation in long-horizon reasoning with lower costs. The code and data are available at https://github.com/AI9Stars/CheckRLM.",
+        "authors": [
+          {
+            "authorId": "2314779448",
+            "name": "Dingling Xu"
+          },
+          {
+            "authorId": null,
+            "name": "Ruobing Wang"
+          },
+          {
+            "authorId": "2220669262",
+            "name": "Qingfei Zhao"
+          },
+          {
+            "authorId": "2277242040",
+            "name": "Yukun Yan"
+          },
+          {
+            "authorId": null,
+            "name": "Zhichun Wang"
+          },
+          {
+            "authorId": "2325728623",
+            "name": "Daren Zha"
+          },
+          {
+            "authorId": "2314785970",
+            "name": "Shi Yu"
+          },
+          {
+            "authorId": "2323176343",
+            "name": "Zhenghao Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Shuo Wang"
+          },
+          {
+            "authorId": "2284728053",
+            "name": "Xu Han"
+          },
+          {
+            "authorId": "2346997699",
+            "name": "Maosong Sun"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02262",
+          "CorpusId": 289749632,
+          "DOI": "10.18653/v1/2026.acl-long.1780"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02262, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": "CCBY",
+          "status": "GOLD",
+          "url": "https://aclanthology.org/2026.acl-long.1780.pdf"
+        },
+        "paperId": "65c2112eecfbd99ccaac315fdf624ca9c0579b2f",
+        "title": "CheckRLM: Effective Knowledge\u2013Thought Coherence Checking in Retrieval-Augmented Reasoning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "CheckRLM is a framework that improves the reliability of the reasoning process through Retrieval-Augmented Generation (RAG) by timely checking and correcting factual errors, and substantially outperforms existing baselines."
+        },
+        "url": "https://www.semanticscholar.org/paper/65c2112eecfbd99ccaac315fdf624ca9c0579b2f",
+        "venue": "Volume 1",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02387": {
+      "cached_at": "2026-07-04T04:22:45.259348+00:00",
+      "data": {
+        "abstract": "NASA and its data centers hold thousands of geoscience datasets and tools like Worldview, Giovanni, the Science Discovery Engine, and Harmony. Finding the right one is hard even for domain experts. We present an agentic search system, deployed as a public service for the geoscience community, that takes a natural-language research query and returns the matching datasets and tools. We demonstrate that, in the era of large language models, the latent value of knowledge graphs (KGs) can be substantially amplified through agentic search. From the NASA Earth Observation Knowledge Graph (NASA EO-KG) we derive NASA-EO-Bench, an open benchmark of 47k query-dataset pairs (21k task-based queries). A neural scorer fine-tuned on NASA-EO-Bench beats cosine and BM25 baselines. Further combining it with BM25 via score fusion raises both Recall@10 (R@10) and MRR by over 5x. On top of this supervised pipeline, we add a zero-shot agentic reranking stage that, without any additional training, lifts MRR by 28% on a stratified N=200 subset, showing that LLM reasoning is complementary to supervised retrieval.",
+        "authors": [
+          {
+            "authorId": "2348540677",
+            "name": "Minghan Yu"
+          },
+          {
+            "authorId": null,
+            "name": "Youran Sun"
+          },
+          {
+            "authorId": "2324054562",
+            "name": "Chugang Yi"
+          },
+          {
+            "authorId": "2350441961",
+            "name": "Yixin Wen"
+          },
+          {
+            "authorId": "2404064460",
+            "name": "Haizhao Yang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02387",
+          "CorpusId": 289748400
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02387, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9203d76600b705d616783c659a1acd2cd27bda59",
+        "title": "Bringing Agentic Search to Earth Observation Data Discovery",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work presents an agentic search system that takes a natural-language research query and returns the matching datasets and tools, and adds a zero-shot agentic reranking stage that lifts MRR by 28% on a stratified N=200 subset, showing that LLM reasoning is complementary to supervised retrieval."
+        },
+        "url": "https://www.semanticscholar.org/paper/9203d76600b705d616783c659a1acd2cd27bda59",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02391": {
+      "cached_at": "2026-07-04T04:22:43.074969+00:00",
+      "data": {
+        "abstract": "Large Language Model (LLM) inference workloads are a rapidly growing contributor to data center energy consumption. Optimizing these deployments requires matching specific LLMs to the most efficient GPUs, but operators currently lack the tools to do so without exhaustively profiling each combination. While some predictive models exist, they still require profiling data and struggle to generalize to hardware unseen during training. To address this, we introduce \\textit{WattGPU}, featuring two predictive models for mean GPU power draw and Inter-Token Latency (ITL). Our approach leverages only publicly available LLM metadata and GPU specifications, eliminating the need for hardware access or profiling while enabling generalization to unseen NVIDIA server-grade GPUs and LLMs. We evaluate our models using rigorous leave-one-GPU-out and leave-one-LLM-out cross-validation on a dataset of 42 open-source LLMs (0.1B--27B parameters) and 8 GPUs under both offline and server scenarios. The mean power draw model achieves a median absolute percentage error of $\\leq3.4\\%$ for offline and $\\leq13.5\\%$ for server scenarios on unseen GPUs, while the latency model achieves $\\leq8.5\\%$ in server mode, both maintaining strong GPU ranking correlations for server scenarios (Kendall $\\tau\\geq0.76$). Compared to standard physically grounded baselines -- Load-Scaled Thermal Design Power (TDP) for power draw and roofline for latency -- our models reduce median absolute percentage error by approximately 4$\\times$ on unseen LLM-GPU combinations for server scenarios or approximately 2$\\times$ for completely unseen GPUs. WattGPU's data and code are publicly available at https://github.com/maufadel/wattgpu.",
+        "authors": [
+          {
+            "authorId": "51136369",
+            "name": "Mauricio Fadel Argerich"
+          },
+          {
+            "authorId": "2380523061",
+            "name": "Jonathan Furst"
+          },
+          {
+            "authorId": "2305026216",
+            "name": "Marta Pati\u00f1o-Mart\u00ednez"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02391",
+          "CorpusId": 289748663
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02391, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8c84192895af6dd9a94a129560860d034a39dd19",
+        "title": "WattGPU: Predicting Inference Power and Latency on Unseen GPUs and LLMs",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work introduces WattGPU, featuring two predictive models for mean GPU power draw and Inter-Token Latency (ITL), and leverages only publicly available LLM metadata and GPU specifications, eliminating the need for hardware access or profiling while enabling generalization to unseen NVIDIA server-grade GPUs and LLMs."
+        },
+        "url": "https://www.semanticscholar.org/paper/8c84192895af6dd9a94a129560860d034a39dd19",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02494": {
+      "cached_at": "2026-07-04T04:22:22.096096+00:00",
+      "data": {
+        "abstract": "Models trained via Contrastive Language-Image Pretraining (CLIP) serve as the foundational vision encoders for most modern Large Vision Language Models (LVLMs). Despite their widespread adoption, CLIP models exhibit a critical yet underexplored failure mode: irrelevant text appearing within images confounds visual representations, biasing them toward lexical meaning rather than true visual semantics. This robustness issue, commonly described as a Typographic Attack (TA), exposes a vulnerability that poses a significant risk to safety-critical applications such as autonomous driving. To achieve interpretable and effective robustness against TA, we propose a novel, training-free mechanistic interpretability method. Our method provides sampling-based interpretations of hidden state representations and quantitatively attributes semantic versus lexical focus to individual attention heads. Through probabilistic analysis and circuit mining, we isolate specific Vision Transformer (ViT) components that disproportionately encode lexical information, thereby identifying the mechanistic source of TA. We further show that simple interventions applied directly to the identified circuits, without any additional training, can substantially improve robustness against Typographic Attacks in object classification. These interventions, such as selective adjustment of attention weights, also outperform both supervised and training-free defense methods. Our experiments demonstrate that applying the proposed intervention to the vision encoders of several state-of-the-art LVLMs yields substantial gains in Visual Question Answering accuracy under Typographic Attack interference on RIO-Bench. These results confirm both the efficacy and the generalizability of our mechanistic approach. Code is released at https://github.com/Liu-524/SamplingTAR.",
+        "authors": [
+          {
+            "authorId": "2392880515",
+            "name": "Bohan Liu"
+          },
+          {
+            "authorId": "122298411",
+            "name": "Wenqian Ye"
+          },
+          {
+            "authorId": "2048053804",
+            "name": "Guangzhi Xiong"
+          },
+          {
+            "authorId": "2378188378",
+            "name": "Zhenghao He"
+          },
+          {
+            "authorId": "66010012",
+            "name": "Sanchit Sinha"
+          },
+          {
+            "authorId": "2302504818",
+            "name": "Aidong Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02494",
+          "CorpusId": 289749382
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02494, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "adfd52730b3f2425937dd88acbdd100d98b7b7c8",
+        "title": "Towards Robustness against Typographic Attack with Training-free Concept Localization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A novel, training-free mechanistic interpretability method that provides sampling-based interpretations of hidden state representations and quantitatively attributes semantic versus lexical focus to individual attention heads helps achieve interpretable and effective robustness against Typographic Attack."
+        },
+        "url": "https://www.semanticscholar.org/paper/adfd52730b3f2425937dd88acbdd100d98b7b7c8",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02509": {
+      "cached_at": "2026-07-04T04:21:56.887602+00:00",
+      "data": {
+        "abstract": "Understanding and reasoning over long contexts has become a key requirement for deploying large language models (LLMs) in realistic applications. Although recent LLMs support increasingly long context windows, they often fail to use relevant evidence that is already present in the input, revealing a gap between context access and effective context utilization. In this work, we propose Recursive Evidence Replay as LLM Harness for Long-Context Reasoning (RECONTEXT), a training-free inference method for improving long-context reasoning. RECONTEXT uses model-internal relevance signals to construct a query-conditioned evidence pool and replays it before final generation while preserving the full original context. This recursive selection process separates evidence organization from answer generation without training, external memory, or context pruning. We also provide a theoretical analysis based on associative memory, which characterizes the context as a memory store, the question as a retrieval cue, attention as cue-trace association, and replay as trace reactivation. Experiments on eight long-context datasets with 128K context length show that RECONTEXT consistently improves evidence utilization across Qwen3-4B, Qwen3-8B, and Llama3-8B, achieving the best average rank on all three backbones. Code is available at https://github.com/Yanjun-Zhao/ReContext.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yanjun Zhao"
+          },
+          {
+            "authorId": "2187298875",
+            "name": "Ruizhong Qiu"
+          },
+          {
+            "authorId": "2319175383",
+            "name": "Tianxin Wei"
+          },
+          {
+            "authorId": "2394305012",
+            "name": "Yuanchen Bei"
+          },
+          {
+            "authorId": "2257083296",
+            "name": "Zhining Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Lingjie Chen"
+          },
+          {
+            "authorId": "2099420",
+            "name": "Ismini Lourentzou"
+          },
+          {
+            "authorId": "2359204202",
+            "name": "Hanghang Tong"
+          },
+          {
+            "authorId": "2303885774",
+            "name": "Jingrui He"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02509",
+          "CorpusId": 289749031
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02509, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b6f8f70e375bb5869b60cc96494208165e322c89",
+        "title": "ReContext: Recursive Evidence Replay as LLM Harness for Long-Context Reasoning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Recursive Evidence Replay as LLM Harness for Long-Context Reasoning (RECONTEXT), a training-free inference method for improving long-context reasoning that uses model-internal relevance signals to construct a query-conditioned evidence pool and replays it before final generation while preserving the full original context."
+        },
+        "url": "https://www.semanticscholar.org/paper/b6f8f70e375bb5869b60cc96494208165e322c89",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
