@@ -72,7 +72,7 @@ def display_tech_news_source(item: SignalItem) -> str:
 def display_tech_news_summary(item: SignalItem) -> str:
     """Return the public one-sentence summary for a news item."""
     if _has_incomplete_source_sentence(item.summary):
-        return ""
+        return display_tech_news_why(item)
     if not is_low_quality_note(item.summary):
         return _public_sentence(clean_note_text(item.summary), item.title)
     return display_tech_news_why(item)
@@ -123,8 +123,8 @@ def _hacker_news_notes(item: SignalItem) -> TechNewsNotes:
     engagement = _engagement_phrase(score, comments)
     title = clean_note_text(item.title) or "this story"
     why = (
-        f"This Hacker News story is drawing {engagement}, so it is worth watching "
-        "for shifts in developer attention, AI infrastructure, or product strategy."
+        f"Developers are discussing \"{title}\" with {engagement}, making it a useful "
+        "signal for tool adoption, AI infrastructure, or product strategy shifts."
     )
     learning = (
         f"Use it to understand why \"{title}\" is attracting attention and what "
@@ -150,7 +150,9 @@ def _rss_notes(item: SignalItem) -> TechNewsNotes:
     if not excerpt:
         excerpt = clean_note_text(item.title)
     why = _source_public_sentence(excerpt, item.title)
-    learning = f"Use it to understand the concrete change: {_truncate(excerpt, 180)}."
+    learning = "Use it to understand the concrete change: " + _with_terminal_punctuation(
+        _truncate(_strip_title_prefix(excerpt, item.title), 180)
+    )
     return TechNewsNotes(
         why_it_matters=why,
         learning_value=learning,
@@ -167,8 +169,12 @@ def _github_release_notes(item: SignalItem) -> TechNewsNotes:
     excerpt = clean_note_text(item.raw_content)
     if not excerpt:
         excerpt = f"{title} ships a new project release."
-    why = _source_public_sentence(excerpt, item.title)
-    learning = f"Use it to identify the practical release changes: {_truncate(excerpt, 180)}."
+        why = _public_sentence(excerpt, "")
+    else:
+        why = _source_public_sentence(excerpt, item.title)
+    learning = "Use it to identify the practical release changes: " + _with_terminal_punctuation(
+        _truncate(_strip_title_prefix(excerpt, item.title), 180)
+    )
     return TechNewsNotes(
         why_it_matters=why,
         learning_value=learning,
@@ -212,13 +218,24 @@ def _engagement_phrase(score: int, comments: int) -> str:
 def _truncate(value: str, limit: int) -> str:
     if len(value) <= limit:
         return value
-    return value[: limit - 3].rstrip() + "..."
+    trimmed = value[: limit - 3].rstrip(" \t\r\n.,;:")
+    return trimmed + "..."
+
+
+def _with_terminal_punctuation(value: str) -> str:
+    text = value.strip()
+    if not text:
+        return ""
+    if text.endswith(("...", ".", "!", "?")):
+        return text
+    return f"{text}."
 
 
 def _source_public_sentence(value: str, title: str) -> str:
     text = _public_sentence(_strip_title_prefix(value, title), "")
     if not text or _has_dangling_end(text):
-        return "This item points to a practical AI tooling or research update worth checking from the source."
+        clean_title = clean_note_text(title) or "this update"
+        return f"The source points to \"{clean_title}\" as a practical AI tooling or research update worth checking."
     return text
 
 
@@ -228,20 +245,29 @@ def _public_sentence(value: str, title: str) -> str:
     while _has_dangling_end(text) and " " in text:
         text = text.rsplit(" ", 1)[0].strip(" \t\r\n#-:;,.")
     if not text:
-        return "This item points to a practical AI tooling or research update worth checking from the source."
+        return ""
     return text if text[-1] in ".!?" else f"{text}."
 
 
 def _strip_title_prefix(value: str, title: str) -> str:
     text = clean_note_text(value)
+    text = re.sub(r"^\s*release\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
     title_text = clean_note_text(title)
     if title_text:
-        text = re.sub(rf"^\s*{re.escape(title_text)}\s*[:\-]\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(
+            rf"^\s*{re.escape(title_text)}(?:\s*[:\-]\s*|\s+)",
+            "",
+            text,
+            flags=re.IGNORECASE,
+        )
     return text.strip(" \t\r\n#-:;,.")
 
 
 def _has_dangling_end(value: str) -> bool:
-    lowered = value.strip().lower().rstrip(".")
+    stripped = value.strip()
+    if _has_unbalanced_delimiters(stripped) or _has_short_trailing_sentence(stripped):
+        return True
+    lowered = stripped.lower().rstrip(".")
     if not lowered:
         return True
     endings = (
@@ -269,6 +295,23 @@ def _has_dangling_end(value: str) -> bool:
         return True
     words = re.findall(r"[a-z0-9]+", lowered)
     return bool(words and len(words[-1]) <= 2 and words[-1] not in {"ai", "ml", "rl", "ui", "ux", "os", "go", "js", "m3"})
+
+
+def _has_unbalanced_delimiters(text: str) -> bool:
+    return (
+        text.count("(") > text.count(")")
+        or text.count("[") > text.count("]")
+        or text.count("{") > text.count("}")
+    )
+
+
+def _has_short_trailing_sentence(text: str) -> bool:
+    sentences = [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", text) if sentence.strip()]
+    if len(sentences) < 2:
+        return False
+    words = re.findall(r"[A-Za-z0-9]+", sentences[-1])
+    all_words = re.findall(r"[A-Za-z0-9]+", text)
+    return 0 < len(words) <= 2 and len(all_words) > 6
 
 
 def _has_incomplete_source_sentence(value: str) -> bool:

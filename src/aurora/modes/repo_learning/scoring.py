@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import math
 import re
+import asyncio
 from collections.abc import Sequence
 from datetime import datetime, timedelta, timezone
 from pathlib import PurePosixPath
@@ -134,7 +135,10 @@ class RepoLearningEnricher:
     ) -> list[SignalItem]:
         if self.http_client is not None:
             return await self._enrich_with_client(items, score_results, self.http_client, context)
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=self.config.sources.github_search.request_timeout_sec,
+            follow_redirects=True,
+        ) as client:
             return await self._enrich_with_client(items, score_results, client, context)
 
     async def _enrich_with_client(
@@ -154,19 +158,23 @@ class RepoLearningEnricher:
             )[: self.config.ranking.enrich_top_n]
         }
         github = GitHubRepoClient(self.config.sources.github_search, http_client=client)
+        metadata_by_id = {item.id: dict(item.metadata) for item in items}
+        repo_context_by_id = await _fetch_top_repo_contexts(
+            [item for item in items if item.id in top_ids],
+            metadata_by_id,
+            github,
+            context,
+        )
         enriched: list[SignalItem] = []
         for item in items:
             score = scores_by_id.get(item.id)
-            metadata = dict(item.metadata)
-            readme_text: str | None = None
-            tree_paths: list[str] = []
-            if item.id in top_ids:
-                readme_text, tree_paths = await _fetch_repo_context(github, metadata)
-                if readme_text:
-                    metadata["readme_excerpt"] = _excerpt(readme_text, limit=2400)
-                if tree_paths:
-                    metadata["tree_preview"] = tree_paths[:200]
-                    metadata["package_files"] = extract_package_files(tree_paths)
+            metadata = metadata_by_id[item.id]
+            readme_text, tree_paths = repo_context_by_id.get(item.id, (None, []))
+            if readme_text:
+                metadata["readme_excerpt"] = _excerpt(readme_text, limit=2400)
+            if tree_paths:
+                metadata["tree_preview"] = tree_paths[:200]
+                metadata["package_files"] = extract_package_files(tree_paths)
             if score is not None:
                 metadata["score_breakdown"] = score.score_breakdown
                 metadata["score_reason"] = score.reason
@@ -260,23 +268,32 @@ def what_to_study(metadata: dict[str, Any]) -> str:
 
 def repo_action_items(metadata: dict[str, Any]) -> list[str]:
     full_name = str(metadata.get("full_name") or "the repository")
+    language = str(metadata.get("language") or "").strip()
+    topics = [str(topic).strip() for topic in metadata.get("topics") or [] if str(topic).strip()]
     groups = _study_file_groups(metadata)
     targets = _ordered_study_targets(groups)
     actions: list[str] = []
     if targets:
-        actions.append(f"Inspect concrete learning files: {', '.join(targets[:5])}.")
+        actions.append(f"Inspect key learning files such as {', '.join(targets[:5])}.")
     else:
-        actions.append("Read the README and inspect the top-level project structure.")
+        focus = _repo_focus_phrase(language, topics)
+        actions.append(f"Read the README and map the {focus} workflow.")
     if groups["examples"]:
         actions.append(f"Trace or run the smallest example: {groups['examples'][0]}.")
     elif groups["docs"]:
         actions.append(f"Map the setup and architecture from {groups['docs'][0]}.")
     elif metadata.get("readme_excerpt"):
         actions.append("Extract setup steps, architecture notes, and extension points from the README.")
+    elif language:
+        actions.append(f"Identify the main {language} entry points before cloning deeply.")
+    elif topics:
+        actions.append(f"Compare the stated topics ({', '.join(topics[:3])}) with the actual project layout.")
     else:
         actions.append(f"Clone {full_name} only after confirming it has a useful setup path.")
     if groups["workflows"]:
         actions.append(f"Use {groups['workflows'][0]} to understand CI or automation assumptions.")
+    elif topics:
+        actions.append(f"Build a small experiment around the {topics[0]} workflow if the setup is clear.")
     else:
         actions.append("In one week, build a small extension or integration around the core workflow.")
     return actions[:3]
@@ -372,6 +389,16 @@ def _format_count(value: int) -> str:
     return f"{compact}k"
 
 
+def _repo_focus_phrase(language: str, topics: Sequence[str]) -> str:
+    if language and topics:
+        return f"{language} {topics[0]}".strip()
+    if language:
+        return f"{language} project"
+    if topics:
+        return f"{topics[0]} project"
+    return "project"
+
+
 def _fetch_repo_context_error(metadata: dict[str, Any], error: Exception) -> None:
     metadata["repo_learning_enrichment_error"] = str(error)
 
@@ -389,6 +416,26 @@ async def _fetch_repo_context(
         _fetch_repo_context_error(metadata, exc)
         return None, []
     return readme, [str(entry.get("path") or "") for entry in tree if entry.get("type") == "blob"]
+
+
+async def _fetch_top_repo_contexts(
+    items: Sequence[SignalItem],
+    metadata_by_id: dict[str, dict[str, Any]],
+    github: GitHubRepoClient,
+    context: StageContext,
+) -> dict[str, tuple[str | None, list[str]]]:
+    if not items:
+        return {}
+    concurrency = 2
+    if context.config is not None:
+        concurrency = context.config.ai.enrichment_concurrency
+    semaphore = asyncio.Semaphore(max(1, concurrency))
+
+    async def fetch(item: SignalItem) -> tuple[str, tuple[str | None, list[str]]]:
+        async with semaphore:
+            return item.id, await _fetch_repo_context(github, metadata_by_id[item.id])
+
+    return dict(await asyncio.gather(*(fetch(item) for item in items)))
 
 
 def _relevance(item: SignalItem) -> float:

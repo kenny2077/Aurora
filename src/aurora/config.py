@@ -8,11 +8,17 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, field_validator, model_validator
 
-from aurora.interests import REPO_INTEREST_PRESETS, SCHOLAR_FIELD_PRESETS, clean_preset_names
+from aurora.interests import (
+    REPO_INTEREST_PRESETS,
+    SCHOLAR_FIELD_PRESETS,
+    TOPIC_PRESETS,
+    clean_preset_names,
+)
 
 
 ModeName = Literal["tech_news", "scholar", "repo_learning", "unified_digest"]
 SignalSection = Literal["news", "paper", "repo"]
+QualityTier = Literal["lean", "balanced", "thorough"]
 AIProvider = Literal[
     "deepseek",
     "openai",
@@ -34,8 +40,10 @@ class RunConfig(BaseModel):
         default_factory=lambda: ["tech_news", "scholar", "repo_learning"]
     )
     timezone: str = "Asia/Shanghai"
+    quality_tier: QualityTier = "balanced"
     time_window_hours: int = Field(default=24, ge=1)
     max_items: int = Field(default=50, ge=1)
+    topic: str | None = None
     dry_run: bool = False
     state_path: Path = Path("data/aurora_state.json")
     cache_dir: Path = Path("data/cache")
@@ -56,6 +64,17 @@ class RunConfig(BaseModel):
         if not isinstance(value, str) or not value.strip():
             raise ValueError("timezone must be a non-empty string")
         return value.strip()
+
+    @field_validator("topic")
+    @classmethod
+    def validate_topic(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        topic = value.strip().lower()
+        if topic not in TOPIC_PRESETS:
+            available = ", ".join(sorted(TOPIC_PRESETS))
+            raise ValueError(f"unknown topic: {value}; available: {available}")
+        return topic
 
 
 class DedupConfig(BaseModel):
@@ -134,6 +153,7 @@ class AIConfig(BaseModel):
     max_requests_per_run: int | None = Field(default=None, ge=0)
     max_network_attempts_per_run: int | None = Field(default=None, ge=0)
     max_tokens_per_run: int | None = Field(default=None, ge=0)
+    request_timeout_sec: float = Field(default=25.0, gt=0.0)
     input_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
     output_cost_per_million_tokens: float | None = Field(default=None, ge=0.0)
     fail_open_on_budget_exceeded: bool = True
@@ -612,6 +632,7 @@ class RepoLearningGitHubSearchConfig(BaseModel):
     recent_years: int = Field(default=2, ge=0)
     active_within_days: int = Field(default=180, ge=1)
     per_page: int = Field(default=20, ge=1, le=100)
+    request_timeout_sec: float = Field(default=15.0, gt=0.0)
     custom_keywords: list[str] = Field(default_factory=list)
     languages: list[str] = Field(default_factory=list)
 

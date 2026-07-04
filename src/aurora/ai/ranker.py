@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 from collections.abc import Callable, Sequence
 from time import perf_counter
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from aurora.ai.client import AIClient, AIResponseFormatError
 from aurora.ai.retry import classify_ai_failure, complete_json_with_retries
@@ -24,7 +25,7 @@ class LLMAnalysis(BaseModel):
 
     model_config = ConfigDict(extra="ignore")
 
-    score: float = Field(ge=0.0, le=10.0)
+    score: float = Field(default=5.0, ge=0.0, le=10.0)
     summary: str = ""
     why_it_matters: str = ""
     learning_value: str = ""
@@ -32,8 +33,71 @@ class LLMAnalysis(BaseModel):
     suggested_learning_path: str = ""
     tags: list[str] = Field(default_factory=list)
 
+    @field_validator("score", mode="before")
+    @classmethod
+    def parse_score(cls, value: Any) -> float:
+        if value is None or value == "":
+            return 5.0
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            return float(value)
+        match = re.search(r"-?\d+(?:\.\d+)?", str(value))
+        if not match:
+            return 5.0
+        return float(match.group(0))
+
+    @field_validator("summary", "why_it_matters", "learning_value", "suggested_learning_path", mode="before")
+    @classmethod
+    def coerce_public_text(cls, value: Any) -> str:
+        if value is None:
+            return ""
+        if isinstance(value, list):
+            return " ".join(str(item).strip() for item in value if str(item).strip())
+        return str(value).strip()
+
+    @field_validator("action_items", "tags", mode="before")
+    @classmethod
+    def coerce_text_list(cls, value: Any) -> list[str]:
+        if value is None or value == "":
+            return []
+        if isinstance(value, list):
+            return [str(item).strip() for item in value if str(item).strip()]
+        return [
+            part.strip(" \t\r\n-*")
+            for part in re.split(r"[\n;,]+", str(value))
+            if part.strip(" \t\r\n-*")
+        ]
+
 
 PromptBuilder = Callable[[SignalItem], tuple[str, str]]
+PROMPT_RAW_CONTENT_CHARS = 1000
+PROMPT_METADATA_KEYS = (
+    "description",
+    "full_name",
+    "stars",
+    "forks",
+    "open_issues",
+    "language",
+    "topics",
+    "license",
+    "homepage",
+    "updated_at",
+    "created_at",
+    "feed_name",
+    "score",
+    "descendants",
+    "comment_count",
+    "venue",
+    "venue_year",
+    "year",
+    "status",
+    "semantic_scholar_tldr",
+    "code_urls",
+    "project_urls",
+    "recommendation_evidence",
+    "package_files",
+    "quality_label",
+    "selection_reason",
+)
 
 
 class LLMRanker:
@@ -175,12 +239,35 @@ def item_prompt_payload(item: SignalItem) -> str:
             "deterministic_score": item.deterministic_score,
             "final_score": item.final_score,
             "tags": item.tags,
-            "raw_content": item.raw_content[:4000],
-            "metadata": item.metadata,
+            "raw_content": item.raw_content[:PROMPT_RAW_CONTENT_CHARS],
+            "metadata": _prompt_metadata(item.metadata),
         },
         sort_keys=True,
         default=str,
     )
+
+
+def _prompt_metadata(metadata: dict[str, Any]) -> dict[str, Any]:
+    compact: dict[str, Any] = {}
+    for key in PROMPT_METADATA_KEYS:
+        if key not in metadata:
+            continue
+        compact[key] = _compact_prompt_value(metadata[key])
+    return compact
+
+
+def _compact_prompt_value(value: Any) -> Any:
+    if isinstance(value, str):
+        return value[:500]
+    if isinstance(value, list):
+        return [_compact_prompt_value(item) for item in value[:8]]
+    if isinstance(value, dict):
+        return {
+            str(key): _compact_prompt_value(item)
+            for key, item in list(value.items())[:12]
+            if str(key).strip()
+        }
+    return value
 
 
 def _action_items_from_suggested_path(value: str) -> list[str]:

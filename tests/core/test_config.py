@@ -14,11 +14,13 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
 
     assert config.run.enabled_modes == ["tech_news", "scholar", "repo_learning"]
     assert config.run.timezone == "Asia/Shanghai"
+    assert config.run.quality_tier == "balanced"
     assert config.ai.provider == "deepseek"
     assert config.ai.model == "deepseek-chat"
     assert config.ai.api_key_env == "DEEPSEEK_API_KEY"
     assert config.ai.max_requests_per_run is None
     assert config.ai.max_tokens_per_run is None
+    assert config.ai.request_timeout_sec == 25.0
     assert config.ai.fail_open_on_budget_exceeded is True
     assert config.pipeline.scoring.score_threshold == 7.0
     assert config.delivery.filesystem.enabled is True
@@ -64,6 +66,7 @@ def test_aurora_config_defaults_match_pr1_contract() -> None:
     assert config.modes.repo_learning.sources.github_search.recent_years == 2
     assert config.modes.repo_learning.sources.github_search.active_within_days == 180
     assert config.modes.repo_learning.sources.github_search.per_page == 20
+    assert config.modes.repo_learning.sources.github_search.request_timeout_sec == 15.0
     assert config.modes.repo_learning.ranking.final_item_count == 6
     assert config.modes.repo_learning.ranking.enrich_top_n == 12
     assert config.modes.repo_learning.ranking.llm_analysis_top_n == 12
@@ -194,6 +197,7 @@ def test_local_llm_example_config_uses_ollama_without_cloud_access() -> None:
 def test_actions_config_enables_email_and_content_window() -> None:
     config = load_config(Path("data/actions.config.json"))
 
+    assert config.run.topic == "agents"
     assert config.run.enabled_modes == ["unified_digest"]
     assert config.run.time_window_hours == 168
     assert config.delivery.email.enabled is True
@@ -201,9 +205,10 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.delivery.email.password_env == "EMAIL_PASSWORD"
     assert config.delivery.email.recipients_env == "AURORA_EMAIL_RECIPIENTS"
     assert config.ai.max_tokens == 650
-    assert config.ai.max_requests_per_run == 12
-    assert config.ai.max_network_attempts_per_run == 18
+    assert config.ai.max_requests_per_run == 18
+    assert config.ai.max_network_attempts_per_run == 26
     assert config.ai.max_tokens_per_run == 240000
+    assert config.ai.request_timeout_sec == 20.0
     assert config.ai.fail_open_on_budget_exceeded is True
     assert config.ai.analysis_concurrency == 2
     assert config.ai.transient_retry_attempts == 2
@@ -216,12 +221,12 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert "developer" not in config.modes.tech_news.filters.include_keywords
     assert "security" not in config.modes.tech_news.filters.include_keywords
     assert "python" not in config.modes.tech_news.filters.include_keywords
-    assert config.modes.tech_news.llm_analysis_top_n == 0
-    assert config.modes.scholar.llm_analysis_top_n == 0
-    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 0
+    assert config.modes.tech_news.llm_analysis_top_n == 2
+    assert config.modes.scholar.llm_analysis_top_n == 2
+    assert config.modes.repo_learning.ranking.llm_analysis_top_n == 2
     assert config.modes.tech_news.sources.hackernews.fetch_top_stories == 100
     assert config.modes.tech_news.sources.hackernews.min_score == 30
-    assert config.modes.tech_news.sources.reddit.enabled is True
+    assert config.modes.tech_news.sources.reddit.enabled is False
     assert config.modes.tech_news.sources.reddit.subreddits == ["MachineLearning", "LocalLLaMA"]
     assert config.modes.tech_news.sources.github_releases.enabled is True
     assert "openai/openai-python" in config.modes.tech_news.sources.github_releases.repositories
@@ -236,10 +241,26 @@ def test_actions_config_enables_email_and_content_window() -> None:
     assert config.modes.scholar.sources.semantic_scholar.max_retries == 4
     assert config.modes.scholar.sources.semantic_scholar.retry_delay_sec == 5.0
     assert config.modes.repo_learning.sources.github_search.min_stars == 100
+    assert config.modes.repo_learning.sources.github_search.request_timeout_sec == 12.0
+    assert config.modes.repo_learning.ranking.enrich_top_n == 6
     assert config.modes.unified_digest.section_order == ["news", "repo", "paper"]
     assert config.modes.unified_digest.section_limits == {"news": 5, "repo": 3, "paper": 3}
     assert config.modes.unified_digest.minimum_section_items == {"news": 5, "repo": 3, "paper": 3}
     assert config.modes.unified_digest.max_total_items == 11
+
+
+def test_public_topic_presets_validate_for_config_users() -> None:
+    config = AuroraConfig(
+        run={"topic": "robots"},
+        modes={
+            "repo_learning": {"interests": ["llm", "agents", "robots"]},
+            "scholar": {"fields": ["llm", "agents", "robots"]},
+        },
+    )
+
+    assert config.run.topic == "robots"
+    assert config.modes.repo_learning.interests == ["llm", "agents", "robots"]
+    assert config.modes.scholar.fields == ["llm", "agents", "robots"]
 
 
 def test_unified_digest_rejects_minimum_section_count_above_limit() -> None:

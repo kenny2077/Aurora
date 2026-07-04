@@ -13,9 +13,10 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-from aurora.config import AuroraConfig, ModeName
+from aurora.config import AuroraConfig, ModeName, QualityTier
 from aurora.ai.diagnostics import diagnose_ai_provider
 from aurora.evaluation import benchmark_llm_fixture, compare_reports, replay_fixture, write_eval_report
+from aurora.interests import PUBLIC_TOPIC_NAMES, TOPIC_PRESETS
 from aurora.modes.repo_learning import build_repo_learning_pipeline
 from aurora.modes.scholar import build_scholar_pipeline
 from aurora.modes.tech_news import build_tech_news_pipeline
@@ -28,10 +29,38 @@ from aurora.storage.config_loader import load_config
 
 MODE_CHOICES = ("tech_news", "scholar", "repo_learning", "unified_digest", "all")
 IMPLEMENTED_MODES = ("tech_news", "scholar", "repo_learning", "unified_digest")
-TOPIC_PRESET_MAP = {
-    "machine_learning": "ml",
-    "agents_harness": "agents",
-    "computer_vision": "cv",
+TOPIC_PRESET_MAP = {name: name for name in PUBLIC_TOPIC_NAMES}
+QUALITY_TIER_PRESETS: dict[QualityTier, dict[str, int]] = {
+    "lean": {
+        "max_requests_per_run": 8,
+        "max_network_attempts_per_run": 14,
+        "max_tokens": 550,
+        "tech_news_llm_top_n": 0,
+        "scholar_llm_top_n": 0,
+        "repo_llm_top_n": 0,
+        "repo_enrich_top_n": 4,
+        "semantic_scholar_requests": 12,
+    },
+    "balanced": {
+        "max_requests_per_run": 18,
+        "max_network_attempts_per_run": 26,
+        "max_tokens": 650,
+        "tech_news_llm_top_n": 2,
+        "scholar_llm_top_n": 2,
+        "repo_llm_top_n": 2,
+        "repo_enrich_top_n": 6,
+        "semantic_scholar_requests": 20,
+    },
+    "thorough": {
+        "max_requests_per_run": 36,
+        "max_network_attempts_per_run": 52,
+        "max_tokens": 900,
+        "tech_news_llm_top_n": 5,
+        "scholar_llm_top_n": 5,
+        "repo_llm_top_n": 5,
+        "repo_enrich_top_n": 12,
+        "semantic_scholar_requests": 40,
+    },
 }
 
 
@@ -141,6 +170,7 @@ def _build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--run-id", default=None)
     run_parser.add_argument("--hours", type=int, default=None)
     run_parser.add_argument("--topic", choices=tuple(TOPIC_PRESET_MAP), default=None)
+    run_parser.add_argument("--quality-tier", choices=tuple(QUALITY_TIER_PRESETS), default=None)
     run_parser.add_argument("--repo-interest", action="append", default=None)
     run_parser.add_argument("--research-field", action="append", default=None)
     run_parser.add_argument("--skip-llm", action="store_true")
@@ -340,17 +370,39 @@ def _select_modes(config: AuroraConfig, mode: str | None) -> list[ModeName]:
 
 def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> AuroraConfig:
     modes = config.modes
-    if args.topic:
-        if args.repo_interest or args.research_field:
-            raise ValueError("--topic cannot be combined with --repo-interest or --research-field")
-        preset = TOPIC_PRESET_MAP[args.topic]
+    ai = config.ai
+    topic = args.topic or config.run.topic
+    if args.topic and (args.repo_interest or args.research_field):
+        raise ValueError("--topic cannot be combined with --repo-interest or --research-field")
+    if topic and not (args.repo_interest or args.research_field):
+        preset_name = TOPIC_PRESET_MAP[topic]
+        preset = TOPIC_PRESETS[preset_name]
+        tech_filters = type(modes.tech_news.filters).model_validate(
+            {
+                **modes.tech_news.filters.model_dump(mode="python"),
+                "include_keywords": preset["tech_news_keywords"],
+            }
+        )
+        tech_news = type(modes.tech_news).model_validate(
+            {**modes.tech_news.model_dump(mode="python"), "filters": tech_filters}
+        )
         repo_learning = type(modes.repo_learning).model_validate(
-            {**modes.repo_learning.model_dump(mode="python"), "interests": [preset]}
+            {
+                **modes.repo_learning.model_dump(mode="python"),
+                "interests": preset["repo_interests"],
+            }
         )
         scholar = type(modes.scholar).model_validate(
-            {**modes.scholar.model_dump(mode="python"), "fields": [preset]}
+            {**modes.scholar.model_dump(mode="python"), "fields": preset["research_fields"]}
         )
-        modes = modes.model_copy(update={"repo_learning": repo_learning, "scholar": scholar})
+        modes = modes.model_copy(
+            update={
+                "tech_news": tech_news,
+                "repo_learning": repo_learning,
+                "scholar": scholar,
+            }
+        )
+    modes, ai = _apply_quality_tier(modes, ai, args.quality_tier or config.run.quality_tier)
     if args.repo_interest:
         repo_learning = type(modes.repo_learning).model_validate(
             {**modes.repo_learning.model_dump(mode="python"), "interests": args.repo_interest}
@@ -361,7 +413,6 @@ def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> Auro
             {**modes.scholar.model_dump(mode="python"), "fields": args.research_field}
         )
         modes = modes.model_copy(update={"scholar": scholar})
-    ai = config.ai
     if args.local_llm or args.free_mode:
         if not ai.is_local_provider():
             raise ValueError("--local-llm and --free-mode require a configured local provider")
@@ -369,6 +420,66 @@ def _apply_run_overrides(config: AuroraConfig, args: argparse.Namespace) -> Auro
     if modes is not config.modes or ai is not config.ai:
         return config.model_copy(update={"modes": modes, "ai": ai})
     return config
+
+
+def _apply_quality_tier(modes, ai, tier: QualityTier):
+    preset = QUALITY_TIER_PRESETS[tier]
+    ai = type(ai).model_validate(
+        {
+            **ai.model_dump(mode="python"),
+            "max_requests_per_run": preset["max_requests_per_run"],
+            "max_network_attempts_per_run": preset["max_network_attempts_per_run"],
+            "max_tokens": preset["max_tokens"],
+        }
+    )
+    tech_news = type(modes.tech_news).model_validate(
+        {
+            **modes.tech_news.model_dump(mode="python"),
+            "llm_analysis_top_n": preset["tech_news_llm_top_n"],
+        }
+    )
+    semantic_scholar = type(modes.scholar.sources.semantic_scholar).model_validate(
+        {
+            **modes.scholar.sources.semantic_scholar.model_dump(mode="python"),
+            "max_requests_per_run": preset["semantic_scholar_requests"],
+        }
+    )
+    scholar_sources = type(modes.scholar.sources).model_validate(
+        {
+            **modes.scholar.sources.model_dump(mode="python"),
+            "semantic_scholar": semantic_scholar,
+        }
+    )
+    scholar = type(modes.scholar).model_validate(
+        {
+            **modes.scholar.model_dump(mode="python"),
+            "llm_analysis_top_n": preset["scholar_llm_top_n"],
+            "sources": scholar_sources,
+        }
+    )
+    repo_ranking = type(modes.repo_learning.ranking).model_validate(
+        {
+            **modes.repo_learning.ranking.model_dump(mode="python"),
+            "llm_analysis_top_n": preset["repo_llm_top_n"],
+            "enrich_top_n": preset["repo_enrich_top_n"],
+        }
+    )
+    repo_learning = type(modes.repo_learning).model_validate(
+        {
+            **modes.repo_learning.model_dump(mode="python"),
+            "ranking": repo_ranking,
+        }
+    )
+    return (
+        modes.model_copy(
+            update={
+                "tech_news": tech_news,
+                "scholar": scholar,
+                "repo_learning": repo_learning,
+            }
+        ),
+        ai,
+    )
 
 
 async def _run_dry_modes(

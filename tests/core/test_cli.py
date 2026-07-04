@@ -339,13 +339,102 @@ def test_run_topic_override_applies_to_repo_learning_and_scholar(
             "--output-dir",
             str(output_dir),
             "--topic",
-            "agents_harness",
+            "agents",
         ]
     )
 
     assert exit_code == 0
-    assert observed_interests == ["agents"]
+    assert observed_interests == ["agents", "mcp", "workflow-automation"]
     assert observed_fields == ["agents"]
+
+
+def test_run_public_topic_override_applies_to_all_learning_sections(
+    tmp_path: Path, monkeypatch
+) -> None:
+    observed_interests: list[str] = []
+    observed_fields: list[str] = []
+    observed_keywords: list[str] = []
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text(
+        '{"run": {"enabled_modes": ["tech_news", "repo_learning", "scholar"]}}',
+        encoding="utf-8",
+    )
+
+    def fake_tech_pipeline(config) -> ModePipeline:
+        observed_keywords.extend(config.modes.tech_news.filters.include_keywords)
+        return _fake_pipeline(config)
+
+    def fake_repo_pipeline(config) -> ModePipeline:
+        observed_interests.extend(config.modes.repo_learning.interests)
+        return _fake_repo_learning_pipeline(config)
+
+    def fake_scholar_pipeline(config) -> ModePipeline:
+        observed_fields.extend(config.modes.scholar.fields)
+        return _fake_scholar_pipeline(config)
+
+    monkeypatch.setattr("aurora.cli.build_tech_news_pipeline", fake_tech_pipeline)
+    monkeypatch.setattr("aurora.cli.build_repo_learning_pipeline", fake_repo_pipeline)
+    monkeypatch.setattr("aurora.cli.build_scholar_pipeline", fake_scholar_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "all",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--topic",
+            "robots",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed_interests == ["robots"]
+    assert observed_fields == ["robots"]
+    assert "robotics" in observed_keywords
+    assert "embodied ai" in observed_keywords
+    assert "agent" not in observed_keywords
+
+
+def test_run_quality_tier_override_controls_llm_and_source_depth(
+    tmp_path: Path, monkeypatch
+) -> None:
+    observed: dict[str, int | None] = {}
+    config_path = tmp_path / "config.json"
+    output_dir = tmp_path / "runs"
+    config_path.write_text('{"run": {"enabled_modes": ["repo_learning"]}}', encoding="utf-8")
+
+    def fake_repo_pipeline(config) -> ModePipeline:
+        observed["max_requests"] = config.ai.max_requests_per_run
+        observed["repo_llm_top_n"] = config.modes.repo_learning.ranking.llm_analysis_top_n
+        observed["repo_enrich_top_n"] = config.modes.repo_learning.ranking.enrich_top_n
+        return _fake_repo_learning_pipeline(config)
+
+    monkeypatch.setattr("aurora.cli.build_repo_learning_pipeline", fake_repo_pipeline)
+
+    exit_code = main(
+        [
+            "run",
+            "--mode",
+            "repo_learning",
+            "--config",
+            str(config_path),
+            "--output-dir",
+            str(output_dir),
+            "--quality-tier",
+            "thorough",
+        ]
+    )
+
+    assert exit_code == 0
+    assert observed == {
+        "max_requests": 36,
+        "repo_llm_top_n": 5,
+        "repo_enrich_top_n": 12,
+    }
 
 
 def test_run_topic_override_rejects_advanced_interest_overrides(
@@ -362,7 +451,7 @@ def test_run_topic_override_rejects_advanced_interest_overrides(
             "--config",
             str(config_path),
             "--topic",
-            "machine_learning",
+            "llm",
             "--repo-interest",
             "agents",
         ]
@@ -375,7 +464,7 @@ def test_run_topic_override_rejects_advanced_interest_overrides(
             "--config",
             str(config_path),
             "--topic",
-            "computer_vision",
+            "robots",
             "--research-field",
             "cv",
         ]

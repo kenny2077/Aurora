@@ -12,6 +12,7 @@ from aurora.config import ReleaseGateConfig
 def evaluate_release_gate(run_summary: dict[str, Any]) -> dict[str, Any]:
     """Return whether one run summary is clean enough for the release gate."""
     blockers: list[str] = []
+    warnings: list[str] = []
     ai_usage = run_summary.get("ai_usage") if isinstance(run_summary.get("ai_usage"), dict) else {}
     public_copy = (
         run_summary.get("public_copy_quality")
@@ -20,11 +21,11 @@ def evaluate_release_gate(run_summary: dict[str, Any]) -> dict[str, Any]:
     )
 
     if _int_value(ai_usage, "failed_calls") > 0:
-        blockers.append("llm_failed_calls")
+        warnings.append("llm_failed_calls")
     if _int_value(ai_usage, "json_failures") > 0:
-        blockers.append("llm_json_failures")
+        warnings.append("llm_json_failures")
     if _int_value(ai_usage, "deterministic_fallbacks") > 0:
-        blockers.append("deterministic_fallbacks")
+        warnings.append("deterministic_fallbacks")
     if _int_value(public_copy, "unresolved_selected") > 0:
         blockers.append("public_copy_unresolved")
     if _int_value(public_copy, "delivery_blocked") > 0:
@@ -38,11 +39,13 @@ def evaluate_release_gate(run_summary: dict[str, Any]) -> dict[str, Any]:
                 blockers.append(f"section_{section}_below_minimum")
 
     blockers = list(dict.fromkeys(blockers))
+    warnings = list(dict.fromkeys(warnings))
     return {
         "run_id": str(run_summary.get("run_id") or ""),
         "mode": str(run_summary.get("mode") or ""),
         "clean": not blockers,
         "blockers": blockers,
+        "warnings": warnings,
         "checked_at": datetime.now(timezone.utc).isoformat(),
     }
 

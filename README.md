@@ -124,7 +124,7 @@ rtk uv run aurora run --mode unified_digest --config data/config.example.json
 Run a topic-focused digest using the GitHub Actions config:
 
 ```bash
-rtk uv run aurora run --mode unified_digest --config data/actions.config.json --topic agents_harness
+rtk uv run aurora run --mode unified_digest --config data/actions.config.json --topic agents
 ```
 
 GitHub Actions setup:
@@ -173,18 +173,35 @@ rtk uv run aurora run --mode scholar --research-field ml --research-field agents
 
 ## Topic Presets
 
-For the unified digest, `--topic` applies one preset to both repository and
-research selection:
+For the unified digest, `--topic` applies one preset to tech news keywords,
+repository interests, and research fields:
 
-| Topic | Repo interest | Scholar field |
+| Topic | Tech news focus | Repo interests | Scholar fields |
+| --- | --- | --- | --- |
+| `llm` | models, inference, RAG, evaluation | `llm`, `mcp`, `devtools` | `llm` |
+| `agents` | agents, tool use, MCP, workflows | `agents`, `mcp`, `workflow-automation` | `agents` |
+| `robots` | robotics, embodied AI, robot learning | `robots` | `robots` |
+
+Use topic presets when you want the daily digest to stay coherent across news,
+hands-on repositories, and papers. You can select a topic in GitHub Actions, set
+`run.topic` in config, or pass `--topic` locally. See
+[docs/interests.md](docs/interests.md) for the full interest and research field
+preset list.
+
+## Quality Tiers
+
+Aurora defaults to `balanced`: a modest number of DeepSeek-compatible calls for
+polish and ranking, bounded source enrichment, and deterministic fallbacks when
+providers are slow or unavailable.
+
+| Tier | Use when | Behavior |
 | --- | --- | --- |
-| `machine_learning` | `ml` | `ml` |
-| `agents_harness` | `agents` | `agents` |
-| `computer_vision` | `cv` | `cv` |
+| `lean` | You want the cheapest reliable daily feed | deterministic-first, smaller source enrichment, no child-mode LLM ranking |
+| `balanced` | You want the default public digest | a few LLM calls per section, moderate repo and paper enrichment |
+| `thorough` | You want a deeper editorial pass | more LLM ranking/polish calls and broader repo/paper enrichment |
 
-Use topic presets when you want the daily digest to stay coherent across hands-on
-repositories and papers. See [docs/interests.md](docs/interests.md) for the full
-interest and research field preset list.
+Use `--quality-tier balanced`, set `run.quality_tier`, or choose the tier in
+GitHub Actions.
 
 ## Secrets
 
@@ -303,8 +320,10 @@ volatile provider pricing.
 
 Tech news source packs are opt-in. In addition to Hacker News and explicit RSS
 feeds, config can enable curated RSS groups, Reddit listings, and GitHub
-releases. Source health history is tracked in the cache and weak source health
-demotes candidates internally without adding diagnostics to the public digest.
+releases. The scheduled public config leaves Reddit disabled because the public
+JSON endpoint frequently blocks automated fetches. Source health history is
+tracked in the cache and weak source health demotes candidates internally
+without adding diagnostics to the public digest.
 
 ## Quality Evaluation
 

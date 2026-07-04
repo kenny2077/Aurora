@@ -437,6 +437,48 @@ def test_pipeline_runner_includes_public_copy_quality_in_run_summary(tmp_path) -
     }
 
 
+def test_pipeline_runner_copies_selected_digest_ids_into_run_summary(tmp_path) -> None:
+    calls: list[str] = []
+
+    class SelectionRender(RecordingRender):
+        async def render(
+            self, summary: str, items: Sequence[SignalItem], context: StageContext
+        ) -> RenderedDigest:
+            rendered = await super().render(summary, items, context)
+            return rendered.model_copy(
+                update={
+                    "metadata": {
+                        "selected_item_ids": ["news:1", "repo:1", "paper:1"],
+                        "recommended_repo_ids": ["repo:1"],
+                    }
+                }
+            )
+
+    pipeline = _pipeline(calls)
+    pipeline = ModePipeline(
+        mode=pipeline.mode,
+        fetch_stages=pipeline.fetch_stages,
+        normalize_stage=pipeline.normalize_stage,
+        deduplicate_stage=pipeline.deduplicate_stage,
+        score_stage=pipeline.score_stage,
+        enrich_stage=pipeline.enrich_stage,
+        summarize_stage=pipeline.summarize_stage,
+        render_stage=SelectionRender(calls),
+        deliver_stage=pipeline.deliver_stage,
+    )
+
+    result = asyncio.run(
+        PipelineRunner(tmp_path).run(
+            pipeline,
+            StageContext(mode="unified_digest", run_id="ids"),
+        )
+    )
+
+    summary = result.rendered_digest.metadata["run_summary"]
+    assert summary["selected_item_ids"] == ["news:1", "repo:1", "paper:1"]
+    assert summary["recommended_repo_ids"] == ["repo:1"]
+
+
 def test_pipeline_runner_writes_run_summary_when_delivery_raises(tmp_path) -> None:
     calls: list[str] = []
     pipeline = _pipeline(calls)

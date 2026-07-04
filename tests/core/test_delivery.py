@@ -87,6 +87,45 @@ def test_filesystem_delivery_appends_source_health_when_run_summary_exists(tmp_p
     assert "rss failed: timeout" in markdown
 
 
+def test_unified_delivery_does_not_append_source_health_to_public_digest(tmp_path: Path) -> None:
+    config = AuroraConfig(
+        delivery=DeliveryConfig(
+            filesystem=FilesystemDeliveryConfig(reports_dir=tmp_path / "reports"),
+            github_pages=GitHubPagesDeliveryConfig(enabled=False),
+        )
+    )
+    context = StageContext(
+        mode="unified_digest",
+        run_id="run-1",
+        metadata={
+            "run_summary": {
+                "counts": {"raw": 2, "normalized": 2, "deduplicated": 1, "enriched": 1},
+                "source_health": {"ok": 1, "failed": 1, "rate_limited": 0},
+                "sources": [{"source": "rss", "ok": False, "error": "timeout"}],
+            }
+        },
+        config=config,
+    )
+
+    results = asyncio.run(
+        ConfiguredDeliveryStage(config).deliver(
+            RenderedDigest(
+                mode="unified_digest",
+                title="Aurora Unified Digest",
+                markdown="# Aurora Unified Digest\n\n## Tech News\n\nBody",
+            ),
+            context,
+        )
+    )
+
+    markdown = (tmp_path / "reports" / "run-1" / "unified_digest.md").read_text(
+        encoding="utf-8"
+    )
+    assert results[0].ok is True
+    assert markdown == "# Aurora Unified Digest\n\n## Tech News\n\nBody"
+    assert "## Source Health" not in markdown
+
+
 def test_configured_delivery_can_skip_delivery(tmp_path: Path) -> None:
     config = AuroraConfig(
         delivery=DeliveryConfig(

@@ -319,12 +319,16 @@ def _excerpt(value: str, limit: int) -> str:
 
 def _section_item_lines(index: int, item: SignalItem) -> list[str]:
     if item.type == "repo":
-        return [
+        lines = [
             f"{index}. [{item.title}]({item.url})",
             f"   - {_repo_stats_compact_text(item.metadata)}",
             f"   - Description: {_repo_description_text(item)}",
             f"   - Tags: {_repo_tags_text(item.metadata)}",
         ]
+        study_path = _study_path_text(item)
+        if study_path:
+            lines.append(f"   - Study path: {study_path}")
+        return lines
     if item.type == "paper":
         return [
             f"{index}. [{item.title}]({item.url})",
@@ -679,6 +683,13 @@ def _repo_topic_tag(value: object) -> str:
     text = str(value or "").strip().replace("-", " ").replace("_", " ")
     text = " ".join(text.split())
     return f"# {text}" if text else ""
+
+
+def _study_path_text(item: SignalItem) -> str:
+    actions = _action_items(item)
+    if not actions:
+        return ""
+    return " ".join(_first_sentence(action) for action in actions[:3] if action).strip()
 
 
 def _first_sentence(value: str) -> str:

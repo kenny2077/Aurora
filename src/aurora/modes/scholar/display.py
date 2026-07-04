@@ -42,7 +42,10 @@ def format_paper_description(item: SignalItem) -> str:
     why_text = _clean_text(item.why_it_matters)
     if why_text and not _is_generic_fallback_text(why_text):
         return _short_description(why_text)
-    return f"This paper studies {title} and why it may matter for future AI systems."
+    return (
+        f"Read this paper to understand \"{title}\", then map its method, evidence, "
+        "and likely implementation constraints."
+    )
 
 
 def _paper_year(value: object) -> int | None:

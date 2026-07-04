@@ -42,7 +42,7 @@ class AIClient:
             raise RuntimeError(f"missing AI API key env var: {self.config.api_key_env}")
         if self.http_client is not None:
             return await self._complete_with_client(self.http_client, system_prompt, user_prompt)
-        async with httpx.AsyncClient(timeout=60.0) as client:
+        async with httpx.AsyncClient(timeout=self.config.request_timeout_sec) as client:
             return await self._complete_with_client(client, system_prompt, user_prompt)
 
     async def _complete_with_client(

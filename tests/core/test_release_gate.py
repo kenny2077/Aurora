@@ -11,7 +11,7 @@ def test_release_gate_requires_consecutive_clean_scheduled_runs(tmp_path: Path) 
     config = ReleaseGateConfig(enabled=True, ledger_path=ledger_path, required_clean_runs=3)
 
     record_release_gate_run(config, _summary("run-1"), scheduled=True)
-    record_release_gate_run(config, _summary("run-2", ai_failed=1), scheduled=True)
+    record_release_gate_run(config, _summary("run-2", unresolved=1), scheduled=True)
     record_release_gate_run(config, _summary("run-3"), scheduled=True)
     record_release_gate_run(config, _summary("run-4"), scheduled=True)
 
@@ -42,11 +42,26 @@ def test_release_gate_ignores_manual_runs_and_reports_blockers(tmp_path: Path) -
     assert status["total_recorded_runs"] == 0
     assert status["ready"] is False
     assert set(evaluated["blockers"]) >= {
-        "llm_failed_calls",
-        "deterministic_fallbacks",
         "public_copy_unresolved",
         "delivery_blocked",
         "section_paper_below_minimum",
+    }
+    assert set(evaluated["warnings"]) >= {
+        "llm_failed_calls",
+        "llm_json_failures",
+        "deterministic_fallbacks",
+    }
+
+
+def test_release_gate_keeps_optional_llm_failures_as_warnings_when_public_output_is_clean() -> None:
+    evaluated = evaluate_release_gate(_summary("cheap-clean", ai_failed=2, fallbacks=3))
+
+    assert evaluated["clean"] is True
+    assert evaluated["blockers"] == []
+    assert set(evaluated["warnings"]) == {
+        "llm_failed_calls",
+        "llm_json_failures",
+        "deterministic_fallbacks",
     }
 
 

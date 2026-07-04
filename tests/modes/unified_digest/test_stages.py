@@ -140,6 +140,43 @@ def test_unified_rendering_respects_section_order_and_caps() -> None:
     assert "web_html" in rendered.metadata
 
 
+def test_unified_repo_cards_include_hands_on_study_path() -> None:
+    config = UnifiedDigestModeConfig(
+        section_limits={"news": 1, "repo": 1, "paper": 1},
+        max_total_items=3,
+        section_order=["news", "repo", "paper"],
+    )
+    repo = _item(
+        "repo:study",
+        "repo",
+        "org/study-kit",
+        9.0,
+        metadata={
+            "description": "A practical agent workflow toolkit.",
+            "stars": 2400,
+            "language": "Python",
+            "topics": ["agents"],
+        },
+        action_items=[
+            "Inspect key learning files such as pyproject.toml, examples/basic.py.",
+            "Trace or run the smallest example: examples/basic.py.",
+            "In one week, build a small extension around the core workflow.",
+        ],
+    )
+    items = [
+        _item("news:1", "news", "News", 7.0),
+        repo,
+        _item("paper:1", "paper", "Paper", 7.0),
+    ]
+    context = StageContext(mode="unified_digest", run_id="test")
+
+    summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
+
+    assert "Study path:" in summary
+    assert "pyproject.toml" in summary
+    assert "In one week" in summary
+
+
 def test_unified_default_section_limits_select_five_news_three_repos_and_three_papers() -> None:
     config = UnifiedDigestModeConfig(max_total_items=20)
     items = [
@@ -240,6 +277,23 @@ def test_unified_news_selection_does_not_promote_weak_sources_for_variety() -> N
         "news:hn-2",
         "news:hn-3",
     ]
+
+
+def test_public_copy_quality_rejects_truncated_parenthetical_news_summary() -> None:
+    item = _item(
+        "news:fragment",
+        "news",
+        "Amazon Bedrock adds a model",
+        8.0,
+        source="rss",
+        summary="Amazon Bedrock adds NVIDIA Nemotron (Nano.",
+        why_it_matters="Amazon Bedrock added a model option that may change inference choices.",
+    )
+
+    quality = public_copy_quality(item)
+
+    assert quality.ok is False
+    assert "dangling_fragment" in quality.reasons
 
 
 def test_unified_paper_selection_prefers_two_top_venues_and_one_arxiv_preprint() -> None:
@@ -627,7 +681,7 @@ def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
     summary = asyncio.run(UnifiedDigestSummarizer(config).summarize(items, context))
 
     assert "### News to Watch" not in summary
-    assert "Hacker News" in summary
+    assert "Developers are discussing" in summary
     assert "https:&#x2F;" not in summary
     assert "[aaaronic]:" not in summary
     assert "## Research Papers" in summary
@@ -689,7 +743,7 @@ def test_unified_paper_description_hides_generic_scholar_fallback() -> None:
 
     assert "Relevant ML research candidate" not in summary
     assert (
-        "This paper studies Reward Modeling for Multi-Agent Orchestration and why it may matter"
+        'Read this paper to understand "Reward Modeling for Multi-Agent Orchestration"'
         in summary
     )
 
@@ -869,13 +923,15 @@ def test_public_copy_quality_uses_the_rendered_news_fallback() -> None:
 
 
 def test_public_copy_quality_rejects_incomplete_source_sentence() -> None:
+    summary = "Oak is useful for teams that need a Git alternative but lacks Windo"
     item = _item(
         "news:truncated",
         "news",
         "Show HN: Oak, a Git alternative",
         9.0,
         source="hackernews",
-        summary="Oak is useful for teams that need a Git alternative but lacks Windo",
+        summary=summary,
+        why_it_matters=summary,
     )
 
     quality = public_copy_quality(item)
@@ -923,6 +979,27 @@ def test_public_copy_quality_accepts_concrete_rss_source_sentence() -> None:
 
     assert quality.ok
     assert "AWS shows how agentic overlays" in quality.text
+
+
+def test_public_copy_quality_uses_source_text_when_news_summary_is_incomplete() -> None:
+    item = _item(
+        "news:incomplete-summary",
+        "news",
+        "Agent video demos for coding workflows",
+        8.0,
+        source="rss",
+        summary="Agent video demos help teams review coding work with",
+        why_it_matters="",
+        raw_content=(
+            "Shot-scraper can record browser-based agent demos so reviewers can inspect "
+            "what changed without rerunning the full workflow."
+        ),
+    )
+
+    quality = public_copy_quality(item)
+
+    assert quality.ok
+    assert "Shot-scraper can record browser-based agent demos" in quality.text
 
 
 def test_rendered_public_digest_audit_blocks_deterministic_public_templates() -> None:

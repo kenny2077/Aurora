@@ -6,6 +6,17 @@ from typing import Any
 
 
 REPO_INTEREST_PRESETS: dict[str, dict[str, Any]] = {
+    "llm": {
+        "terms": [
+            "llm",
+            "large language model",
+            "rag",
+            "inference",
+            "reasoning",
+            "evaluation",
+        ],
+        "languages": ["Python", "TypeScript", "Rust"],
+    },
     "ml": {
         "terms": ["machine learning", "deep learning", "ml", "pytorch", "tensorflow"],
         "languages": ["Python"],
@@ -13,6 +24,10 @@ REPO_INTEREST_PRESETS: dict[str, dict[str, Any]] = {
     "agents": {
         "terms": ["agent", "agentic", "llm agent", "tool use", "coding agent"],
         "languages": ["Python", "TypeScript"],
+    },
+    "robots": {
+        "terms": ["robot", "robotics", "embodied ai", "robot learning", "ros", "manipulation"],
+        "languages": ["Python", "C++"],
     },
     "cv": {
         "terms": ["computer vision", "vision", "opencv", "segmentation", "object detection"],
@@ -46,6 +61,18 @@ REPO_INTEREST_PRESETS: dict[str, dict[str, Any]] = {
 
 
 SCHOLAR_FIELD_PRESETS: dict[str, dict[str, list[str]]] = {
+    "llm": {
+        "categories": ["cs.CL", "cs.AI", "cs.LG"],
+        "keywords": [
+            "large language models",
+            "llm",
+            "reasoning",
+            "retrieval augmented generation",
+            "inference optimization",
+            "evaluation",
+        ],
+        "venues": ["ACL", "EMNLP", "NAACL", "ICLR", "NeurIPS", "ICML"],
+    },
     "ml": {
         "categories": ["cs.LG", "cs.AI", "stat.ML"],
         "keywords": ["machine learning", "representation learning", "optimization"],
@@ -55,6 +82,18 @@ SCHOLAR_FIELD_PRESETS: dict[str, dict[str, list[str]]] = {
         "categories": ["cs.AI", "cs.CL"],
         "keywords": ["llm agents", "tool use", "reasoning", "planning", "agentic"],
         "venues": ["ICLR", "NeurIPS", "ICML", "ACL", "EMNLP", "NAACL"],
+    },
+    "robots": {
+        "categories": ["cs.RO", "cs.AI", "cs.LG"],
+        "keywords": [
+            "robotics",
+            "robot learning",
+            "embodied ai",
+            "manipulation",
+            "navigation",
+            "foundation models for robotics",
+        ],
+        "venues": ["CoRL", "ICRA", "IROS", "RSS", "ICLR", "NeurIPS", "ICML"],
     },
     "cv": {
         "categories": ["cs.CV", "cs.LG"],
@@ -85,6 +124,60 @@ SCHOLAR_FIELD_PRESETS: dict[str, dict[str, list[str]]] = {
         "categories": ["cs.CV", "cs.CL", "cs.AI"],
         "keywords": ["multimodal learning", "vision-language", "audio-language", "video understanding"],
         "venues": ["CVPR", "ICCV", "ECCV", "ACL", "NeurIPS", "ICLR"],
+    },
+}
+
+
+PUBLIC_TOPIC_NAMES = ("llm", "agents", "robots")
+
+
+TOPIC_PRESETS: dict[str, dict[str, list[str]]] = {
+    "llm": {
+        "repo_interests": ["llm", "mcp", "devtools"],
+        "research_fields": ["llm"],
+        "tech_news_keywords": [
+            "llm",
+            "large language model",
+            "model release",
+            "inference",
+            "reasoning",
+            "rag",
+            "benchmark",
+            "evaluation",
+            "local llm",
+            "open weights",
+        ],
+    },
+    "agents": {
+        "repo_interests": ["agents", "mcp", "workflow-automation"],
+        "research_fields": ["agents"],
+        "tech_news_keywords": [
+            "agent",
+            "agents",
+            "agentic",
+            "coding agent",
+            "tool use",
+            "mcp",
+            "workflow",
+            "automation",
+            "planning",
+            "reasoning",
+        ],
+    },
+    "robots": {
+        "repo_interests": ["robots"],
+        "research_fields": ["robots"],
+        "tech_news_keywords": [
+            "robot",
+            "robots",
+            "robotics",
+            "embodied ai",
+            "robot learning",
+            "manipulation",
+            "navigation",
+            "ros",
+            "humanoid",
+        ],
     },
 }
 

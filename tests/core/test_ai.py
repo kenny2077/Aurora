@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import asyncio
+import json
 from datetime import datetime, timezone
 
 import httpx
 
+from aurora.ai.client import AIClient
 from aurora.ai.json import parse_json_object
-from aurora.ai.ranker import LLMAnalysis, LLMRanker
+from aurora.ai.ranker import LLMAnalysis, LLMRanker, item_prompt_payload
 from aurora.ai.scoring import combine_scores
 from aurora.config import AIConfig, FinalScoreWeights
 from aurora.models import SignalItem
@@ -121,6 +123,24 @@ def test_llm_ranker_uses_suggested_learning_path_and_tags() -> None:
     assert "benchmarks" in enriched.tags
 
 
+def test_llm_analysis_accepts_common_near_json_shapes() -> None:
+    analysis = LLMAnalysis.model_validate(
+        {
+            "score": "8/10",
+            "summary": ["First sentence.", "Second sentence."],
+            "why_it_matters": None,
+            "action_items": "Read the README; run the smoke test",
+            "tags": "agents, github actions",
+        }
+    )
+
+    assert analysis.score == 8.0
+    assert analysis.summary == "First sentence. Second sentence."
+    assert analysis.why_it_matters == ""
+    assert analysis.action_items == ["Read the README", "run the smoke test"]
+    assert analysis.tags == ["agents", "github actions"]
+
+
 def test_llm_ranker_retries_transient_failures_and_records_attempts() -> None:
     item = _item("news:retry")
     client = _RetryingClient(transient_failures=2)
@@ -161,6 +181,66 @@ def test_llm_ranker_does_not_retry_authentication_failures() -> None:
     assert analyses == {}
     assert client.calls == 1
     assert context.metadata["ai_usage"]["failure_categories"] == {"authentication": 1}
+
+
+def test_item_prompt_payload_is_token_disciplined_and_whitelists_metadata() -> None:
+    item = _item("repo:compact").model_copy(
+        update={
+            "type": "repo",
+            "raw_content": "A" * 5000,
+            "metadata": {
+                "stars": 2400,
+                "forks": 120,
+                "language": "Python",
+                "topics": ["agents", "mcp"],
+                "full_name": "org/compact",
+                "readme_excerpt": "R" * 4000,
+                "tree_preview": [f"src/file_{index}.py" for index in range(50)],
+                "private_token": "do-not-send",
+            },
+        }
+    )
+
+    payload = json.loads(item_prompt_payload(item))
+
+    assert len(payload["raw_content"]) <= 1200
+    assert payload["metadata"] == {
+        "forks": 120,
+        "full_name": "org/compact",
+        "language": "Python",
+        "stars": 2400,
+        "topics": ["agents", "mcp"],
+    }
+
+
+def test_ai_client_uses_configured_request_timeout(monkeypatch) -> None:
+    created: dict[str, float] = {}
+
+    class RecordingAsyncClient:
+        def __init__(self, *, timeout: float) -> None:
+            created["timeout"] = timeout
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb) -> None:
+            return None
+
+    async def fake_complete(self, client, system_prompt: str, user_prompt: str) -> dict:
+        return {"score": 8}
+
+    monkeypatch.setenv("AURORA_TEST_KEY", "token")
+    monkeypatch.setattr("aurora.ai.client.httpx.AsyncClient", RecordingAsyncClient)
+    monkeypatch.setattr(AIClient, "_complete_with_client", fake_complete)
+
+    result = asyncio.run(
+        AIClient(
+            AIConfig(api_key_env="AURORA_TEST_KEY", request_timeout_sec=12.5)
+        ).complete_json("system", "user")
+    )
+
+    assert result == {"score": 8}
+    assert created["timeout"] == 12.5
 
 
 def _prompt(item: SignalItem) -> tuple[str, str]:

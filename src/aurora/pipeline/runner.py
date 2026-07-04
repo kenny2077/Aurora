@@ -153,6 +153,19 @@ class PipelineRunner:
         summary = await pipeline.summarize_stage.summarize(enriched_items, context)
         rendered_digest = await pipeline.render_stage.render(summary, enriched_items, context)
         _copy_render_metadata_to_context(rendered_digest.metadata, context)
+        run_summary = _run_summary(
+            run_id=context.run_id,
+            mode=pipeline.mode,
+            raw_count=len(raw_items),
+            normalized_count=len(normalized_items),
+            deduplicated_count=len(deduplicated_items),
+            score_result_count=len(score_results),
+            enriched_count=len(enriched_items),
+            source_statuses=source_statuses,
+            source_quality=context.metadata.get("source_quality"),
+            context_metadata=context.metadata,
+        )
+        context.metadata["run_summary"] = run_summary
         rendered_digest = rendered_digest.model_copy(
             update={"metadata": {**rendered_digest.metadata, "run_summary": run_summary}}
         )
@@ -290,6 +303,9 @@ def _run_summary(
     release_counts = _release_gate_counts(context_metadata)
     if release_counts:
         summary.update(release_counts)
+    selected_ids = _selected_digest_ids(context_metadata)
+    if selected_ids:
+        summary.update(selected_ids)
     warnings = _summary_warnings(context_metadata)
     if warnings:
         summary["warnings"] = warnings
@@ -300,6 +316,10 @@ def _copy_render_metadata_to_context(metadata: dict[str, Any], context: StageCon
     item_counts = metadata.get("item_counts")
     if isinstance(item_counts, dict):
         context.metadata["item_counts"] = item_counts
+    for key in ("selected_item_ids", "recommended_repo_ids"):
+        values = metadata.get(key)
+        if isinstance(values, list):
+            context.metadata[key] = [str(value) for value in values if str(value).strip()]
     if context.config is not None and context.mode == "unified_digest":
         context.metadata["minimum_section_items"] = (
             context.config.modes.unified_digest.minimum_section_items
@@ -324,6 +344,19 @@ def _release_gate_counts(context_metadata: dict[str, Any] | None) -> dict[str, A
             for section, minimum in minimums.items()
             if str(section) in {"news", "repo", "paper"}
         }
+    return payload
+
+
+def _selected_digest_ids(context_metadata: dict[str, Any] | None) -> dict[str, Any]:
+    if not isinstance(context_metadata, dict):
+        return {}
+    payload: dict[str, Any] = {}
+    for key in ("selected_item_ids", "recommended_repo_ids"):
+        values = context_metadata.get(key)
+        if isinstance(values, list):
+            cleaned = [str(value) for value in values if str(value).strip()]
+            if cleaned:
+                payload[key] = cleaned
     return payload
 
 

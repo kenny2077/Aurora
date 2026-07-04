@@ -77,7 +77,14 @@ RENDERED_FORBIDDEN_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("score_visible", re.compile(r"\b\d+(?:\.\d+)?/10\b")),
     ("deterministic_news_template", re.compile(r"\bThe (?:update describes|release highlights)\b", re.IGNORECASE)),
     ("deterministic_news_generic", re.compile(r"This item points to a practical AI tooling or research update", re.IGNORECASE)),
-    ("generic_hackernews_template", re.compile(r"This Hacker News story is drawing .+ developer attention", re.IGNORECASE)),
+    (
+        "generic_hackernews_template",
+        re.compile(
+            r"(?:This Hacker News story is drawing .+ developer attention|"
+            r"Developers are discussing .+ with .+ signal for)",
+            re.IGNORECASE,
+        ),
+    ),
     ("deterministic_repo_template", re.compile(r"is useful for studying how a real project organizes its architecture", re.IGNORECASE)),
     ("deterministic_paper_template", re.compile(r"This paper studies .+ and why the idea could matter for practical AI systems", re.IGNORECASE)),
 )
@@ -98,7 +105,11 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
 
     if len(normalized) < 20:
         reasons.append("too_short")
-    if item.type == "news" and _has_incomplete_source_sentence(item.summary):
+    if (
+        item.type == "news"
+        and _has_incomplete_source_sentence(item.summary)
+        and normalized == source_summary
+    ):
         reasons.append("incomplete_source_sentence")
     if any(SOURCE_COVERS_PATTERN.search(value) for value in quality_texts):
         reasons.append("source_covers_template")
@@ -128,7 +139,8 @@ def public_copy_quality(item: SignalItem) -> PublicCopyQuality:
     ):
         reasons.append("deterministic_news_generic")
     if item.type == "news" and re.search(
-        r"\bThis Hacker News story is drawing\b.+\bdeveloper attention\b",
+        r"(?:\bThis Hacker News story is drawing\b.+\bdeveloper attention\b|"
+        r"\bDevelopers are discussing\b.+\bwith\b.+\bsignal for\b)",
         quality_lowered,
         re.IGNORECASE,
     ):
@@ -229,13 +241,33 @@ def _has_duplicated_title_prefix(item: SignalItem, text: str) -> bool:
 
 
 def _has_dangling_fragment(text: str) -> bool:
-    lowered = text.strip().lower()
+    stripped = text.strip()
+    if _has_unbalanced_delimiters(stripped) or _has_short_trailing_sentence(stripped):
+        return True
+    lowered = stripped.lower()
     if lowered.endswith(DANGLING_ENDINGS):
         return True
     words = re.findall(r"[a-z0-9]+", lowered)
     if words and len(words[-1]) <= 2 and words[-1] not in ALLOWED_SHORT_FINAL_WORDS:
         return True
     return lowered.endswith((" vs.", " e.g.", " i.e."))
+
+
+def _has_unbalanced_delimiters(text: str) -> bool:
+    return (
+        text.count("(") > text.count(")")
+        or text.count("[") > text.count("]")
+        or text.count("{") > text.count("}")
+    )
+
+
+def _has_short_trailing_sentence(text: str) -> bool:
+    sentences = [sentence.strip() for sentence in re.split(r"(?<=[.!?])\s+", text) if sentence.strip()]
+    if len(sentences) < 2:
+        return False
+    words = re.findall(r"[A-Za-z0-9]+", sentences[-1])
+    all_words = re.findall(r"[A-Za-z0-9]+", text)
+    return 0 < len(words) <= 2 and len(all_words) > 6
 
 
 def _has_incomplete_source_sentence(value: object) -> bool:

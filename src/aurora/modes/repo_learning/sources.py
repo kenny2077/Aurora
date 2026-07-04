@@ -30,7 +30,10 @@ class GitHubSearchFetchStage:
             return []
         if self.http_client is not None:
             return await self._fetch_with_client(self.http_client, context)
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(
+            timeout=self.config.sources.github_search.request_timeout_sec,
+            follow_redirects=True,
+        ) as client:
             return await self._fetch_with_client(client, context)
 
     async def _fetch_with_client(

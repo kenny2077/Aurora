@@ -49,6 +49,8 @@ def _capture(channel: str, callback) -> DeliveryResult:
 
 
 def _with_source_health(rendered: RenderedDigest, context: StageContext) -> RenderedDigest:
+    if rendered.mode == "unified_digest" or context.mode == "unified_digest":
+        return rendered
     if "## Source Health" in rendered.markdown or "## Run Summary" in rendered.markdown:
         return rendered
     run_summary = context.metadata.get("run_summary")

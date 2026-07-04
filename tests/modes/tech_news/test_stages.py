@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from aurora.ai.ranker import LLMRanker
 from aurora.config import AIConfig, AuroraConfig, FinalScoreWeights
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
+from aurora.modes.tech_news.notes import display_tech_news_learning, display_tech_news_summary
 from aurora.modes.tech_news.pipeline import build_tech_news_pipeline
 from aurora.modes.tech_news.prompts import TECH_NEWS_ANALYSIS_SYSTEM
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
@@ -248,7 +249,8 @@ def test_enricher_generates_polished_hackernews_learning_notes() -> None:
 
     enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
 
-    assert "Hacker News" in enriched.why_it_matters
+    assert "Developers are discussing" in enriched.why_it_matters
+    assert "Can the stockmarket swallow Anthropic, SpaceX and OpenAI?" in enriched.why_it_matters
     assert "1240" in enriched.why_it_matters
     assert enriched.learning_value
     assert enriched.action_items
@@ -256,6 +258,23 @@ def test_enricher_generates_polished_hackernews_learning_notes() -> None:
         assert "&#x" not in value
         assert "https:" not in value
         assert "[augstein]:" not in value
+
+
+def test_rss_public_summary_removes_release_title_prefix_and_extra_dots() -> None:
+    item = _item(
+        "news:rss-release",
+        "llm-coding-agent 0.1a0",
+        "https://example.com/llm-coding-agent",
+        raw_content=(
+            "Release: llm-coding-agent 0.1a0 Another Fable experiment shows what a simple "
+            "coding agent looks like when built on a small LLM framework. It includes a "
+            "minimal edit loop, command execution, and notes for future extension. "
+            "The article continues with implementation details and setup caveats."
+        ),
+    )
+
+    assert display_tech_news_summary(item).startswith("Another Fable experiment")
+    assert "...." not in display_tech_news_learning(item)
 
 
 def test_tech_news_prompt_does_not_request_credibility_prediction() -> None:
@@ -457,7 +476,8 @@ def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> 
 
     enriched = asyncio.run(TechNewsEnricher(_LowQualityRanker()).enrich([item], [score], _context()))[0]
 
-    assert "Hacker News" in enriched.why_it_matters
+    assert "Developers are discussing" in enriched.why_it_matters
+    assert "AI Agent Guidelines for CS336 at Stanford" in enriched.why_it_matters
     assert "https:&#x2F;" not in enriched.why_it_matters
     assert "[aaaronic]:" not in enriched.learning_value
     assert enriched.action_items == [

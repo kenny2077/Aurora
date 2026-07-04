@@ -9,11 +9,15 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "schedule:" in workflow
     assert "workflow_dispatch:" in workflow
     assert "topic:" in workflow
-    assert "default: agents_harness" in workflow
-    assert "machine_learning" in workflow
-    assert "agents_harness" in workflow
-    assert "computer_vision" in workflow
+    assert "default: agents" in workflow
+    assert "llm" in workflow
+    assert "agents" in workflow
+    assert "robots" in workflow
     assert "skip_llm:" in workflow
+    assert "quality_tier:" in workflow
+    assert "default: balanced" in workflow
+    assert "lean" in workflow
+    assert "thorough" in workflow
     assert "default: \"false\"" in workflow
     assert "FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: \"true\"" in workflow
     assert "aurora:" in workflow
@@ -45,11 +49,13 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "cp -R \"$STATE_DIR/.aurora/content/posts/.\" web/src/content/posts/" in workflow
     assert "cp -R \"$STATE_DIR/.aurora/cache/.\" data/cache/" in workflow
     assert "CONFIG_PATH=\"data/actions.config.json\"" in workflow
-    assert "TOPIC=\"${{ github.event.inputs.topic || 'agents_harness' }}\"" in workflow
+    assert "TOPIC=\"${{ github.event.inputs.topic || 'agents' }}\"" in workflow
     assert "GITHUB_TOKEN: ${{ github.token }}" in workflow
     assert "ARGS=(--config \"$CONFIG_PATH\" --mode \"$MODE\")" in workflow
     assert "ARGS+=(--topic \"$TOPIC\")" in workflow
     assert "SKIP_LLM=\"${{ github.event.inputs.skip_llm || 'false' }}\"" in workflow
+    assert "QUALITY_TIER=\"${{ github.event.inputs.quality_tier || 'balanced' }}\"" in workflow
+    assert "ARGS+=(--quality-tier \"$QUALITY_TIER\")" in workflow
     assert "ARGS+=(--skip-llm)" in workflow
     assert "uv run aurora run \"${ARGS[@]}\" --strict-delivery" in workflow
     assert "SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}" in workflow

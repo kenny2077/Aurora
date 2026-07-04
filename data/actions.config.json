@@ -2,8 +2,10 @@
   "run": {
     "enabled_modes": ["unified_digest"],
     "timezone": "Asia/Shanghai",
+    "quality_tier": "balanced",
     "time_window_hours": 168,
     "max_items": 50,
+    "topic": "agents",
     "dry_run": false,
     "state_path": "data/aurora_state.json",
     "cache_dir": "data/cache",
@@ -31,9 +33,10 @@
   },
   "ai": {
     "max_tokens": 650,
-    "max_requests_per_run": 12,
-    "max_network_attempts_per_run": 18,
+    "max_requests_per_run": 18,
+    "max_network_attempts_per_run": 26,
     "max_tokens_per_run": 240000,
+    "request_timeout_sec": 20.0,
     "fail_open_on_budget_exceeded": true,
     "analysis_concurrency": 2,
     "transient_retry_attempts": 2,
@@ -47,7 +50,7 @@
   },
   "modes": {
     "tech_news": {
-      "llm_analysis_top_n": 0,
+      "llm_analysis_top_n": 2,
       "filters": {
         "require_include_keyword": true,
         "include_keywords": [
@@ -123,7 +126,7 @@
           }
         ],
         "reddit": {
-          "enabled": true,
+          "enabled": false,
           "subreddits": ["MachineLearning", "LocalLLaMA"],
           "listing": "top",
           "time_filter": "day",
@@ -146,7 +149,7 @@
       "fields": ["ml", "agents"],
       "max_candidates": 200,
       "final_item_count": 10,
-      "llm_analysis_top_n": 0,
+      "llm_analysis_top_n": 2,
       "score_threshold": 5.5,
       "sources": {
         "arxiv": {
@@ -179,13 +182,14 @@
           "min_stars": 100,
           "recent_years": 5,
           "active_within_days": 365,
+          "request_timeout_sec": 12.0,
           "per_page": 30
         }
       },
       "ranking": {
         "final_item_count": 6,
-        "enrich_top_n": 12,
-        "llm_analysis_top_n": 0,
+        "enrich_top_n": 6,
+        "llm_analysis_top_n": 2,
         "history_lookback_days": 14
       }
     },

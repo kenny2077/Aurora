@@ -6,12 +6,19 @@ from pathlib import Path
 
 import httpx
 
-from aurora.config import RepoLearningModeConfig, RepoLearningRankingConfig
+from aurora.config import (
+    AuroraConfig,
+    RepoLearningGitHubSearchConfig,
+    RepoLearningModeConfig,
+    RepoLearningRankingConfig,
+    RepoLearningSourcesConfig,
+)
 from aurora.modes.repo_learning.render import RepoLearningRenderer, RepoLearningSummarizer
 from aurora.modes.repo_learning.scoring import (
     RepoLearningEnricher,
     RepoLearningScorer,
     extract_package_files,
+    repo_action_items,
 )
 from aurora.modes.repo_learning.stages import (
     RepoLearningDeduplicateStage,
@@ -219,6 +226,114 @@ def test_enricher_fetches_readme_tree_and_fills_learning_fields() -> None:
     assert enriched.why_it_matters
     assert enriched.learning_value
     assert len(enriched.action_items) == 3
+
+
+def test_enricher_uses_configured_github_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    created: dict[str, object] = {}
+
+    class RecordingAsyncClient:
+        def __init__(self, *, timeout: float, follow_redirects: bool) -> None:
+            created["timeout"] = timeout
+            created["follow_redirects"] = follow_redirects
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb) -> None:
+            return None
+
+    async def fake_enrich(self, items, score_results, client, context):
+        return list(items)
+
+    config = RepoLearningModeConfig(
+        sources=RepoLearningSourcesConfig(
+            github_search=RepoLearningGitHubSearchConfig(request_timeout_sec=8.0)
+        )
+    )
+    monkeypatch.setattr("aurora.modes.repo_learning.scoring.httpx.AsyncClient", RecordingAsyncClient)
+    monkeypatch.setattr(RepoLearningEnricher, "_enrich_with_client", fake_enrich)
+
+    result = asyncio.run(RepoLearningEnricher(config).enrich([], [], _context()))
+
+    assert result == []
+    assert created == {"timeout": 8.0, "follow_redirects": True}
+
+
+def test_enricher_fetches_repo_context_with_bounded_concurrency() -> None:
+    items = [
+        _repo("repo:org/first", "org/first", {"name": "first", "full_name": "org/first"}),
+        _repo("repo:org/second", "org/second", {"name": "second", "full_name": "org/second"}),
+    ]
+    scores = [
+        ScoreResult(item_id=item.id, deterministic_score=9.0 - index, final_score=9.0 - index)
+        for index, item in enumerate(items)
+    ]
+    active_tree_requests = 0
+    max_active_tree_requests = 0
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal active_tree_requests, max_active_tree_requests
+        if request.url.host == "raw.githubusercontent.com":
+            return httpx.Response(200, text="# Example\n\nRun the agent workflow.")
+        active_tree_requests += 1
+        max_active_tree_requests = max(max_active_tree_requests, active_tree_requests)
+        await asyncio.sleep(0.05)
+        active_tree_requests -= 1
+        return httpx.Response(
+            200,
+            json={"tree": [{"path": "pyproject.toml", "type": "blob"}]},
+        )
+
+    async def exercise() -> list[SignalItem]:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            return await RepoLearningEnricher(
+                RepoLearningModeConfig(ranking=RepoLearningRankingConfig(enrich_top_n=2)),
+                http_client=client,
+            ).enrich(
+                items,
+                scores,
+                StageContext(
+                    mode="repo_learning",
+                    run_id="test",
+                    config=AuroraConfig(ai={"enrichment_concurrency": 2}),
+                ),
+            )
+
+    enriched = asyncio.run(exercise())
+
+    assert [item.metadata["package_files"] for item in enriched] == [
+        ["pyproject.toml"],
+        ["pyproject.toml"],
+    ]
+    assert max_active_tree_requests == 2
+
+
+def test_repo_action_items_use_public_safe_study_path_labels() -> None:
+    actions = repo_action_items(
+        {
+            "full_name": "org/example",
+            "package_files": ["pyproject.toml", "examples/basic.py"],
+        }
+    )
+
+    assert actions[0] == "Inspect key learning files such as pyproject.toml, examples/basic.py."
+    assert "files:" not in actions[0].lower()
+
+
+def test_repo_action_items_remain_specific_without_file_evidence() -> None:
+    actions = repo_action_items(
+        {
+            "full_name": "org/agent-kit",
+            "language": "TypeScript",
+            "topics": ["agents", "workflow"],
+        }
+    )
+
+    assert actions == [
+        "Read the README and map the TypeScript agents workflow.",
+        "Identify the main TypeScript entry points before cloning deeply.",
+        "Build a small experiment around the agents workflow if the setup is clear.",
+    ]
 
 
 def test_enricher_explains_repo_with_evidence_and_specific_actions() -> None:

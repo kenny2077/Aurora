@@ -109,6 +109,37 @@ def test_github_client_uses_auth_and_parses_search_readme_and_tree(
     ]
 
 
+def test_fetch_stage_uses_configured_github_timeout(monkeypatch: pytest.MonkeyPatch) -> None:
+    created: dict[str, object] = {}
+
+    class RecordingAsyncClient:
+        def __init__(self, *, timeout: float, follow_redirects: bool) -> None:
+            created["timeout"] = timeout
+            created["follow_redirects"] = follow_redirects
+
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc, tb) -> None:
+            return None
+
+    async def fake_fetch(self, client, context: StageContext) -> list[dict]:
+        return []
+
+    config = RepoLearningModeConfig(
+        sources=RepoLearningSourcesConfig(
+            github_search=RepoLearningGitHubSearchConfig(request_timeout_sec=9.5)
+        )
+    )
+    monkeypatch.setattr("aurora.modes.repo_learning.sources.httpx.AsyncClient", RecordingAsyncClient)
+    monkeypatch.setattr(GitHubSearchFetchStage, "_fetch_with_client", fake_fetch)
+
+    result = asyncio.run(GitHubSearchFetchStage(config).fetch(StageContext(mode="repo_learning", run_id="test")))
+
+    assert result == []
+    assert created == {"timeout": 9.5, "follow_redirects": True}
+
+
 def test_github_client_returns_empty_context_on_404() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(404)
