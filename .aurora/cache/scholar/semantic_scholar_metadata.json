@@ -373,6 +373,66 @@
         "year": 2026
       }
     },
+    "arxiv:2607.02291": {
+      "cached_at": "2026-07-06T04:53:56.015567+00:00",
+      "data": {
+        "abstract": "Conventional reinforcement learning strategies for visual generation typically employ sample-wise reward functions, yet this practice frequently results in reward hacking that degrades image diversity and introduces visual anomalies. To address these limitations, we present a novel framework that finetunes generative models using distribution-wise rewards, ensuring better alignment with real-world data distributions. Unlike rewards that evaluate samples individually, distribution-wise reward accounts for the data distribution of the samples, mitigating the mode collapse problem that occurs when all samples optimize towards the same direction independently. To overcome the prohibitive computational cost of estimating these rewards, we introduce a subset-replace strategy that efficiently provides reward signals by updating only a small subset of a generated reference set. Additionally, we apply RL to optimize post-hoc model merging coefficients, potentially mitigating the train-inference inconsistency caused by introducing stochastic differential equation (SDE) in regular RL practices. Extensive experiments show our approach significantly improves FID-50K across various base models, from 8.30 to 5.77 for SiT and from 3.74 to 3.52 for EDM2. Qualitative evaluation also confirms that our method enhances perceptual quality while preserving sample diversity.",
+        "authors": [
+          {
+            "authorId": "2262451401",
+            "name": "Ruihang Li"
+          },
+          {
+            "authorId": null,
+            "name": "Mengde Xu"
+          },
+          {
+            "authorId": "2351410258",
+            "name": "Shuyang Gu"
+          },
+          {
+            "authorId": "1990265392",
+            "name": "Leigang Qu"
+          },
+          {
+            "authorId": "2280911299",
+            "name": "Fuli Feng"
+          },
+          {
+            "authorId": "2351597805",
+            "name": "Han Hu"
+          },
+          {
+            "authorId": "2408862803",
+            "name": "Wenjie Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02291",
+          "CorpusId": 289749556
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02291, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "58a879f5f4066c787ee0320922843c73abf71ffc",
+        "title": "Optimizing Visual Generative Models via Distribution-wise Rewards",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A novel framework that finetunes generative models using distribution-wise rewards, ensuring better alignment with real-world data distributions is presented, and a subset-replace strategy that efficiently provides reward signals by updating only a small subset of a generated reference set is introduced."
+        },
+        "url": "https://www.semanticscholar.org/paper/58a879f5f4066c787ee0320922843c73abf71ffc",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2607.02387": {
       "cached_at": "2026-07-04T04:22:45.259348+00:00",
       "data": {
@@ -521,6 +581,70 @@
           "text": "A novel, training-free mechanistic interpretability method that provides sampling-based interpretations of hidden state representations and quantitatively attributes semantic versus lexical focus to individual attention heads helps achieve interpretable and effective robustness against Typographic Attack."
         },
         "url": "https://www.semanticscholar.org/paper/adfd52730b3f2425937dd88acbdd100d98b7b7c8",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.02502": {
+      "cached_at": "2026-07-06T04:53:46.710545+00:00",
+      "data": {
+        "abstract": "On-policy self-distillation (OPSD) has emerged as a practical method for training large language models (LLMs) to reason, where a single model acts as both the teacher and the student with different levels of information access. However, recent studies have found that the teacher's dense token-level supervision, conditioned on privileged information, can lead to overfitting to in-domain patterns, suppress exploration, and hurt cross-domain generalization, while also introducing a more fundamental issue: *privileged information leakage*, where the student encodes answer-dependent shortcuts that are unavailable at test time. We introduce **DemoPSD**, a novel framework that resolves such problems through the idea of *selective adoption of teacher guidance*. Instead of fitting the full teacher distribution, DemoPSD steers the student toward a *reverse-KL barycenter target*, a weighted geometric combination of the teacher and student distributions, that naturally balances learning from the teacher with preserving the student's own reasoning capacity. We measure the difference between their distributions and use such a discrepancy to adaptively control the blending at each token position. We provably show that DemoPSD achieves **(1)** *leakage attenuation*, i.e., effective mitigation of privileged information leakage; and **(2)** *exploration preservation*, i.e., preservation of exploration capacity under dense token-level distillation. Extensive experiments on SciKnowEval across four scientific fields show that DemoPSD outperforms both GRPO and SDPO while maintaining higher training entropy and robustly generalizing to out-of-distribution GPQA benchmarks.",
+        "authors": [
+          {
+            "authorId": "2333010656",
+            "name": "Yunhe Li"
+          },
+          {
+            "authorId": "2430559074",
+            "name": "Haolin Shi"
+          },
+          {
+            "authorId": "2299480458",
+            "name": "Wenhao Liu"
+          },
+          {
+            "authorId": "2188778804",
+            "name": "Mengzhe Ruan"
+          },
+          {
+            "authorId": "2270631179",
+            "name": "Hanxu Hou"
+          },
+          {
+            "authorId": "2391887850",
+            "name": "Zhongxiang Dai"
+          },
+          {
+            "authorId": "2383826566",
+            "name": "Shuang Qiu"
+          },
+          {
+            "authorId": "2329139474",
+            "name": "Linqi Song"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.02502",
+          "CorpusId": 289749191
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.02502, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "131ebf8d78de0112b580ab735d5cad379733bc93",
+        "title": "DemoPSD: Disagreement-Modulated Policy Self-Distillation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "DemoPSD is introduced, a novel framework that resolves problems through the idea of *selective adoption of teacher guidance*."
+        },
+        "url": "https://www.semanticscholar.org/paper/131ebf8d78de0112b580ab735d5cad379733bc93",
         "venue": "",
         "year": 2026
       }
