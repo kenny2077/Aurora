@@ -717,6 +717,912 @@
         "year": 2026
       }
     },
+    "arxiv:2607.04562": {
+      "cached_at": "2026-07-11T03:53:25.356715+00:00",
+      "data": {
+        "abstract": "Large language models (LLMs) generate fluent outputs that can be wrong. Unlike humans, who often exhibit cues when providing false information, LLMs produce errors that are difficult to detect because autoregressive decoding provides no mechanism for verifying intermediate reasoning before state progression. We introduce Heaviside Continuity of Rolling Coefficients (HCRC), a verification-first execution framework that reformulates inference as predicate-gated state transitions governed by a Heaviside Gate. HCRC combines model confidence with independent verification signals from a parallel worker architecture, allowing execution to advance only when predefined correctness predicates are satisfied. This prevents invalid intermediate states from propagating, reducing epistemic entropy without modifying the underlying model. We evaluate HCRC on software-engineering and reasoning tasks across thirteen proposers from four providers. On capable proposers, the gate reduces the false-completion rate (FCR) from 4--7% to 0% while remaining latency-competitive and, in some settings, faster than the unwrapped model. On weaker proposers, it converts false completions into honest halts instead of corrupting downstream state. Beyond benchmarking, HCRC has operated for months as the production control plane of an agentic coding environment, authorizing file mutations, verification-driven progress reporting, and memory compaction. These results establish HCRC as a general framework for verification-driven LLM execution, showing that reliable reasoning can be achieved through principled execution control rather than model scale alone.",
+        "authors": [
+          {
+            "authorId": "2448012578",
+            "name": "MY Pitsane"
+          },
+          {
+            "authorId": "27610589",
+            "name": "Hope Mogale"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.04562",
+          "CorpusId": 289934929
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.04562, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "f8e5af96b121b64e105962cfe0214cdc1409d1a7",
+        "title": "Heaviside Continuity of Rolling Coefficients for Eliminating Epistemic Entropy in Large Language Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Heaviside Continuity of Rolling Coefficients (HCRC), a verification-first execution framework that reformulates inference as predicate-gated state transitions governed by a Heaviside Gate, is introduced, showing that reliable reasoning can be achieved through principled execution control rather than model scale alone."
+        },
+        "url": "https://www.semanticscholar.org/paper/f8e5af96b121b64e105962cfe0214cdc1409d1a7",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.05205": {
+      "cached_at": "2026-07-11T03:53:23.116337+00:00",
+      "data": {
+        "abstract": "Fast and reliable motion detection is essential for machine vision and autonomous systems operating in dynamic environments. This work integrates emerging event-based sensing with biologically structured neural computation to establish an efficient computational paradigm for visual motion detection. The proposed framework is built upon a recently developed fly-inspired neural network that emulates motion-processing circuits in the optic lobe. Owing to its feed-forward and training-free architecture, the neural model requires only a small number of interpretable parameters and is well suited for real-time embedded implementation. Event cameras provide low-latency, low-power, and high-dynamic-range visual sensing by asynchronously transmitting brightness-change events. However, their performance can be degraded by event noise, including temporal noise and junction-leakage-induced activity, particularly under low-light conditions. Moreover, effective integration between event-based visual representations and biologically inspired neural processing remains under-explored. To address these challenges, we propose an event-driven computational framework that combines time-surface encoding for front-end event representation with a fly optic-lobe-inspired neural network for foreground motion-direction estimation. A bottom-up attention mechanism is further incorporated to suppress background motion and enhance the saliency of foreground targets. The proposed method is evaluated on real-world ground-vehicle datasets and compared with a baseline frame-based model and an optimization-based approach. Experimental results demonstrate that the framework effectively combines the temporal advantages of event-driven vision with the efficiency and interpretability of bio-inspired neural processing.",
+        "authors": [
+          {
+            "authorId": "2232829",
+            "name": "Qinbing Fu"
+          },
+          {
+            "authorId": "2448382566",
+            "name": "Jingyu Huang"
+          },
+          {
+            "authorId": "2445233374",
+            "name": "Yanru Xie"
+          },
+          {
+            "authorId": "2240331506",
+            "name": "Jigen Peng"
+          },
+          {
+            "authorId": "39702434",
+            "name": "Yuchao Tang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.05205",
+          "CorpusId": 289933143
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.05205, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "634c5978f745ac7093517dbe6c14e28e35ca4981",
+        "title": "An event-driven framework for fly-inspired visual motion detection",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work integrates emerging event-based sensing with biologically structured neural computation to establish an efficient computational paradigm for visual motion detection and proposes an event-driven computational framework that combines time-surface encoding for front-end event representation with a fly optic-lobe-inspired neural network for foreground motion-direction estimation."
+        },
+        "url": "https://www.semanticscholar.org/paper/634c5978f745ac7093517dbe6c14e28e35ca4981",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08056": {
+      "cached_at": "2026-07-11T03:53:46.425002+00:00",
+      "data": {
+        "abstract": "Diffusion Language Models (DLMs) have recently achieved substantial progress in natural language generation tasks. Recent research demonstrates that adaptive token generation ordering can significantly improve performance in mathematical reasoning and code synthesis applications. In this work, we investigate the optimization of generation order for both text-to-image synthesis and multimodal understanding. We first establish that, unlike structured problems in language generation such as Sudoku puzzles, model logits alone are insufficient for determining optimal generation sequences in text-to-image generation and multimodal understanding. To address this challenge, we introduce a learnable control module trained via Group Relative Policy Optimization (GRPO) to determine the generation order. Our results demonstrate that learning this control block substantially improves both text-to-image alignment and multimodal understanding in DLMs. In particular, it enhances the model's ability to capture fine-grained spatial relationships in generated images while also strengthening performance on multimodal reasoning and comprehension tasks. We evaluate our framework on GenEval, an object-focused benchmark for text-to-image alignment, where it achieves 4.08% relative improvements. In addition, experiments on VLMEvalKit confirm 4.85% relative improvements in multimodal understanding, highlighting the broad effectiveness of our approach.",
+        "authors": [
+          {
+            "authorId": "1796267433",
+            "name": "Yidong Ouyang"
+          },
+          {
+            "authorId": "2333381584",
+            "name": "Zhe Wang"
+          },
+          {
+            "authorId": "28455030",
+            "name": "Sourav S. Bhabesh"
+          },
+          {
+            "authorId": "2408535086",
+            "name": "Dmitriy Bespalov"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08056",
+          "CorpusId": 290009803
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08056, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9f706c4b78375b2d3816bfa2608f9318733adc46",
+        "title": "Reinforcing the Generation Order of Multimodal Masked Diffusion Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work introduces a learnable control module trained via Group Relative Policy Optimization (GRPO) to determine the generation order and demonstrates that learning this control block substantially improves both text-to-image alignment and multimodal understanding in DLMs."
+        },
+        "url": "https://www.semanticscholar.org/paper/9f706c4b78375b2d3816bfa2608f9318733adc46",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08127": {
+      "cached_at": "2026-07-11T03:53:14.274191+00:00",
+      "data": {
+        "abstract": "Generative video foundation models exhibit strong compositional priors, yet world-action models (WAMs) and video-action models (VAMs) often lose these priors after finetuning on robotic action data. We refer to this discrepancy as the video-action generalization gap. In this paper, we systematically investigate this gap by evaluating a comprehensive design space of VAMs, demonstrating that standard design choices yield no emergent explanation pattern. To explain this behavior, we introduce the Temporal Ratio (TR), an attention-based measure of how strongly the action head relies on future latent rollouts relative to the anchored current frame. TR has two key properties: first, a model's structural reliance on future-predictive latents, measured via TR, acts as a predictor of its compositional generalization capacity; second, it natively fluctuates based on task phase, shifting attention to future frames during planning and reverting to the present frame for precise manipulation. Finally, based on these findings, we propose an inference-time adaptive guidance method, which exploits this intrinsic feature attention pattern to dynamically amplify compositional video conditioning signals precisely when the policy relies on future rollouts. Evaluated on the LIBERO benchmark and real-world tasks, our approach mitigates the OOD-ID compositional generalization gap. More details: https://umishra.me/temporal-ratio/",
+        "authors": [
+          {
+            "authorId": "2322505995",
+            "name": "U. Mishra"
+          },
+          {
+            "authorId": null,
+            "name": "Yongxin Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Danfei Xu"
+          },
+          {
+            "authorId": "2448675532",
+            "name": "Yang Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Xi Chen"
+          },
+          {
+            "authorId": "2323437497",
+            "name": "Jiayuan Mao"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08127",
+          "CorpusId": 290009690
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08127, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "6476626626c97f7ea14d7e7ddab55db3327c0c38",
+        "title": "Understanding and Mitigating the Video-Action Generalization Gap via Temporal Ratio",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "An inference-time adaptive guidance method is proposed, which exploits this intrinsic feature attention pattern to dynamically amplify compositional video conditioning signals precisely when the policy relies on future rollouts, and mitigates the OOD-ID compositional generalization gap."
+        },
+        "url": "https://www.semanticscholar.org/paper/6476626626c97f7ea14d7e7ddab55db3327c0c38",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08359": {
+      "cached_at": "2026-07-11T03:53:57.938935+00:00",
+      "data": {
+        "abstract": "Vision-Language Navigation (VLN) enables UAV autonomous navigation in unknown environments by mapping language instructions to real-time visual inputs. Compared with GPS-dependent or pre-programmed navigation, VLN supports intuitive human-machine interaction and stronger environmental adaptability, requiring tight integration of high-level semantic reasoning and low-latency flight control.Existing methods suffer from structural misalignment between global multimodal understanding and sequential action generation, causing jittery trajectories and severe decision latency for long-horizon aerial navigation. To solve this issue, we propose FSD-VLN, a fast-slow dual-system architecture disentangling semantic reasoning and low-latency flight command generation.The framework has two asynchronous branches: a slow stream extracting stable semantic priors from pre-trained vision-language models, and a Diffusion Transformer (DiT) fast stream modeling cross-temporal action distributions to produce consistent flight outputs. We further introduce a time-aware adaptive optimizer to stabilize long-sequence training and reduce gradient oscillation.Large-scale low-altitude simulation experiments show FSD-VLN achieves up to 2X higher navigation success rates on unseen scenes than SOTA methods, while cutting single-action inference delay and total task runtime by over 50%. Our work validates the benefit of decoupled semantic-control modeling and provides a practical paradigm for long-horizon aerial VLN.",
+        "authors": [
+          {
+            "authorId": "2333445583",
+            "name": "Xueke Zhu"
+          },
+          {
+            "authorId": "2374965834",
+            "name": "Qingyan Meng"
+          },
+          {
+            "authorId": "46274659",
+            "name": "Liutao Yu"
+          },
+          {
+            "authorId": null,
+            "name": "Wei Zhang"
+          },
+          {
+            "authorId": "2238083677",
+            "name": "Zhengyu Ma"
+          },
+          {
+            "authorId": "2238342115",
+            "name": "Huihui Zhou"
+          },
+          {
+            "authorId": "2275270707",
+            "name": "Yonghong Tian"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08359",
+          "CorpusId": 290010039
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08359, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "284a593836fe3925f5424427c5b0fc95b675625c",
+        "title": "FSD-VLN: Fast-Slow Dual-System Modeling for Aerial Long-Horizon Vision-Language Navigation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "FSD-VLN is proposed, a fast-slow dual-system architecture disentangling semantic reasoning and low-latency flight command generation that validates the benefit of decoupled semantic-control modeling and provides a practical paradigm for long-horizon aerial VLN."
+        },
+        "url": "https://www.semanticscholar.org/paper/284a593836fe3925f5424427c5b0fc95b675625c",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08374": {
+      "cached_at": "2026-07-11T03:53:12.028206+00:00",
+      "data": {
+        "abstract": "Personality recognition has traditionally been constrained by theory-dependent formulations, where models are trained to fit predefined psychological taxonomies rather than uncovering shared underlying behavioral structure. This limits generalization, as personality itself is better understood as theory-invariant, while existing annotations reflect only partial and sometimes inconsistent views of the same latent traits. In this work, we introduce JAM ((J)udge for (A)daptive (M)etric-Alignment), a theory-agnostic framework that shifts learning from adapting to predefined personality theories toward discovering unified latent pseudo-facets that capture shared psychological structure. Rather than constraining the model to any personality taxonomy during training or inference, the framework learns generalizable psychological representations and can infer an individual's latent psychological profile directly from the textual samples, without requiring theory-specific labels. JAM achieves this through an Attention-Pooled Graph Prototypical Network that learns structured representations via clustering in embedding space, together with a Cross-Theory Harmonization (CTH) approach that integrates (i) Human-Guided Linkage and (ii) Machine-Induced Consensus to unify heterogeneous datasets without relying on predefined labels. To further improve robustness and data quality, we incorporate an LLM-as-a-Judge mechanism operating in two configurations, (i) LLM-before-the-loop and (ii) LLM-in-the-loop which identifies ambiguous samples to guide adaptive metric learning. Experiments show that JAM improves cross-framework generalization and performance, establishing a strong step toward theory-agnostic personality inference and supporting low-resource personality theories. The related code repository, model weights, and artifacts are available at https://research.jingjietan.com/JAM",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Jing Jie Tan"
+          },
+          {
+            "authorId": "47594946",
+            "name": "Ban-Hoe Kwan"
+          },
+          {
+            "authorId": "2290574666",
+            "name": "Danny-Wee-Kiat Ng"
+          },
+          {
+            "authorId": "2073463",
+            "name": "Y. Hum"
+          },
+          {
+            "authorId": "6035875",
+            "name": "S. Lo"
+          },
+          {
+            "authorId": null,
+            "name": "Po-An Chen"
+          },
+          {
+            "authorId": "3116547",
+            "name": "N. Kawarazaki"
+          },
+          {
+            "authorId": "2381862884",
+            "name": "Kosuke Takano"
+          },
+          {
+            "authorId": "9081716",
+            "name": "A. Mokraoui"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08374",
+          "CorpusId": 290010065,
+          "DOI": "10.1109/TAFFC.2026.3712379"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08374, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c2a48d583ec5558177315e462c88cba351c700af",
+        "title": "Large-Language-Models-as-a-Judge in Theory-Agnostic Adaptive Metric-Alignment for Prototypical Networks in Personality Recognition",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "JAM is introduced, a theory-agnostic framework that shifts learning from adapting to predefined personality theories toward discovering unified latent pseudo-facets that capture shared psychological structure and improves cross-framework generalization and performance."
+        },
+        "url": "https://www.semanticscholar.org/paper/c2a48d583ec5558177315e462c88cba351c700af",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08475": {
+      "cached_at": "2026-07-11T03:53:18.625331+00:00",
+      "data": {
+        "abstract": "Multi-modality transportation refers to urban systems composed of multiple transportation modes, such as traffic flow and public transit, whose dynamics are coupled by shared temporal patterns. Accurate multi-modality transportation forecasting remains challenging because (1) different modalities exhibit distinct spectral characteristics and (2) interact unevenly across frequencies, whereas most existing methods operate primarily in the time domain or rely on coarse feature fusion. To address these limitations, we propose a lightweight yet effective Frequency-Domain Multi-Modality modeling (FreMo) that explicitly exploits the frequency domain to enable adaptive and selective cross-modality synergy. FreMo disentangles modality-wise spectral refinement from cross-modality synergy and supports plug-and-play integration with general time series backbones. Specifically, FreMo introduces a Modality-Wise Frequency Filter (MFF) to adaptively refine spectral components within each modality, emphasizing informative frequencies while suppressing noise. FreMo further incorporates a Frequency-Guided Synergy Integrator (FSI) that selectively aggregates information across modalities based on their relative contribution at each frequency, facilitating effective cross-modality knowledge sharing while mitigating negative transfer. Extensive experiments on real-world datasets show that FreMo consistently outperforms state-of-the-art baselines, with superior performance and generalization across diverse forecasting scenarios. The code is available at https://github.com/beginner-sketch/FreMo.",
+        "authors": [
+          {
+            "authorId": "2261097032",
+            "name": "Jiewen Deng"
+          },
+          {
+            "authorId": "2243527573",
+            "name": "Hangchen Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Junchen Li"
+          },
+          {
+            "authorId": "2448890555",
+            "name": "Boyuan Zhang"
+          },
+          {
+            "authorId": "31279896",
+            "name": "Renhe Jiang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08475",
+          "CorpusId": 290009505
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08475, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "15f15ab5adb94cf9146c6eb6652332b150b78b68",
+        "title": "Frequency-Domain Multi-Modality Transportation Modeling",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A lightweight yet effective Frequency-Domain Multi-Modality modeling (FreMo) that explicitly exploits the frequency domain to enable adaptive and selective cross-modality synergy and supports plug-and-play integration with general time series backbones."
+        },
+        "url": "https://www.semanticscholar.org/paper/15f15ab5adb94cf9146c6eb6652332b150b78b68",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08493": {
+      "cached_at": "2026-07-11T03:53:34.807216+00:00",
+      "data": {
+        "abstract": "Subjective NLP tasks often exhibit systematic annotator disagreement, requiring models that represent uncertainty rather than collapse it. We introduce Ensemble Diversity Optimization (EDO), a prediction-space framework that jointly optimizes ensemble weights, effective cardinality, and calibration through a unified differentiable objective. EDO learns ensemble composition and size end-to-end via Gumbel-Softmax relaxation and incorporates a signed diversity regularizer, tuned on validation data, to steer optimization toward either preserving or suppressing disagreement. This regularization prevents ensemble collapse and enables controlled navigation of the utility-calibration trade-off. The framework integrates a soft F1 surrogate, class-weighted cross-entropy to address imbalance, and reliability-weighted diversity to regulate intra-ensemble variability. Experiments on four subjective text-classification benchmarks (ArMIS, ConvAbuse, HS-Brexit, MD-Agreement) show that EDO substantially improves probabilistic calibration, reducing cross-entropy (40-78% depending on baseline) and lowering Brier scores relative to Soft-CE, Soft-MD, Top-5 Voting, and WEL, while maintaining competitive F1 and better alignment with annotator distributions. These results demonstrate that jointly optimizing ensemble structure with a signed diversity regularizer provides an efficient, model-agnostic approach for modeling human subjectivity in supervised learning.",
+        "authors": [
+          {
+            "authorId": "2372220640",
+            "name": "Xia Cui"
+          },
+          {
+            "authorId": "2374490737",
+            "name": "Ziyi Huang"
+          },
+          {
+            "authorId": "2305412956",
+            "name": "N. Abeynayake"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08493",
+          "CorpusId": 290009470
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08493, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5a8ad762107f16662fab08626091b1093b150275",
+        "title": "Ensemble Diversity Optimization for Subjective Supervision",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Ensemble Diversity Optimization (EDO), a prediction-space framework that jointly optimizes ensemble weights, effective cardinality, and calibration through a unified differentiable objective, provides an efficient, model-agnostic approach for modeling human subjectivity in supervised learning."
+        },
+        "url": "https://www.semanticscholar.org/paper/5a8ad762107f16662fab08626091b1093b150275",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08497": {
+      "cached_at": "2026-07-11T03:53:05.632757+00:00",
+      "data": {
+        "abstract": "Recent unified multimodal models show a single architecture can jointly perform vision/language understanding and image generation/editing. However, they repeatedly feed all historical visual and textual inputs into a shared context window, limiting long-horizon multimodal dialogue due to visual token explosion and unreliable cross-turn referencing. We propose a Cognitive-structured Multimodal Agent that externalizes visual information into an Episodic Visual Memory and selectively reactivates relevant episodes during reasoning. The agent consists of a Perceptual Abstraction Engine for structured visual abstraction, a Cognitive Retrieval Engine for cross-turn memory retrieval, and a Multimodal Executive Controller for autonomous task inference and action planning. To address the lack of turn-level retrieval supervision in existing datasets, we develop a Unified Scenario Engine that programmatically generates structured multi-turn conversations with fine-grained retrieval annotations, enabling reinforcement learning to optimize abstraction and retrieval policies. We also construct a long-horizon visual-dialogue benchmark stratified by difficulty to evaluate episodic visual recall. Our 8B agent achieves 91.4% retrieval accuracy over 20-turn sessions, surpassing 32B baselines by +8.2% while nearly halving per-turn inference time (23.1s ->12.7s). We further present the Cognitive-structured Multimodal Agent Harness (CMA-Harness), a tool-augmented deployment of the same cognitive structure integrating persistent multimodal memory, web access, image generation/editing/composition tools, and OpenAI-compatible serving. Structured memory and modular decision-making offer a more scalable, efficient paradigm for long-horizon multimodal agents than monolithic parameter scaling. Code: https://github.com/caseclose/cma-harness ; Project page: https://caseclose.github.io/cma-harness/",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Feng Wang"
+          },
+          {
+            "authorId": "2348905731",
+            "name": "Canmiao Fu"
+          },
+          {
+            "authorId": null,
+            "name": "Zhipeng Huang"
+          },
+          {
+            "authorId": "2334702567",
+            "name": "Chen Li"
+          },
+          {
+            "authorId": "2394072431",
+            "name": "Jing Lyu"
+          },
+          {
+            "authorId": "2294517847",
+            "name": "Ge Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08497",
+          "CorpusId": 290009972
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08497, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b7e3951a3a1bfcb1079cd6f16c5697e539b2250c",
+        "title": "Cognitive-structured Multimodal Agent for Multimodal Understanding, Generation, and Editing",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A Cognitive-structured Multimodal Agent that externalizes visual information into an Episodic Visual Memory and selectively reactivates relevant episodes during reasoning is proposed, enabling reinforcement learning to optimize abstraction and retrieval policies."
+        },
+        "url": "https://www.semanticscholar.org/paper/b7e3951a3a1bfcb1079cd6f16c5697e539b2250c",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08504": {
+      "cached_at": "2026-07-11T03:53:09.916601+00:00",
+      "data": {
+        "abstract": "Most cooperative Vision-Language Navigation (VLN) methods assume unlimited communication, not considering real-world applications where bandwidth is restricted and information efficiency is critical. We introduce \\textbf{bandwidth-constrained cooperative VLN} and propose \\textbf{hindsight gating}: a lightweight supervised gate that labels communication-critical steps post-hoc from navigation failures, avoiding the high variance of REINFORCE. Contrary to the intuition that agents should communicate when uncertain, we observe a consistent counter-intuitive pattern: trained gates fire predominantly in early episode steps and more often when agents are confident, across all budget levels ($B \\in \\{1,3,5\\}$). We explain this through \\textbf{recurrent hidden-state alignment}: early communication injects grounded trajectory representations that persist and compound through subsequent Gated Recurrent Unit (GRU) updates, achieving $+0.072$ cumulative alignment gain with $B{=}3$ transmissions, approaching unconstrained communication ($+0.078$) at 260\\% greater alignment efficiency than random gating ($+0.020$) and 320\\% greater efficiency than entropy-based gating ($+0.017$). Our results establish a new communication regime for bandwidth-limited embodied agents: synchronise representations early, navigate independently later. Our codebase is available at: https://github.com/AravG13/bandwidth-constrained-cooperative-vln",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Arav Gupta"
+          },
+          {
+            "authorId": "2238007806",
+            "name": "Nivedan Yakolli"
+          },
+          {
+            "authorId": "2080111465",
+            "name": "A. Gautam"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08504",
+          "CorpusId": 290009642
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08504, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "cd1af5f685f85082029ba2f866dae56ed8b90909",
+        "title": "Early to Share, Late to Save: Synchronisation-Driven Communication Gating in Bandwidth-Constrained Cooperative VLN",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A lightweight supervised gate is proposed that labels communication-critical steps post-hoc from navigation failures, avoiding the high variance of REINFORCE and establishing a new communication regime for bandwidth-limited embodied agents."
+        },
+        "url": "https://www.semanticscholar.org/paper/cd1af5f685f85082029ba2f866dae56ed8b90909",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08539": {
+      "cached_at": "2026-07-11T03:53:20.871660+00:00",
+      "data": {
+        "abstract": "Leveraging large language models (LLMs) to analyze complex documents -- such as academic papers, technical manuals, and financial reports -- has emerged as a mainstream and critical task in both research and industry. In practice, users must first filter relevant documents from large collections and then conduct in-depth analysis (e.g. question answering) over the selected subset, yet existing systems flatten documents into plain-text chunks, discarding the rich hierarchical structures (sections, tables, figures, equations) and degrading downstream performance. We present DocMaster, a hierarchical structure-aware document analysis system. DocMaster parses documents into hierarchical document trees preserving original layouts and constructs a structure-aware semantic index that enables accurate document filtering and in-depth analysis. We demonstrate DocMaster through an interactive web interface that enables users to upload document collections, construct tree-based and multi-view semantic indices, filter relevant documents via natural-language conditions, and perform follow-up question answering over the filtered results. The source code, data, and demo are available at https://doc-master.github.io/.",
+        "authors": [
+          {
+            "authorId": "2448913951",
+            "name": "Ziqi Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Yingli Zhou"
+          },
+          {
+            "authorId": null,
+            "name": "Fangyuan Zhang"
+          },
+          {
+            "authorId": "2186626718",
+            "name": "Quanqing Xu"
+          },
+          {
+            "authorId": null,
+            "name": "Chuanhui Yang"
+          },
+          {
+            "authorId": "2345879224",
+            "name": "Yixiang Fang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08539",
+          "CorpusId": 290014577
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08539, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "faf1798a3112ba03469c6ba05933a100cd7a7549",
+        "title": "DocMaster: A Hierarchical Structure-Aware System for Document Analysis",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work presents DocMaster, a hierarchical structure-aware document analysis system that parses documents into hierarchical document trees preserving original layouts and constructs a structure-aware semantic index that enables accurate document filtering and in-depth analysis."
+        },
+        "url": "https://www.semanticscholar.org/paper/faf1798a3112ba03469c6ba05933a100cd7a7549",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08646": {
+      "cached_at": "2026-07-11T03:53:44.181334+00:00",
+      "data": {
+        "abstract": "As available training data approaches its physical limit, gains from Scaling Laws have begun to diminish. Consequently, improving Large Language Models (LLMs) now depends less on data expansion and more on higher-quality data utilization. However, in the context of large-scale corpora, existing refinement methodologies face significant limitations in quality, efficiency, and reliability: Rule-based approaches are constrained by fixed heuristics and struggle with instance-level variations; LLM-based approaches improve quality but fail to meet the efficiency and reliability requirements of large-scale data processing. To address these challenges, we propose UltraX, a function-calling refinement framework for large-scale pre-training data that completes the editing function space by introducing insertion in addition to deletion and modification, enabling fine-grained instance-level editing. Specifically, UltraX builds a reliable program-supervision generation pipeline. In this pipeline, dataset-adaptive prompt optimization first guides an expert LLM to produce high-quality end-to-end refined texts, and Line Alignment Mapping and Dynamic Context Replacement then convert original-refined text pairs into structured program supervision. Meanwhile, UltraX improves supervision quality and stabilizes the training distribution with low-confidence example filtering and ratio-controlled sampling by operation combination. During inference and execution, it normalizes and validates model outputs through sliding-window prediction, global operation aggregation, and systematic post-processing, improving the stability and reliability of large-scale execution. Experiments show that UltraX achieves the highest average performance across all corpora and also matches or surpasses baselines with fewer training tokens, demonstrating stronger data efficiency and refinement reliability.",
+        "authors": [
+          {
+            "authorId": "2359163796",
+            "name": "Xinlong Zhao"
+          },
+          {
+            "authorId": null,
+            "name": "Dongsheng Liu"
+          },
+          {
+            "authorId": "2366164176",
+            "name": "Hengyu Zhao"
+          },
+          {
+            "authorId": "2354260586",
+            "name": "Zixuan Fu"
+          },
+          {
+            "authorId": null,
+            "name": "Zheng Wang"
+          },
+          {
+            "authorId": "2295809950",
+            "name": "Jie Cai"
+          },
+          {
+            "authorId": null,
+            "name": "Jie Zhou"
+          },
+          {
+            "authorId": "2446887686",
+            "name": "Qian Ma"
+          },
+          {
+            "authorId": null,
+            "name": "Xuanhe Zhou"
+          },
+          {
+            "authorId": "2324934386",
+            "name": "Xu Han"
+          },
+          {
+            "authorId": null,
+            "name": "Yudong Wang"
+          },
+          {
+            "authorId": "2316519794",
+            "name": "Zhiyuan Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08646",
+          "CorpusId": 290014422
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08646, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d1a20ffe9f3b611536f6cc97b48acf999107eb53",
+        "title": "UltraX: Refining Pre-Training Data at Scale with Adaptive Programmatic Editing",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "UltraX is proposed, a function-calling refinement framework for large-scale pre-training data that completes the editing function space by introducing insertion in addition to deletion and modification, enabling fine-grained instance-level editing."
+        },
+        "url": "https://www.semanticscholar.org/paper/d1a20ffe9f3b611536f6cc97b48acf999107eb53",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08691": {
+      "cached_at": "2026-07-11T03:54:07.337641+00:00",
+      "data": {
+        "abstract": "Repository-level code generation requires implementing target functions while accounting for complex cross-file dependencies and project-specific conventions. Existing retrieval methods predominantly rely on lexical, structural, or semantic similarity, often overlooking repository functions that implement similar procedural logic despite differing in identifiers or application domains. We propose ProjAgent, a repository-level code generation system that introduces procedural similarity as an explicit retrieval signal. ProjAgent decomposes the target function into intermediate reasoning steps and employs an agentic workflow to retrieve repository functions that exhibit similar procedural behavior at each step. The retrieved procedural context is integrated with conventional semantic retrieval to construct a richer repository context for code generation. ProjAgent further incorporates a conservative static-analysis feedback loop that iteratively repairs generated code using compiler and static-analysis feedback. Evaluated on REPOCOD, ProjAgent achieves 41.14% Pass@1, outperforming existing retrieval-based baselines. These results demonstrate that procedural similarity is an effective and previously unexplored retrieval dimension for repository-level code generation.",
+        "authors": [
+          {
+            "authorId": "2109279775",
+            "name": "Qihong Chen"
+          },
+          {
+            "authorId": "2290076245",
+            "name": "Aaron Imani"
+          },
+          {
+            "authorId": "2290076832",
+            "name": "Iftekhar Ahmed"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08691",
+          "CorpusId": 290014448
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08691, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8464e5589522041d326c8b6f95c41230c0832e21",
+        "title": "ProjAgent: Procedural Similarity Retrieval for Repository-Level Code Generation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "ProjAgent is a repository-level code generation system that introduces procedural similarity as an explicit retrieval signal and decomposes the target function into intermediate reasoning steps and employs an agentic workflow to retrieve repository functions that exhibit similar procedural behavior at each step."
+        },
+        "url": "https://www.semanticscholar.org/paper/8464e5589522041d326c8b6f95c41230c0832e21",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08745": {
+      "cached_at": "2026-07-11T03:53:48.540895+00:00",
+      "data": {
+        "abstract": "Recent advances in Vision-Language Models, Large Language Models, and Multimodal Large Language Models have improved autonomous driving tasks such as scene understanding, decision making, trajectory prediction, and visual question answering. However, evaluating whether these models can reliably reason about safety-critical incidents remains challenging. To address this gap, we present AUTOPILOT-VQA, an incident-centric visual question answering benchmark for dashcam video understanding. The dataset evaluates different systems through structured questions designed around real-world driving incidents and near-incidents. The benchmark covers diverse safety-relevant categories, including weather and lighting conditions, traffic environment, road layout, road surface state, signage, involved entities, accident occurrence, impact location, and avoidability-related reasoning. By requiring models to answer grounded questions about both contextual scene properties and event-level incident details, AUTOPILOT-VQA moves beyond object recognition toward temporally grounded, safety-aware reasoning. The dataset is released as part of the AUTOPILOT CVPR 2026 competition and provides a standardized benchmark for assessing the reliability of autonomous driving systems in different scenarios. Our benchmark support developments for more interpretable, robust, and safety-conscious vision-language systems for real-world autonomous driving.",
+        "authors": [
+          {
+            "authorId": "2448707439",
+            "name": "Siddharth Damodharan"
+          },
+          {
+            "authorId": null,
+            "name": "Radhika Gupta"
+          },
+          {
+            "authorId": "2307974150",
+            "name": "Ali K. AlShami"
+          },
+          {
+            "authorId": "2334479908",
+            "name": "Ryan Rabinowitz"
+          },
+          {
+            "authorId": "2342185583",
+            "name": "Jugal K. Kalita"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08745",
+          "CorpusId": 290014553
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08745, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "0cac603c1aa3d049c2040fbcfee79ab611ea53fc",
+        "title": "AUTOPILOT VQA: Benchmarking Vision-Language Models for Incident-Centric Dashcam Understanding",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The AUTOPILOT-VQA benchmark provides a standardized benchmark for assessing the reliability of autonomous driving systems in different scenarios and support developments for more interpretable, robust, and safety-conscious vision-language systems for real-world autonomous driving."
+        },
+        "url": "https://www.semanticscholar.org/paper/0cac603c1aa3d049c2040fbcfee79ab611ea53fc",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08751": {
+      "cached_at": "2026-07-11T03:53:16.499321+00:00",
+      "data": {
+        "abstract": "Building general-purpose dexterous manipulation policies requires benchmarks that go beyond isolated tasks to systematically evaluate policies across diverse interaction modes, sensory conditions, and robot embodiments. However, existing benchmarks remain limited in task and data diversity, embodiment coverage, or controllable visual variation, hindering studies of cross-task and cross-embodiment generalization. We present DexVerse, a large-scale and modular benchmark for dexterous manipulation. DexVerse includes 100 tasks spanning a broad range of manipulation skills, including object grasping and relocation, articulated-object interaction, functional tool use, bimanual coordination, non-prehensile control, contact-rich behaviors, multi-goal execution, and long-horizon multi-stage task completion. It supports 3 robot arms and 6 dexterous hands, and is extensible to new tasks, assets, and embodiments. To evaluate visuomotor generalization, DexVerse provides configurable visual variations in textures, background, lighting, and camera viewpoints. We further provide a VR-based teleoperation interface and 3,180 demonstrations with synchronized proprioceptive, RGB, depth, point-cloud, and state observations. We benchmark representative methods, including Diffusion Policy, DP3, OpenVLA, and $\\pi_{0.5}$, across 19 tasks. Results reveal substantial challenges in task generalization and visuomotor robustness, establishing DexVerse as a promising testbed for general-purpose dexterous manipulation. Project page: https://ycyao216.github.io/DexVerse.site",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yunchao Yao"
+          },
+          {
+            "authorId": "2308983686",
+            "name": "Zhuxiu Xu"
+          },
+          {
+            "authorId": null,
+            "name": "Tianqi Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Zixian Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Sikai Li"
+          },
+          {
+            "authorId": "2394124879",
+            "name": "Zhenyu Wei"
+          },
+          {
+            "authorId": null,
+            "name": "Feng Chen"
+          },
+          {
+            "authorId": "2292899023",
+            "name": "Di Huang"
+          },
+          {
+            "authorId": "2275613019",
+            "name": "Kechang Wan"
+          },
+          {
+            "authorId": "2292350179",
+            "name": "Chenyang Ma"
+          },
+          {
+            "authorId": "2288286963",
+            "name": "Shuqi Zhao"
+          },
+          {
+            "authorId": null,
+            "name": "Shenghua Gao"
+          },
+          {
+            "authorId": "2261974717",
+            "name": "Masayoshi Tomizuka"
+          },
+          {
+            "authorId": "2255716385",
+            "name": "Yi Ma"
+          },
+          {
+            "authorId": "2346837065",
+            "name": "Mingyu Ding"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08751",
+          "CorpusId": 290014532
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08751, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5f63e5d4daea0fe42cf0f94e0a43e34b609784fa",
+        "title": "DexVerse: A Modular Benchmark for Multi-Task, Multi-Embodiment Dexterous Manipulation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Results reveal substantial challenges in task generalization and visuomotor robustness, establishing DexVerse as a promising testbed for general-purpose dexterous manipulation."
+        },
+        "url": "https://www.semanticscholar.org/paper/5f63e5d4daea0fe42cf0f94e0a43e34b609784fa",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.08768": {
+      "cached_at": "2026-07-11T03:53:07.771292+00:00",
+      "data": {
+        "abstract": "The rapid development of large language models and multimodal large language models has accelerated the emergence of proactive agents capable of operating everyday tools and assisting users in real-world environments. However, existing benchmarks struggle to evaluate such agents effectively, as they often rely on sandboxed environments and single-turn evaluation paradigms. Moreover, their scenario-based task taxonomies mix multiple model capabilities within the same task category, making it difficult to identify the root causes of agent failures. To address these limitations, we introduce UniClawBench, the first capability-driven benchmark designed to evaluate proactive agents in dynamic, real-world settings. UniClawBench is built around five foundational model capabilities: Skill Usage, Exploration, Long-Context Reasoning, Multimodal Understanding, and Cross-Platform Coordination. Based on these capabilities, we design 400 bilingual real-world tasks. Unlike previous benchmarks that rely on static, pre-recorded answers, our benchmark evaluates agents in live Docker containers using fine-grained, step-by-step completion checkpoints. Furthermore, we design a closed-loop evaluation strategy comprising an executor agent, a hidden supervisor agent, and a user agent to simulate realistic multi-turn human feedback without leaking grading criteria. To disentangle base model capabilities from framework-level design choices, we evaluate state-of-the-art models under multiple agent frameworks. Through comprehensive comparisons across both models and frameworks, we show how base model capabilities and agent framework designs jointly shape performance in real-world environments. To facilitate future research, we make our benchmark and code publicly available at https://github.com/HKU-MMLab/UniClawBench.",
+        "authors": [
+          {
+            "authorId": "2372143074",
+            "name": "Zhekai Chen"
+          },
+          {
+            "authorId": "2326302007",
+            "name": "Chengqi Duan"
+          },
+          {
+            "authorId": "2312392026",
+            "name": "Kaiyue Sun"
+          },
+          {
+            "authorId": null,
+            "name": "Bohao Li"
+          },
+          {
+            "authorId": null,
+            "name": "Yuqing Wang"
+          },
+          {
+            "authorId": "2386865313",
+            "name": "Manyuan Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Xihui Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.08768",
+          "CorpusId": 290014383
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.08768, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "53e7f2678abc9120dbb1c669772ef0f7feceb1ad",
+        "title": "UniClawBench: A Universal Benchmark for Proactive Agents on Real-World Tasks",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The first capability-driven benchmark designed to evaluate proactive agents in dynamic, real-world settings is introduced, and comprehensive comparisons across both models and frameworks show how base model capabilities and agent framework designs jointly shape performance in real-world environments."
+        },
+        "url": "https://www.semanticscholar.org/paper/53e7f2678abc9120dbb1c669772ef0f7feceb1ad",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
