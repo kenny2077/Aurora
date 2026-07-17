@@ -1623,6 +1623,55 @@
         "year": 2026
       }
     },
+    "arxiv:2607.13602": {
+      "cached_at": "2026-07-17T03:48:53.546434+00:00",
+      "data": {
+        "abstract": "Systematic comparisons between current situations and structurally similar past events in the historical, i.e., historical analogies, is among the most powerful tools for foresight analysis. In this work, we present a new task called Analogical Deep Research (ADR) to Large Language Model (LLM) agents and construct the first ADR benchmark ADR-bench to study whether LLM agents are able to find and leverage historical analogies when doing foresight analysis. Our investigation reveals a key obstacle: LLM agents are poor at finding analogies because they match on surface features rather than underlying mechanisms. We argue that ADR is inherently a causal question as it requires understanding why the event occurred. Based on our theoretical analysis, we propose two principles required for ADR, including the mechanism alignment and cross-analogy confirmation. Built upon our theoretical results, we propose a new agentic framework called Causal Analogical Researcher (CANA) that guides LLMs to find and integrate historical analogies. CANA incorporates a simple yet effective structural decomposition representation, and integrates structural feedback for reflective improvements of historical analogy identification and integration. We show that CANA brings up to 10% improvements in historical analogy generation, and surpasses the state-of-the-art deep research agents in the ADR-bench. Case studies with the ongoing events confirm the effectiveness of CANA in leveraging historical analogies.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yongqiang Chen"
+          },
+          {
+            "authorId": "2284868670",
+            "name": "Guangyi Chen"
+          },
+          {
+            "authorId": "2296939725",
+            "name": "Yuewen Sun"
+          },
+          {
+            "authorId": "2344244639",
+            "name": "Kun Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.13602",
+          "CorpusId": 290178989
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.13602, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7a35064617b76618844c67b9d55f65cfbdd8b897",
+        "title": "Analogical Deep Research: Retrieving and Integrating Historical Analogies for Foresight Analysis",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A new agentic framework called Causal Analogical Researcher (CANA) is proposed that guides LLMs to find and integrate historical analogies and brings up to 10% improvements in historical analogy generation, and surpasses the state-of-the-art deep research agents in the ADR-bench."
+        },
+        "url": "https://www.semanticscholar.org/paper/7a35064617b76618844c67b9d55f65cfbdd8b897",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
