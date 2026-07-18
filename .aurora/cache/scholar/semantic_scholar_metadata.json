@@ -1672,6 +1672,930 @@
         "year": 2026
       }
     },
+    "arxiv:2607.14190": {
+      "cached_at": "2026-07-18T03:43:36.113835+00:00",
+      "data": {
+        "abstract": "Amyotrophic lateral sclerosis (ALS) is a progressive and heterogeneous neurodegenerative disease in which predicting clinically meaningful milestones, such as assistive device use, remains challenging. We developed a time-to-event, digital-twin-inspired framework that integrates longitudinal ALS Functional Rating Scale-Revised (ALSFRS-R) trajectories with survival modeling to support individualized prediction of functional decline and assistive device utilization. We constructed a harmonized longitudinal dataset by integrating diagnosis records, ALSFRS-R assessments, activities of daily living, and demographic information, followed by preprocessing to ensure data quality, temporal alignment, and cohort consistency. Correlation-based clustering identified coherent functional domains spanning bulbar, upper limb, axial, lower limb, and respiratory systems. Generalized additive mixed models characterized nonlinear, domain-specific functional decline across all domains. In addition, a temporal machine learning model was developed to predict longitudinal functional decline and capture stage-dependent disease progression. Cox proportional hazards modeling further identified lower limb function, particularly walking and stair climbing, as the strongest predictors of earlier wheelchair access. Building on these results, we implemented a digital twin-inspired temporal machine learning-based time-to-event (TTE) model that generates individualized survival curves and dynamically predicts wheelchair-free survival. This framework provides a scalable, interpretable, and clinically actionable approach for linking ALS progression with personalized decision support, with applications in proactive care planning, clinical trial stratification, and precision medicine.",
+        "authors": [
+          {
+            "authorId": "2276861503",
+            "name": "Zongliang Yue"
+          },
+          {
+            "authorId": "2340522579",
+            "name": "Qi Li"
+          },
+          {
+            "authorId": "2361912059",
+            "name": "Terry Heiman-Patterson"
+          },
+          {
+            "authorId": "4288812",
+            "name": "Frank Bearoff"
+          },
+          {
+            "authorId": "2323523321",
+            "name": "Zhaohui Qin"
+          },
+          {
+            "authorId": "2334867972",
+            "name": "Huanmei Wu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.14190",
+          "CorpusId": 290212760
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.14190, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4a993b6036bf52a4ff63d36bcc3e9842cd4742c4",
+        "title": "A Temporal Machine Learning-Based Time-to-Event Model for Predicting ALS Progression and Healthcare Utilization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A time-to-event, digital-twin-inspired framework that integrates longitudinal ALS Functional Rating Scale-Revised trajectories with survival modeling to support individualized prediction of functional decline and assistive device utilization is developed."
+        },
+        "url": "https://www.semanticscholar.org/paper/4a993b6036bf52a4ff63d36bcc3e9842cd4742c4",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.14777": {
+      "cached_at": "2026-07-18T03:42:31.575771+00:00",
+      "data": {
+        "abstract": "Large language models are increasingly trained as interactive agents for long-horizon tasks involving multi-turn interaction, tool use, and environment feedback. Outcome-based reinforcement learning (RL) provides a practical optimization paradigm, but its sparse trajectory-level rewards offer limited guidance on intermediate decisions, leaving a supervision gap between episode-level outcomes and token-level policy learning. We propose SEED (SElf-Evolving On-Policy Distillation), a self-evolving framework that converts completed on-policy trajectories into training-time hindsight skills and distills their behavioral effect back into the policy model. SEED first fine-tunes the policy to analyze completed trajectories and generate natural-language skills that capture reusable workflows, decisive observations, or failure-avoidance rules. During RL, the current policy both collects trajectories and serves as the analyzer that extracts hindsight skills from them. Policy updates therefore improve subsequent decision making and skill analysis together, allowing hindsight supervision to evolve with the policy. SEED then re-scores the sampled actions under ordinary and skill-augmented contexts, converting the skill-induced probability shift into a dense token-level on-policy distillation signal. This signal is jointly optimized with outcome-based RL, keeping the auxiliary supervision aligned with the current trajectory distribution. Extensive experiments on text-based and vision-based agentic tasks show that SEED consistently improves performance and sample efficiency, exhibiting robust generalization to unseen scenarios. Our code is available at https://github.com/jinyangwu/SEED.",
+        "authors": [
+          {
+            "authorId": "2403133423",
+            "name": "Jinyang Wu"
+          },
+          {
+            "authorId": "2407392216",
+            "name": "Shuo Yang"
+          },
+          {
+            "authorId": "2373465967",
+            "name": "Zhengxi Lu"
+          },
+          {
+            "authorId": "2341692584",
+            "name": "Fan Zhang"
+          },
+          {
+            "authorId": "2403422346",
+            "name": "Yuhao Shen"
+          },
+          {
+            "authorId": "2349401037",
+            "name": "Lang Feng"
+          },
+          {
+            "authorId": "2408472160",
+            "name": "Haoran Luo"
+          },
+          {
+            "authorId": "2209378940",
+            "name": "Zheng Lian"
+          },
+          {
+            "authorId": null,
+            "name": "Shuai Zhang"
+          },
+          {
+            "authorId": "1718662",
+            "name": "Zhengqi Wen"
+          },
+          {
+            "authorId": "2298423822",
+            "name": "Jianhua Tao"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.14777",
+          "CorpusId": 290212935
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.14777, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "666a1fdf86c0d8bfaa2fe93043a992778b4138a0",
+        "title": "SEED: Self-Evolving On-Policy Distillation for Agentic Reinforcement Learning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "SEED (SElf-Evolving On-Policy Distillation), a self-evolving framework that converts completed on-policy trajectories into training-time hindsight skills and distills their behavioral effect back into the policy model, is proposed."
+        },
+        "url": "https://www.semanticscholar.org/paper/666a1fdf86c0d8bfaa2fe93043a992778b4138a0",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.14865": {
+      "cached_at": "2026-07-18T03:43:10.727734+00:00",
+      "data": {
+        "abstract": "LLM-based agents are increasingly deployed in multi-agent environments whose incentives can shape their behavior. We introduce The Energy Society, a minimal survival economy for studying how competitive and cooperative incentives affect emergent behavior when inference cost is directly tied to survival: Agents spend energy based on model size when generating tokens, regain energy by completing jobs or receiving donations, and deactivate if their energy reaches zero. We compare competitive and cooperative objectives against a baseline setting and several control variants. Across experiments, larger models consistently consume the most energy and spend more energy than they gain, even in those settings where token cost is not size-dependent. Cooperative incentives substantially alter behavior: agents donate to reactivate others, sometimes at the cost of their own survival, and job allocation changes. Ablations reveal that allowing agents to recommend actions to each other supports coordination and ambitious job selection, while memory helps agents calibrate risk from past outcomes. Agents rarely choose direct sabotage, but show more subtle signs of self-serving behavior in the competitive setting. The Energy Society is a compact testbed for studying the interaction between token costs and group incentives under a survival pressure. Source code is available at https://github.com/LucasBergholdt/EnergySociety",
+        "authors": [
+          {
+            "authorId": "2450183711",
+            "name": "Lucas Bergholdt Hansen"
+          },
+          {
+            "authorId": "2119003687",
+            "name": "Federico Torrielli"
+          },
+          {
+            "authorId": "2376393819",
+            "name": "Filippo Tonini"
+          },
+          {
+            "authorId": "2393206291",
+            "name": "Lukas Galke Poech"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.14865",
+          "CorpusId": 290213430
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.14865, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "57bdfc92a02e589687d7dc5d6842866fb0645881",
+        "title": "The Energy Society: A Simulation Environment for Studying Agent Cooperation under Survival Pressure",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The Energy Society is a compact testbed for studying the interaction between token costs and group incentives under a survival pressure, andlations reveal that allowing agents to recommend actions to each other supports coordination and ambitious job selection."
+        },
+        "url": "https://www.semanticscholar.org/paper/57bdfc92a02e589687d7dc5d6842866fb0645881",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.14989": {
+      "cached_at": "2026-07-18T03:43:14.970451+00:00",
+      "data": {
+        "abstract": "Large language models are increasingly evolving from text generators into general agents capable of understanding user requests, invoking external tools, and completing complex tasks through interaction. However, existing agent benchmarks often focus on limited scenarios, tool ecosystems, or interaction formats, making it difficult to systematically characterize model capabilities across heterogeneous application settings. We introduce OmniaBench, a benchmark for evaluating general agents across diverse scenarios with explicit state spaces. We derive application-oriented scenario knowledge from app stores, product documents, industry resources, Web retrieval, and human refinement, forming a hierarchical taxonomy that spans ToC, ToB and ToE with 90 level-1 and 354 level-2 domains. Based on this taxonomy, we construct executable environments and synthesize single-turn and multi-turn tasks through four complementary routes: DAG, DAG-S, Solver, and Program. OmniaBench further introduces a ten-dimensional capability taxonomy and eight compositional atomic difficulty factors to support fine-grained evaluation and analysis. The resulting dataset contains 1,431 tasks, together with a challenging subset of 644 tasks designed to reduce evaluation cost and mitigate potential contamination of the full set after public release. The bench presents substantial challenges to current frontier models, with even Claude-Sonnet-5 and GPT-5.6-Sol achieving Overall Pass@1 scores of only 58.54 and 57.14, respectively. Further analyses reveal clear differences across domains and capabilities, as well as persistent limitations in planning, constraint maintenance, and adaptive correction. OmniaBench provides a broad and diagnostic benchmark for characterizing the capability boundaries of general agents.",
+        "authors": [
+          {
+            "authorId": "2365452366",
+            "name": "Chengyu Shen"
+          },
+          {
+            "authorId": "2450302941",
+            "name": "Yujie Fu"
+          },
+          {
+            "authorId": "2450230120",
+            "name": "Gangtao Xin"
+          },
+          {
+            "authorId": "2148908678",
+            "name": "Yanheng Hou"
+          },
+          {
+            "authorId": "2301581242",
+            "name": "Wenlong Fei"
+          },
+          {
+            "authorId": "2292671060",
+            "name": "Guojie Zhu"
+          },
+          {
+            "authorId": null,
+            "name": "Jiawei Li"
+          },
+          {
+            "authorId": null,
+            "name": "Hongcheng Gao"
+          },
+          {
+            "authorId": "2363128980",
+            "name": "Runming He"
+          },
+          {
+            "authorId": "2325175258",
+            "name": "Z. Wong"
+          },
+          {
+            "authorId": "2347352499",
+            "name": "Meiyi Qiang"
+          },
+          {
+            "authorId": "2396449193",
+            "name": "Hao Liang"
+          },
+          {
+            "authorId": "2269030109",
+            "name": "Zhao Cao"
+          },
+          {
+            "authorId": "2450302856",
+            "name": "Hao Jiang"
+          },
+          {
+            "authorId": null,
+            "name": "Chong Chen"
+          },
+          {
+            "authorId": "2408727802",
+            "name": "Wentao Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.14989",
+          "CorpusId": 290216941
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.14989, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "424c288ed70b252c629a45c20d90f89662b994e3",
+        "title": "OmniaBench: Benchmarking General AI Agents Across Diverse Scenarios",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "OmniaBench provides a broad and diagnostic benchmark for characterizing the capability boundaries of general agents across diverse scenarios with explicit state spaces, and introduces a ten-dimensional capability taxonomy and eight compositional atomic difficulty factors to support fine-grained evaluation and analysis."
+        },
+        "url": "https://www.semanticscholar.org/paper/424c288ed70b252c629a45c20d90f89662b994e3",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15001": {
+      "cached_at": "2026-07-18T03:43:33.881094+00:00",
+      "data": {
+        "abstract": "Lattice quantum chromodynamics (LQCD) provides a first-principles framework for computing hadronic observables, but its practical use remains limited by the substantial expertise required to turn research motivation into reliable computing workflows. Here we present \\textsc{LQCDMaster}, a tool-augmented, skill-guided and domain-specialized scientific computing agent that converts natural-language LQCD research tasks into executable PyQUDA computing workflows, including measurement scripts, job-submission artifacts, execution logs and numerical outputs. The system combines agentic planning, expert-annotated LQCD skills and a deterministic Wick-contraction tool to constrain the algebraically fragile components of code generation. We evaluate \\textsc{LQCDMaster} on a benchmark at the forefront of scientific research, comprising 70 LQCD computing tasks, with observables covering local and nonlocal two-point functions, Wilson loops, meson and baryon three-point functions. The generated workflows exactly reproduce expert-written implementations in 63 of 70 tasks at machine precision, with three additional discrepancies attributable to convention mismatches. Across representative observables, the agent reduces implementation time from hours to minutes while preserving end-to-end numerical validation. Further, we present a typical case of \\textsc{LQCDMaster}-driven exploration: a lattice computation of light-cone distribution amplitudes with diagonal Wilson-line, a quantity accessible with standard methods but never before computed, and computation of the spectrum of proton, deuteron, triton, hyperon, hyperdeuteron and hypertriton. This work pioneers the paradigm of agentic scientific computing by automating the end-to-end scientific computing workflows in lattice QCD research, lowering its barrier and facilitating the exploration and verification of non-standard scientific ideas.",
+        "authors": [
+          {
+            "authorId": "2378041422",
+            "name": "Hao Gao"
+          },
+          {
+            "authorId": "2367185011",
+            "name": "Tingjia Miao"
+          },
+          {
+            "authorId": "2361639997",
+            "name": "Wen-Long Jin"
+          },
+          {
+            "authorId": "2375755843",
+            "name": "Muhua Zhang"
+          },
+          {
+            "authorId": "2447883233",
+            "name": "Hanzhang Wang"
+          },
+          {
+            "authorId": "2450228854",
+            "name": "Jie Ran"
+          },
+          {
+            "authorId": null,
+            "name": "Jinxin Tan"
+          },
+          {
+            "authorId": "2450392131",
+            "name": "Zhentao Zhang"
+          },
+          {
+            "authorId": "2450230711",
+            "name": "Bo Tang"
+          },
+          {
+            "authorId": "2450399722",
+            "name": "Leiyi Li"
+          },
+          {
+            "authorId": "2253425227",
+            "name": "Jun Hua"
+          },
+          {
+            "authorId": "2376000823",
+            "name": "Xiangyu Jiang"
+          },
+          {
+            "authorId": "103430352",
+            "name": "Qi-An Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Siheng Chen"
+          },
+          {
+            "authorId": "2267634829",
+            "name": "Wei Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15001",
+          "CorpusId": 290216775
+        },
+        "fieldsOfStudy": [
+          "Physics",
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15001, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b1ea55c5f086f37c959cf95186c373b2debfb07a",
+        "title": "LQCDMaster: Agentic Scientific Computing for Lattice Quantum Chromodynamics Research",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work pioneers the paradigm of agentic scientific computing by automating the end-to-end scientific computing workflows in lattice QCD research, lowering its barrier and facilitating the exploration and verification of non-standard scientific ideas."
+        },
+        "url": "https://www.semanticscholar.org/paper/b1ea55c5f086f37c959cf95186c373b2debfb07a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15058": {
+      "cached_at": "2026-07-18T03:42:36.020586+00:00",
+      "data": {
+        "abstract": "CAD-to-image alignment aims to estimate an object's 9D pose (rotation, translation, and anisotropic scale) from a single RGB image, enabling applications in robotics and augmented reality. Recent zero-shot methods use visual foundation models to match image regions to CAD models, yet typically their correspondences are appearance-driven and degrade under occlusion or sim-to-real domain shift. To address these limitations, we introduce SUFLECA (Scaling Up Feature LEarning for CAD Alignment), a weakly-supervised framework for zero-shot CAD alignment with two key contributions. First, SUFLECA scales up geometry-grounded feature learning from pretrained visual representations through Normalized Object Coordinates (NOCs) supervision on 674K images spanning 12 real and synthetic datasets, learning compact geometry-aware features that generalize across domains. Second, we propose a geometrically consistent matching algorithm that establishes reliable one-to-one CAD-to-image correspondences. Together, these contributions enable accurate, sub-second alignment per object instance without iterative pose refinement. On ScanNet25k, SUFLECA achieves 33.4%/42.3% category/instance accuracy, outperforming, with a smaller computational footprint, the strongest zero-shot baseline by 10.3/12.2 percentage points and, for the first time on this benchmark, even surpassing fully supervised methods. Code is available at: https://github.com/snt-arg/SUFLECA",
+        "authors": [
+          {
+            "authorId": "2320402847",
+            "name": "Saad Ejaz"
+          },
+          {
+            "authorId": "2151611669",
+            "name": "Miguel Fern\u00e1ndez-Cortizas"
+          },
+          {
+            "authorId": "2273546248",
+            "name": "Javier Civera"
+          },
+          {
+            "authorId": "2060086740",
+            "name": "Holger Voos"
+          },
+          {
+            "authorId": "2249758142",
+            "name": "J. L. S\u00e1nchez-L\u00f3pez"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15058",
+          "CorpusId": 290216802
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15058, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8bdd76f288c71965073ad997f836deb702f75391",
+        "title": "SUFLECA: Scaling Up Feature Learning for CAD-to-image Alignment",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "SUFLECA (Scaling Up Feature LEarning for CAD Alignment), a weakly-supervised framework for zero-shot CAD alignment with two key contributions, and a geometrically consistent matching algorithm that establishes reliable one-to-one CAD-to-image correspondences."
+        },
+        "url": "https://www.semanticscholar.org/paper/8bdd76f288c71965073ad997f836deb702f75391",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15077": {
+      "cached_at": "2026-07-18T03:42:33.795823+00:00",
+      "data": {
+        "abstract": "Many engineering problems involve phenomena whose governing equations are poorly characterized or only partially known. Surrogate modeling techniques such as neural networks can capture the behavior of these systems, but they typically demand large training datasets that are difficult to obtain in engineering contexts and yield models with limited physical interpretability. The Sparse Identification of Nonlinear Dynamics (SINDy) method addresses both limitations by performing sparse regression over libraries of candidate nonlinear terms, recovering interpretable governing equations from comparatively small datasets. Although SINDy has been demonstrated extensively on canonical benchmark systems, its application to practical engineering problems is less widely documented. This tutorial introduces the SINDy method and progressively builds toward its main extensions, from noise-robust weak-form and ensembling-based variants to constrained and parametrizable formulations. The paper and the accompanying tutorial (available at https://github.com/paullililili/SINDy4Engineers) is organized in three parts: the first introduces the standard SINDy algorithm and progressively extends it, inviting readers without prior knowledge to follow each step and adapt the methods to their own problems; the remaining two parts present detailed case studies on (1) the system identification of an unmanned aerial vehicle and (2) a chaotic thermosyphon heat exchanger. Through these examples, we aim to demonstrate that SINDy is simple to implement yet flexible enough to serve as a valuable identification tool for advanced engineering applications.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yao Cheng Li"
+          },
+          {
+            "authorId": "144414263",
+            "name": "A. Larra\u00f1aga"
+          },
+          {
+            "authorId": "2351290367",
+            "name": "Steven L. Brunton"
+          },
+          {
+            "authorId": "2407548000",
+            "name": "Urban Fasel"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15077",
+          "CorpusId": 290216793
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15077, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d9c757e2a0a4d16cd8e542f99324c74a951b7277",
+        "title": "An Introduction to Sparse Identification of Nonlinear Dynamics for Engineering Applications",
+        "tldr": null,
+        "url": "https://www.semanticscholar.org/paper/d9c757e2a0a4d16cd8e542f99324c74a951b7277",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15079": {
+      "cached_at": "2026-07-18T03:43:12.845734+00:00",
+      "data": {
+        "abstract": "Understanding the brain increasingly depends on integrating evidence across scales, modalities, and disciplines. Addressing a single research question therefore requires a coordinated sequence of operations, from surveying prior work to executing analyses and interpreting results in light of domain knowledge. AI agents promise to accelerate this process, but current agents lack domain expertise in brain science, may fabricate claims, drift during multi-step reasoning, and offer few defined points for expert intervention. These failures are especially costly in brain science, where conclusions feed into downstream scientific claims and depend on laboratory-specific expertise and careful human judgment. We present \\textbf{BrainPilot} a \\textbf{fully open-source} multi-agent system that accelerates brain science research with traceable logs and agent-verified results. A principal investigator (PI) agent coordinates specialist agents grounded in curated domain knowledge: a unified brain science knowledge base containing 7{,}233 indexed items and a skill library of 72 reusable methodology units across seven research domains. Every major step is recorded in the Graph of Trace, an auditable record that links subgoals, tool use, evidence, and claims and allows researchers to follow and inspect the workflow. An Auditor agent further integrates fabrication checking into the workflow. For evaluation, we run three brain science tasks from Agents'Last Exam, introduce our own benchmark, \\textbf{BrainPilotBench-v0}, and present additional end-to-end case studies. Across these evaluations, BrainPilot with an open-source backbone model attains performance comparable to state-of-the-art agent framework with less costs.",
+        "authors": [
+          {
+            "authorId": "2375906082",
+            "name": "Haoxuan Li"
+          },
+          {
+            "authorId": "2186175793",
+            "name": "Tian Gao"
+          },
+          {
+            "authorId": null,
+            "name": "Jianhe Li"
+          },
+          {
+            "authorId": "2450234092",
+            "name": "Yang Fan"
+          },
+          {
+            "authorId": "2340277602",
+            "name": "Runze Shi"
+          },
+          {
+            "authorId": "2240703461",
+            "name": "Weiran Wang"
+          },
+          {
+            "authorId": "2238191223",
+            "name": "Tianxiang Zhao"
+          },
+          {
+            "authorId": "2442880228",
+            "name": "Zezhao Wu"
+          },
+          {
+            "authorId": "2450268500",
+            "name": "Xiaoyang Jiang"
+          },
+          {
+            "authorId": "2404591095",
+            "name": "Qihui Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Jia Li"
+          },
+          {
+            "authorId": null,
+            "name": "Xiao Xiao"
+          },
+          {
+            "authorId": "2450230000",
+            "name": "Kai Du"
+          },
+          {
+            "authorId": "2450241659",
+            "name": "Xiaoxuan Jia"
+          },
+          {
+            "authorId": "2322075887",
+            "name": "Chao Xie"
+          },
+          {
+            "authorId": "2163143685",
+            "name": "Lu Mi"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15079",
+          "CorpusId": 290216990
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15079, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4a6aced770cd279008eb87b3d15bb0c6ce99fc29",
+        "title": "BrainPilot: Automating Brain Discovery with Agentic Research",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "BrainPilot with an open-source backbone model attains performance comparable to state-of-the-art agent framework with less costs, and introduces its own benchmark, BrainPilotBench-v0, and presents additional end-to-end case studies."
+        },
+        "url": "https://www.semanticscholar.org/paper/4a6aced770cd279008eb87b3d15bb0c6ce99fc29",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15082": {
+      "cached_at": "2026-07-18T03:42:51.903714+00:00",
+      "data": {
+        "abstract": "Understanding newspaper images remains a challenging task due to their complex, nested hierarchical structures and dense, heterogeneous layouts. In this paper, we explore two complementary approaches for newspaper structure understanding. First, we present a modular bottom-up pipeline that combines state-of-the-art open-source models: YOLO for layout detection, LayoutReader for reading order prediction, and a custom algorithm for article segmentation. This approach leverages existing robust components while maintaining flexibility and interpretability. Second, we introduce Tiramisu (Tiered Transformers for Hierarchical Structure Understanding), a novel end-to-end transformer-based architecture that explicitly models document hierarchy through an iterative tiered process. Tiramisu performs section and article separation, block localization, semantic categorization, and reading order prediction using highly parallelized attention mechanisms. Finally, we release Finlam La Libert\\'e, a new dataset designed specifically for evaluating hierarchical information retrieval in historical newspapers. Experimental results demonstrate the effectiveness of both approaches in reconstructing complex newspaper hierarchies, with comparative analysis highlighting their respective strengths for scalable document digitization. The Tiramisu training code, including the synthetic newspaper generator, is available at https://git.litislab.fr/tiramisu/tiramisu-newspaper-articles-extractor.",
+        "authors": [
+          {
+            "authorId": "2126077182",
+            "name": "William Moca\u00ebr"
+          },
+          {
+            "authorId": "116700157",
+            "name": "Sol\u00e8ne Tarride"
+          },
+          {
+            "authorId": "2165905020",
+            "name": "Thomas Constum"
+          },
+          {
+            "authorId": "2427139965",
+            "name": "Merveilles Agbeti-messan"
+          },
+          {
+            "authorId": "19866912",
+            "name": "T. Simon"
+          },
+          {
+            "authorId": "145593192",
+            "name": "C. Chatelain"
+          },
+          {
+            "authorId": "97014121",
+            "name": "St\u00e9phane Nicolas"
+          },
+          {
+            "authorId": "2928766",
+            "name": "Pierrick Tranouez"
+          },
+          {
+            "authorId": "2450229041",
+            "name": "S\u00e9bastien Cretin"
+          },
+          {
+            "authorId": "2298968607",
+            "name": "Thierry Paquet"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15082",
+          "CorpusId": 290216721
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15082, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "26bfaa363f605fc26ff09f26d22802fd1b83eb24",
+        "title": "Towards Hierarchical Structure Understanding of Newspaper Images",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A modular bottom-up pipeline that combines state-of-the-art open-source models: YOLO for layout detection, LayoutReader for reading order prediction, and a custom algorithm for article segmentation is presented, and Tiramisu (Tiered Transformers for Hierarchical Structure Understanding) is introduced."
+        },
+        "url": "https://www.semanticscholar.org/paper/26bfaa363f605fc26ff09f26d22802fd1b83eb24",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15095": {
+      "cached_at": "2026-07-18T03:43:31.759964+00:00",
+      "data": {
+        "abstract": "The formation of political coalitions is a complex negotiation driven by both concrete policy objectives and deep-seated ideological convictions. While Large Language Models (LLMs) open new avenues for computational political science, the neutrality and helpfulness biases instilled by Reinforcement Learning from Human Feedback (RLHF) prevent them from sustaining steadfast partisan behaviour. We present a multi-agent framework that reconciles factual grounding with ideological alignment by combining Supervised Fine-Tuning (SFT), Direct Preference Optimization (DPO), and Retrieval-Augmented Generation (RAG): DPO instils aggressive party-specific personas, while a per-party RAG pipeline keeps each agent bounded to its official manifesto. We operationalize the framework on the 2019 Flemish election, deploying the partisan agents in a hub-and-spoke negotiation arbitrated by a formateur. To make the emergent negotiation interpretable, we introduce a Multi-Layered Information Lineage Topology (MILT) that traces every clause in the final agreement back to its manifesto origin and classifies it into five provenance states, a Coalition Influence Score (CIS) that aggregates these traceable contributions to identify which party shaped the agreement, and a real-world grounding pass that benchmarks each simulated provision against the historically adopted coalition agreement. Across three independent simulations the framework yields a stable winner and ranking (N-VA ahead of CD\\&V and Open Vld), and manifesto-anchored lineage reliably predicts real-world materialization whereas hallucinated content does not. The result is a transparent, scalable testbed for the ex-ante exploration of party compatibility and formateur-mediated compromise.",
+        "authors": [
+          {
+            "authorId": "2450229474",
+            "name": "Dylan Van Mulders"
+          },
+          {
+            "authorId": "34760981",
+            "name": "Matthias Bogaert"
+          },
+          {
+            "authorId": "1741136",
+            "name": "D. V. Poel"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15095",
+          "CorpusId": 290216932
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15095, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "86264ad63e3afefe772f054567bedbb393bb6098",
+        "title": "Digital Pantheon: Simulating and Auditing Coalition Formation with LLM Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A multi-agent framework that reconciles factual grounding with ideological alignment by combining Supervised Fine-Tuning, Direct Preference Optimization, and Retrieval-Augmented Generation is presented, which yields a stable winner and ranking, and manifesto-anchored lineage reliably predicts real-world materialization whereas hallucinated content does not."
+        },
+        "url": "https://www.semanticscholar.org/paper/86264ad63e3afefe772f054567bedbb393bb6098",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15129": {
+      "cached_at": "2026-07-18T03:43:01.446249+00:00",
+      "data": {
+        "abstract": "Dynamic object exchange between humans and robots remains a challenging problem due to uncertainty in perception, timing, and contact-rich interaction. Human-robot juggling represents a particularly demanding instance of this problem, requiring precise real-time coordination, predictive motion planning with feedback control, and robustness to variability in human motion. Enabling such skills is of interest for advancing physical human-robot interaction and shared autonomy. We present a real-time planning and control architecture for human-robot partner juggling that enables a robot to reliably catch and throw balls in synchronized multi-ball patterns with a human partner. The system integrates predictive ball tracking, adaptive online trajectory optimization using a multiple-shooting formulation, and a state-machine-based coordination logic to enable synchronized multi-ball human-robot partner juggling. In a user study with 8 participants of varying juggling skill from beginner to expert, we demonstrate that our system can achieve three-ball cascades shared between the robot and the human. All participants exceeded previously reported best-case results within a 10-minute test session, with one participant extending the previous record for shared three-ball cascade juggling fivefold to 20 consecutive robot catches, and another participant achieving a 100% success rate with 40 consecutive catches in a single-ball catch-and-return setting. Video documentation can be found at https://kai-ploeger.com/partner-juggling",
+        "authors": [
+          {
+            "authorId": "2309871471",
+            "name": "Jonathan Rainer Lippert"
+          },
+          {
+            "authorId": "51177013",
+            "name": "Kai Ploeger"
+          },
+          {
+            "authorId": "1434553823",
+            "name": "Abir Chowdhury"
+          },
+          {
+            "authorId": "2238577689",
+            "name": "H. M\u00fcller"
+          },
+          {
+            "authorId": "2329405186",
+            "name": "Jan Peters"
+          },
+          {
+            "authorId": "2145217956",
+            "name": "Alap Kshirsagar"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15129",
+          "CorpusId": 290217034
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Engineering"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15129, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "dc0c88e85d13bac585b585c4efba90721e2bbcd0",
+        "title": "Catch, Throw, Repeat: Planning for Human-Robot Partner Juggling",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A real-time planning and control architecture for human-robot partner juggling that enables a robot to reliably catch and throw balls in synchronized multi-ball patterns with a human partner."
+        },
+        "url": "https://www.semanticscholar.org/paper/dc0c88e85d13bac585b585c4efba90721e2bbcd0",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15161": {
+      "cached_at": "2026-07-18T03:42:38.249484+00:00",
+      "data": {
+        "abstract": "On-policy distillation is an alternative post-training method in reinforcement learning that alleviates the constraints imposed by reward models by providing token-level supervision from a teacher model. Although on-policy distillation has been studied and applied across various settings, its fundamental design remains underexplored. In this paper, we introduce a new distillation reward, termed the delta signal, instead of directly imitating the teacher's output distribution. The delta signal is defined as the difference between the teacher model and its base model prior to instruction tuning for reasoning capability. It therefore captures the changes induced by reasoning tuning and provides a more direct signal for transferring reasoning capabilities. Using extensive empirical evidence, we show that the delta signal substantially improves on-policy distillation and refer to the new distillation method as On-Policy Delta Distillation (OPD$^2$). Experiments across mathematics, science, and code-reasoning benchmarks demonstrate that OPD$^2$ consistently outperforms conventional on-policy distillation, enabling reasoning LLMs to achieve strong performance with only a short post-training period. Code will be available at https://github.com/naver-ai/opd2",
+        "authors": [
+          {
+            "authorId": "3086596",
+            "name": "Byeongho Heo"
+          },
+          {
+            "authorId": "2387351353",
+            "name": "Jaehui Hwang"
+          },
+          {
+            "authorId": "2325167785",
+            "name": "Sangdoo Yun"
+          },
+          {
+            "authorId": "2086576",
+            "name": "Dongyoon Han"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15161",
+          "CorpusId": 290216727
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15161, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8c9c00276b5b1e4ecbf03b373d249ddd072bafc2",
+        "title": "On-Policy Delta Distillation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "It is shown that the delta signal substantially improves on-policy distillation and the new distillation method is referred to as On-Policy Delta Distillation (OPD), enabling reasoning LLMs to achieve strong performance with only a short post-training period."
+        },
+        "url": "https://www.semanticscholar.org/paper/8c9c00276b5b1e4ecbf03b373d249ddd072bafc2",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15176": {
+      "cached_at": "2026-07-18T03:42:40.462185+00:00",
+      "data": {
+        "abstract": "Multimodal large language models (MLLMs) are increasingly used to interpret visualizations, yet current evaluations remain largely chart-centric and provide limited evidence of understanding of scientific visualization (SciVis). We benchmark six MLLMs on the scientific visualization literacy assessment test, a standardized SciVis literacy assessment comprising 49 items based on 18 scientific visualizations and illustrations, spanning 8 techniques and 11 task types. We evaluate three closed-source and three open-source models under a closed-world protocol and compare their performance using data from 485 human participants. Results show that current MLLMs do not exhibit uniform SciVis literacy. Gemini is the strongest model overall, exceeding the human mean across the evaluated subsets, whereas the open-source models remain below the human baseline. Performance is highly uneven across techniques and tasks: models perform best on scientific illustration, search, and spatial understanding, but struggle on texture-based and integration-based visualizations and on quantitative estimation. Error analysis reveals recurring failures in fine-grained quantitative estimation, flow-direction interpretation, and grounded encoding interpretation. These findings position SciVis literacy as a necessary benchmark dimension for evaluating multimodal AI systems. Our code and model outputs are publicly available at https://github.com/patdmp/mllm-scivis-lit-benchmark.",
+        "authors": [
+          {
+            "authorId": "2372071940",
+            "name": "Patrick Phuoc Do"
+          },
+          {
+            "authorId": "2450229110",
+            "name": "Chau M. Ta"
+          },
+          {
+            "authorId": "48586275",
+            "name": "Chaoli Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15176",
+          "CorpusId": 290217094
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15176, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "99afc32cf722375e38a6f02745784232c8c20633",
+        "title": "Benchmarking Multimodal Large Language Models for Scientific Visualization Literacy",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Performance is highly uneven across techniques and tasks: models perform best on scientific illustration, search, and spatial understanding, but struggle on texture-based and integration-based visualizations and on quantitative estimation."
+        },
+        "url": "https://www.semanticscholar.org/paper/99afc32cf722375e38a6f02745784232c8c20633",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15216": {
+      "cached_at": "2026-07-18T03:42:29.445656+00:00",
+      "data": {
+        "abstract": "Multimodal large language models (MLLMs) often introduce errors when generating image captions, resulting in misaligned image-text pairs. Our work focuses on a class of captioning errors that we refer to as systematic misalignments, where a recurring error in MLLM-generated captions is closely associated with the presence of a specific visual feature in the paired image. Given a vision-language dataset with MLLM-generated captions, our aim in this work is to detect such errors, a task we refer to as systematic misalignment detection. As our first key contribution, we present Symbal, which utilizes a structured, dual-stage setup with off-the-shelf foundation models to identify systematic misalignments and summarize results in natural language. As our second key contribution, we introduce SymbalBench, a benchmark designed to evaluate automated methods on our proposed task. SymbalBench consists of 1.7 million image-text pairs from two domains (natural and medical images), organized into 420 vision-language datasets with annotated systematic misalignments. Symbal exhibits strong performance on this benchmark, correctly identifying systematic misalignments in 63.8% of datasets, a nearly 4x improvement over the closest baseline. We supplement our evaluations on SymbalBench with real-world evaluations, showing that (1) Symbal can accurately surface systematic misalignments in captions generated by four MLLMs and (2) Symbal is a powerful tool for auditing off-the-shelf image-caption datasets. Ultimately, our novel task, method, and benchmark can aid users with auditing MLLM-generated captions and identifying critical errors, without requiring access to the underlying MLLM. Code is available at https://github.com/Stanford-AIMI/Symbal.",
+        "authors": [
+          {
+            "authorId": "2280143067",
+            "name": "M. Varma"
+          },
+          {
+            "authorId": "35935570",
+            "name": "Jean-Benoit Delbrouck"
+          },
+          {
+            "authorId": "2300092101",
+            "name": "S. Ostmeier"
+          },
+          {
+            "authorId": "2307003139",
+            "name": "Akshay S. Chaudhari"
+          },
+          {
+            "authorId": "2268849011",
+            "name": "C. Langlotz"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15216",
+          "CorpusId": 288109770
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15216, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5e7ba97466ee191a5a03ac3376952053bcf3d980",
+        "title": "Symbal: Detecting Systematic Misalignments in Model-Generated Captions",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Symbal is presented, which utilizes a structured, dual-stage setup with off-the-shelf foundation models to identify systematic misalignments and summarize results in natural language, and SymbalBench is introduced, a benchmark designed to evaluate automated methods on this proposed task."
+        },
+        "url": "https://www.semanticscholar.org/paper/5e7ba97466ee191a5a03ac3376952053bcf3d980",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.15263": {
+      "cached_at": "2026-07-18T03:42:49.779725+00:00",
+      "data": {
+        "abstract": "Security-agent evaluations commonly measure peak offensive capability under generous inference budgets, emphasizing vulnerability discovery, exploit development, penetration testing, and CTF completion. Such measurements are useful but incomplete: in operational security, every reasoning step, tool call, telemetry query, and enrichment request consumes budget. We evaluate language-model security agents through this cost-success lens on offensive Cybench challenges and defensive Splunk BOTS v1 investigation challenges. Instead of reporting only best-case success, we compare models at fixed cost levels and decompose performance by inference spend and tool spend. Our results show distinct scalingregimes for red- and blue-team tasks. Offensive CTF performance improves with additional test-time compute, and scaled open-weight models can approach frontier proprietary systems while remaining cost-competitive. Defensive SOC investigation does not scale in the same way: success depends more heavily on disciplined tool use, telemetry navigation, and selective enrichment than on raw reasoning budget alone. We argue that security-agent benchmarks should measure economic efficiency and operational fit alongside task success. Cost-aware, SOC-native evaluations provide a clearer picture of which models are practically useful today and where defensive agents still need to improve. We present an interactive website with our results https://evals.frontier.security.",
+        "authors": [
+          {
+            "authorId": "2127465423",
+            "name": "Paul Kassianik"
+          },
+          {
+            "authorId": "2269473686",
+            "name": "Blaine Nelson"
+          },
+          {
+            "authorId": "2269472758",
+            "name": "Yaron Singer"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.15263",
+          "CorpusId": 290216862
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.15263, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7a0727db9c1e57f0a2334ad2b024bc9251cc063d",
+        "title": "Beyond Success Rate: Cost-Aware Evaluation of Offensive and Defensive Security Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "It is argued that security-agent benchmarks should measure economic efficiency and operational fit alongside task success alongside task success, and cost-aware, SOC-native evaluations provide a clearer picture of which models are practically useful today and where defensive agents still need to improve."
+        },
+        "url": "https://www.semanticscholar.org/paper/7a0727db9c1e57f0a2334ad2b024bc9251cc063d",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
