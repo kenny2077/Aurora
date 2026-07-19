@@ -1,17 +1,6 @@
 {
   "runs": [
     {
-      "blockers": [
-        "llm_failed_calls",
-        "llm_json_failures",
-        "deterministic_fallbacks"
-      ],
-      "checked_at": "2026-07-04T04:24:16.130210+00:00",
-      "clean": false,
-      "mode": "unified_digest",
-      "run_id": "run-20260704T042124Z"
-    },
-    {
       "blockers": [],
       "checked_at": "2026-07-05T04:43:32.474433+00:00",
       "clean": true,
@@ -114,7 +103,15 @@
       "mode": "unified_digest",
       "run_id": "run-20260718T034216Z",
       "warnings": []
+    },
+    {
+      "blockers": [],
+      "checked_at": "2026-07-19T04:06:05.676151+00:00",
+      "clean": true,
+      "mode": "unified_digest",
+      "run_id": "run-20260719T040427Z",
+      "warnings": []
     }
   ],
-  "updated_at": "2026-07-18T03:44:27.746757+00:00"
+  "updated_at": "2026-07-19T04:06:05.676233+00:00"
 }
