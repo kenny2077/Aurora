@@ -4,6 +4,7 @@ import asyncio
 
 from aurora.config import AIConfig, UnifiedDigestModeConfig
 from aurora.models import SignalItem
+from aurora.modes.unified_digest.quality import audit_rendered_public_digest
 from aurora.modes.unified_digest.render import UnifiedDigestSummarizer
 from aurora.pipeline import StageContext
 
@@ -40,6 +41,29 @@ def test_unified_summary_refiner_keeps_deterministic_digest_on_failure() -> None
     assert "## Tech News" in summary
     assert "concise opening" not in summary
     assert context.metadata["ai_usage"]["deterministic_fallbacks"] == 1
+
+
+def test_unified_summary_refiner_rejects_low_quality_opening() -> None:
+    bad_opening = "This digest covers agent tools, with a final comparison and."
+    summarizer = UnifiedDigestSummarizer(
+        UnifiedDigestModeConfig(),
+        ai_config=AIConfig(provider="ollama", model="qwen2.5:3b"),
+        client=_SummaryClient({"summary": bad_opening}),
+    )
+    context = StageContext(mode="unified_digest", run_id="summary")
+
+    summary = asyncio.run(summarizer.summarize([_item()], context))
+
+    assert bad_opening not in summary
+    assert audit_rendered_public_digest(summary).ok
+    assert context.metadata["ai_usage"]["deterministic_fallbacks"] == 1
+    warning = next(
+        warning
+        for warning in context.metadata["warnings"]
+        if "LLM summary refinement rejected by public copy quality gate" in warning
+    )
+    assert "source_covers_template" in warning
+    assert "dangling_fragment" in warning
 
 
 def _item() -> SignalItem:

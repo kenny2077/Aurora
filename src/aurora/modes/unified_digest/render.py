@@ -17,6 +17,7 @@ from aurora.modes.tech_news.notes import (
     display_tech_news_why,
 )
 from aurora.modes.unified_digest.connections import build_connections
+from aurora.modes.unified_digest.quality import audit_rendered_public_digest
 from aurora.models import RenderedDigest, SignalItem
 from aurora.pipeline import StageContext
 from aurora.presentation import render_unified_digest_html
@@ -87,7 +88,19 @@ class UnifiedDigestSummarizer:
         if self.summary_refiner is not None:
             introduction = await self.summary_refiner.refine(selected, context)
             if introduction:
-                lines.extend([introduction, ""])
+                introduction_audit = audit_rendered_public_digest(introduction)
+                if introduction_audit.ok:
+                    lines.extend([introduction, ""])
+                else:
+                    usage = context.metadata.get("ai_usage")
+                    if isinstance(usage, dict):
+                        usage["deterministic_fallbacks"] = (
+                            int(usage.get("deterministic_fallbacks") or 0) + 1
+                        )
+                    context.metadata.setdefault("warnings", []).append(
+                        "LLM summary refinement rejected by public copy quality gate: "
+                        + ", ".join(introduction_audit.reasons)
+                    )
         for item_type in self.config.section_order:
             section_items = [item for item in selected if item.type == item_type]
             if not section_items:
@@ -314,7 +327,10 @@ def _excerpt(value: str, limit: int) -> str:
     text = " ".join(value.split())
     if len(text) <= limit:
         return text
-    return text[: limit - 3].rstrip() + "..."
+    trimmed = text[: limit - 3].rstrip()
+    if trimmed and len(trimmed) < len(text) and not text[len(trimmed)].isspace():
+        trimmed = trimmed.rsplit(" ", 1)[0].rstrip()
+    return trimmed + "..."
 
 
 def _section_item_lines(index: int, item: SignalItem) -> list[str]:

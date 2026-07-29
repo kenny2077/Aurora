@@ -461,6 +461,30 @@ def test_deterministic_news_fallback_removes_title_prefix_and_dangling_fragments
     assert not enriched.why_it_matters.endswith("and.")
 
 
+def test_deterministic_news_fallback_keeps_a_complete_source_sentence() -> None:
+    item = _item(
+        "news:market-surveillance",
+        "Market surveillance agent with LangGraph and Strands on AgentCore",
+        "https://example.com/market-surveillance",
+        source="rss",
+        metadata={"feed_name": "AWS Machine Learning Blog"},
+        raw_content=(
+            "Learn how to architect and deploy a production-ready multi-agent AI system "
+            "using LangGraph for workflow orchestration and Strands for agent reasoning "
+            "on Amazon Bedrock AgentCore. This post walks through a market surveillance "
+            "example with state-driven orchestration and checkpoint-based recovery."
+        ),
+    )
+    score = asyncio.run(
+        TechNewsScorer(TechNewsFiltersConfig(), TechNewsScoringConfig()).score([item], _context())
+    )[0]
+
+    enriched = asyncio.run(TechNewsEnricher().enrich([item], [score], _context()))[0]
+
+    assert enriched.why_it_matters.endswith("Amazon Bedrock AgentCore.")
+    assert "market surve." not in enriched.why_it_matters
+
+
 def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> None:
     item = _item(
         "news:hn",

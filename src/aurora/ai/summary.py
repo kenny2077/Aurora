@@ -36,7 +36,9 @@ class UnifiedSummaryRefiner:
             return ""
         system_prompt = (
             "Return JSON with one field named summary. Write one concise factual opening sentence "
-            "for a daily AI learning digest using only the supplied items. Do not use Markdown."
+            "for a daily AI learning digest using only the supplied items. Do not use Markdown, "
+            "do not use the generic phrase 'this digest covers ... with ...', and end with a "
+            "complete sentence."
         )
         user_prompt = json.dumps(
             [

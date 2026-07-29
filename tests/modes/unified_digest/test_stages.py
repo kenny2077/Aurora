@@ -653,6 +653,34 @@ def test_unified_repo_cards_use_compact_stats_description_and_core_tags() -> Non
     assert "<b>Value:</b>" not in web_html
 
 
+def test_unified_repo_description_truncates_at_a_word_boundary() -> None:
+    config = UnifiedDigestModeConfig()
+    repo = _item(
+        "repo:org/desktop-agent",
+        "repo",
+        "org/desktop-agent",
+        9.0,
+        metadata={
+            "description": (
+                "A desktop MCP client designed as a tool unitary utility integration, "
+                "accelerating AI adoption through the Model Context Protocol and enabling "
+                "cross-vendor LLM API orchestration for production teams."
+            )
+        },
+    )
+
+    summary = asyncio.run(
+        UnifiedDigestSummarizer(config).summarize(
+            [repo],
+            StageContext(mode="unified_digest", run_id="test"),
+        )
+    )
+
+    assert "orchestr..." not in summary
+    assert "Description:" in summary
+    assert "..." in summary
+
+
 def test_unified_rendering_cleans_legacy_news_learning_notes() -> None:
     config = UnifiedDigestModeConfig(
         max_items_per_type=8,

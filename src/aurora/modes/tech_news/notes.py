@@ -219,6 +219,8 @@ def _truncate(value: str, limit: int) -> str:
     if len(value) <= limit:
         return value
     trimmed = value[: limit - 3].rstrip(" \t\r\n.,;:")
+    if trimmed and len(trimmed) < len(value) and not value[len(trimmed)].isspace():
+        trimmed = trimmed.rsplit(" ", 1)[0].rstrip(" \t\r\n.,;:")
     return trimmed + "..."
 
 
@@ -241,9 +243,20 @@ def _source_public_sentence(value: str, title: str) -> str:
 
 def _public_sentence(value: str, title: str) -> str:
     text = _strip_title_prefix(value, title)
-    text = _truncate(text, 220).strip(" \t\r\n#-:;,.")
+    if len(text) > 220:
+        complete: list[str] = []
+        for sentence in re.split(r"(?<=[.!?])\s+", text):
+            sentence = sentence.strip()
+            if not sentence.endswith((".", "!", "?")):
+                break
+            candidate = " ".join([*complete, sentence])
+            if len(candidate) > 220:
+                break
+            complete.append(sentence)
+        text = " ".join(complete) if complete else _truncate(text, 220)
+    text = text.strip(" \t\r\n#-:;,")
     while _has_dangling_end(text) and " " in text:
-        text = text.rsplit(" ", 1)[0].strip(" \t\r\n#-:;,.")
+        text = text.rsplit(" ", 1)[0].strip(" \t\r\n#-:;,")
     if not text:
         return ""
     return text if text[-1] in ".!?" else f"{text}."
