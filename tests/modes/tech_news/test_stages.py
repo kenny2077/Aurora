@@ -6,7 +6,11 @@ from datetime import datetime, timezone
 from aurora.ai.ranker import LLMRanker
 from aurora.config import AIConfig, AuroraConfig, FinalScoreWeights
 from aurora.config import TechNewsFiltersConfig, TechNewsScoringConfig
-from aurora.modes.tech_news.notes import display_tech_news_learning, display_tech_news_summary
+from aurora.modes.tech_news.notes import (
+    clean_note_text,
+    display_tech_news_learning,
+    display_tech_news_summary,
+)
 from aurora.modes.tech_news.pipeline import build_tech_news_pipeline
 from aurora.modes.tech_news.prompts import TECH_NEWS_ANALYSIS_SYSTEM
 from aurora.modes.tech_news.render import TechNewsRenderer, TechNewsSummarizer
@@ -483,6 +487,12 @@ def test_deterministic_news_fallback_keeps_a_complete_source_sentence() -> None:
 
     assert enriched.why_it_matters.endswith("Amazon Bedrock AgentCore.")
     assert "market surve." not in enriched.why_it_matters
+
+
+def test_clean_note_text_closes_spaces_left_by_html_tags_before_punctuation() -> None:
+    raw = 'Attackers moved against <a href="https://example.com">their infrastructure</a>.'
+
+    assert clean_note_text(raw) == "Attackers moved against their infrastructure."
 
 
 def test_enricher_keeps_deterministic_notes_when_llm_output_is_low_quality() -> None:

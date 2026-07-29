@@ -90,6 +90,7 @@ def clean_note_text(value: str) -> str:
     text = re.sub(r"(?m)^\s*[*-]\s+", " ", text)
     text = text.replace("`", " ")
     text = re.sub(r"\s+", " ", text)
+    text = re.sub(r"\s+([.,!?;:])", r"\1", text)
     return text.strip(" \t\r\n#-:;,")
 
 
