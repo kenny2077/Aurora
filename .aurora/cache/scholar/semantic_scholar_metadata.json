@@ -2748,6 +2748,786 @@
         "year": 2026
       }
     },
+    "arxiv:2607.27690": {
+      "cached_at": "2026-08-01T04:03:48.968187+00:00",
+      "data": {
+        "abstract": "We introduce LabEvolver, a training-free framework that equips safe and grounded wet-lab agents with episodic memory from execution experience. LabEvolver couples a state-grounded inner trial loop for adaptive perception, online planning, and safety validation with an outer evolution loop that distills completed trajectories into reusable skill, strategy, and safety experience. On robotic solution-preparation tasks, LabEvolver demonstrates real-world feasibility, reducing pH-regulation completion time and safety-gate intercepts by 48.2% and 60.0%, respectively. On ALFWorld, it further improves cumulative success rate within 20 steps from 76.2% with ReAct to 91.4% over 500 continual tasks, showing generality beyond wet-lab settings. These results support learn-by-doing experience evolution as a feasible path toward closed-loop automated scientific discovery. The project page is available at https://github.com/AndyGao6186/LabEvolver.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Jingya Wang"
+          },
+          {
+            "authorId": "2454328980",
+            "name": "Yuyang Gao"
+          },
+          {
+            "authorId": "2275174489",
+            "name": "Liuzhenghao Lv"
+          },
+          {
+            "authorId": "2409868379",
+            "name": "Yonghong Tian"
+          },
+          {
+            "authorId": "2287806269",
+            "name": "Yuyang Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.27690",
+          "CorpusId": 290690762
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.27690, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7a0e07393e169338f8b70ef69558a701fca24ecd",
+        "title": "LabEvolver: Training-Free Experience Evolution for Safe and Grounded Wet-Lab Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "LabEvolver couples a state-grounded inner trial loop for adaptive perception, online planning, and safety validation with an outer evolution loop that distills completed trajectories into reusable skill, strategy, and safety experience, showing generality beyond wet-lab settings."
+        },
+        "url": "https://www.semanticscholar.org/paper/7a0e07393e169338f8b70ef69558a701fca24ecd",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28229": {
+      "cached_at": "2026-08-01T04:03:18.921288+00:00",
+      "data": {
+        "abstract": "The web is increasingly accessed by AI agents rather than humans. Every agent needs knowledge, especially in the life-sciences, where agentic pipelines are growing fast. Access to the literature is a crucial part of that need, and resources such as Europe PMC, with over 40M indexed records, are widely used to meet it. Yet these resources were not built for AI agents: they take keywords and complex syntax and return whole papers, so every agent must learn the syntax, issue several searches, and read full papers to find the evidence it needs. We introduce EMBL AI Librarian, a knowledge layer that upgrades the Europe PMC interface for AI agents: an agent asks in natural language and receives evidence that answers it. A single LLM orchestrates the whole knowledge retrieval process: it plans complementary subqueries executed by the live Europe PMC search engine, then reads the selected papers and locates the relevant evidence. We evaluate Librarian across four benchmarks: literature synthesis, claim verification, open-domain question answering, and downstream biology tasks such as protocol questions and sequence manipulation. On ScholarQABench, Librarian improves Citation F1 by more than $16$ points over strong recently published baselines. Used as the retrieval layer of an existing claim-verification pipeline, it increases agreement with expert consensus; and on the open-form LitQA2 benchmark, a GPT-5.4 agent scores about $8$ points higher when grounded in Librarian than with web search. Overall, our results show that equipping life-science agents with the Librarian knowledge layer improves performance across a range of tasks. We release our code publicly at https://github.com/petroni-lab/librarian",
+        "authors": [
+          {
+            "authorId": "2164124095",
+            "name": "Luigi Sigillo"
+          },
+          {
+            "authorId": "2343638072",
+            "name": "M. Silvestri"
+          },
+          {
+            "authorId": "4631763",
+            "name": "Francesco Tabaro"
+          },
+          {
+            "authorId": "2061975276",
+            "name": "R. Bhatnagar"
+          },
+          {
+            "authorId": "2267896093",
+            "name": "Syed Irtaza Mubashar"
+          },
+          {
+            "authorId": "2267895911",
+            "name": "M. Jeffryes"
+          },
+          {
+            "authorId": "2454422262",
+            "name": "Daljit Nijjer"
+          },
+          {
+            "authorId": "38686805",
+            "name": "Vittorio Perera"
+          },
+          {
+            "authorId": "1776762",
+            "name": "O. Spjuth"
+          },
+          {
+            "authorId": "1389786323",
+            "name": "J. S\u00e1ez-Rodr\u00edguez"
+          },
+          {
+            "authorId": "2070487583",
+            "name": "Melissa Harrison"
+          },
+          {
+            "authorId": "40052301",
+            "name": "F. Petroni"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28229",
+          "CorpusId": 290694977
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28229, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7622a0082b290b62b6baa53b8e328510e8a93beb",
+        "title": "EMBL AI Librarian: Life-Sciences Knowledge Layer for AI Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "EMBL AI Librarian is introduced, a knowledge layer that upgrades the Europe PMC interface for AI agents that improves performance across a range of tasks: literature synthesis, claim verification, open-domain question answering, and downstream biology tasks such as protocol questions and sequence manipulation."
+        },
+        "url": "https://www.semanticscholar.org/paper/7622a0082b290b62b6baa53b8e328510e8a93beb",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28236": {
+      "cached_at": "2026-08-01T04:03:21.035802+00:00",
+      "data": {
+        "abstract": "Pre-trained language models have significantly improved sentence representation learning, yet their embedding remain sensitive to semantic preserving textual perturbations such as synonym substitution, masking and word dropout. This work proposes a lightweight Contrastive Denoising Autoencoder (CDAE) that refines pre-trained BERT embedding by jointly optimizing contrastive and reconstruction objective to learn perturbation-invariant representation. We evaluate the proposed framework using multiple perturbation strategies with varying strengths and compare it against the original BERT embeddings and SimCSE. Experimental results show that CDAE consistently preserves higher embedding similarity under perturbations, with the improvements becoming more pronounced as framework effectively enhances representation stability while preserving semantic information, highlighting perturbation-invariant learning as a promising direction for improving sentence embeddings. The source code is publicly available at: https://github.com/ComputationIASBS/CDAE",
+        "authors": [
+          {
+            "authorId": "2298179146",
+            "name": "Sina Heydari"
+          },
+          {
+            "authorId": "2400112082",
+            "name": "Amirreza Abbasi"
+          },
+          {
+            "authorId": "2400147407",
+            "name": "Mohsen Hooshmand"
+          },
+          {
+            "authorId": "2066393545",
+            "name": "Majid Ramezani"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28236",
+          "CorpusId": 290694999
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28236, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "6b738ba7dc321bf00539faaa71cd36e8e3325015",
+        "title": "CDAE: Enhancing Perturbation Robustness in Pretrained Language Models with Contrastive Denoising",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Experimental results show that CDAE consistently preserves higher embedding similarity under perturbations, with the improvements becoming more pronounced as framework effectively enhances representation stability while preserving semantic information, highlighting perturbation-invariant learning as a promising direction for improving sentence embeddings."
+        },
+        "url": "https://www.semanticscholar.org/paper/6b738ba7dc321bf00539faaa71cd36e8e3325015",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28382": {
+      "cached_at": "2026-08-01T04:03:51.102014+00:00",
+      "data": {
+        "abstract": "Transferring manipulation skills across object instances that share functionality but differ in geometry remains a fundamental challenge in robot learning. While recent correspondence methods leverage dense visual descriptors and 3D feature fields, nearest-neighbor feature matching often produces spatially incoherent correspondences that fail to recover the local geometric frames required for reliable skill transfer. We introduce SemAnCorr, a training-free framework that establishes dense correspondence by selecting semantically consistent anchor regions through joint pose-correspondence optimization and propagating these constraints over the object surface using functional maps. The resulting correspondences preserve both semantic consistency and geometric coherence, enabling object-centric manipulation skills to transfer across geometrically diverse instances. We evaluate SemAnCorr on a dense correspondence benchmark built on PartNet-Mobility, achieving 90.8% semantic accuracy in our benchmark evaluation while improving geometric coherence over recent state-of-the-art baselines. Finally, we show that these improvements translate directly into real-world manipulation performance: using a single demonstration, SemAnCorr enables substantially more reliable zero-shot manipulation skill transfer to previously unseen objects than existing correspondence methods. Videos and additional visualizations are available at [https://semancorr.github.io](https://semancorr.github.io) .",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Xiaoxiang Dong"
+          },
+          {
+            "authorId": "2207857185",
+            "name": "W. Bar\u00f3n"
+          },
+          {
+            "authorId": "2309203483",
+            "name": "Hongyi Chen"
+          },
+          {
+            "authorId": "2049034998",
+            "name": "Uksang Yoo"
+          },
+          {
+            "authorId": "2269146110",
+            "name": "Jeffrey Ichnowski"
+          },
+          {
+            "authorId": "2238209684",
+            "name": "Weiming Zhi"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28382",
+          "CorpusId": 290694809
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28382, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "0342f77b482a6dcf57ee94a4324b74aec662f534",
+        "title": "SemAnCorr: Semantic Anchored Correspondence for Zero-Shot Manipulation Skill Transfer",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "SemAnCorr is introduced, a training-free framework that establishes dense correspondence by selecting semantically consistent anchor regions through joint pose-correspondence optimization and propagating these constraints over the object surface using functional maps, enabling object-centric manipulation skills to transfer across geometrically diverse instances."
+        },
+        "url": "https://www.semanticscholar.org/paper/0342f77b482a6dcf57ee94a4324b74aec662f534",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28418": {
+      "cached_at": "2026-08-01T04:04:04.642558+00:00",
+      "data": {
+        "abstract": "Pruning is a promising approach for improving the efficiency of LLMs. Existing static structured pruning methods are hardware-friendly and can deliver practical throughput gains, but their input-agnostic computation allocation often causes substantial accuracy degradation under aggressive sparsity. Recent dynamic sparsity methods improve quality retention by adapting computation to individual inputs, yet they remain largely limited to coarse-grained structural decisions and their practical acceleration under real-world inference scenarios remains challenging. To address these challenges, we present WIDE, the first end-to-end differentiable token-level dynamic width pruning framework designed for both prefill and decode scenarios. WIDE enables fine-grained computation allocation by allowing each token to dynamically select attention-head groups and FFN-channel groups, extending dynamic pruning beyond layer-level decisions to neuron-block-level granularity. Through a two-stage training pipeline, WIDE learns effective token-wise sparse execution patterns and achieves substantially better quality retention than existing approaches. To make such fine-grained dynamic pruning practical, we further propose a pruning--kernel co-design framework that decomposes dynamic sparsity acceleration into mask reordering, hardware-agnostic block-level skipping, and hardware-dependent intra-block skipping, enabling efficient execution across different granularities. At 50% sparsity, WIDE provides 55.1% performance boost when compared to the state-of-the-art dynamic depth pruning under calibration-only settings. Under prefill and decoding inference workloads, WIDE achieves close-to-theoretical kernel-level speedups of up to 1.98x for prefill and 4.95x for decoding, as well as 1.68x and 1.55x end-to-end acceleration. Our code is available at https://github.com/EIT-NLP/LLM-Pruning/tree/main/WIDE.",
+        "authors": [
+          {
+            "authorId": "2260835054",
+            "name": "Haozhe Hu"
+          },
+          {
+            "authorId": "2279770782",
+            "name": "Hao Wu"
+          },
+          {
+            "authorId": "2421966154",
+            "name": "Peiran Yin"
+          },
+          {
+            "authorId": "2315674282",
+            "name": "Chao Han"
+          },
+          {
+            "authorId": "2386783555",
+            "name": "Yunpu Ma"
+          },
+          {
+            "authorId": "2312845925",
+            "name": "Xiaoyu Shen"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28418",
+          "CorpusId": 290695269
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28418, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4adf2d6eb97d6758d97e8e9d2e064be694778bb7",
+        "title": "WIDE: Boosting Adaptive LLM Inference via Token-level Dynamic Width Pruning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "WIDE is presented, the first end-to-end differentiable token-level dynamic width pruning framework designed for both prefill and decode scenarios, and a pruning--kernel co-design framework that decomposes dynamic sparsity acceleration into mask reordering, hardware-agnostic block-level skipping, and hardware-dependent intra-block skipping, enabling efficient execution across different granularities."
+        },
+        "url": "https://www.semanticscholar.org/paper/4adf2d6eb97d6758d97e8e9d2e064be694778bb7",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28439": {
+      "cached_at": "2026-08-01T04:03:09.640412+00:00",
+      "data": {
+        "abstract": "Generative UI (GenUI) lets large language models synthesize a complete, renderable interface directly from a natural-language instruction, but evaluating the quality of what they generate remains an open problem. Human evaluation is costly and rater-variant, while LLM-as-a-judge is scalable but reflects only a single implicit viewpoint, unable to capture how different populations of real users actually perceive the same interface. We propose the Evidence-Grounded, Social-Weighted Persona Panel (ESPP), a three-stage GenUI evaluation method in which a panel of psychologically diverse, evidence-grounded personas independently rates a screenshot, exchanges opinions under a trait-derived, semantically-gated bounded-confidence mechanism, and is aggregated via Delphi-inspired social weighting into a single judgment. ESPP tracks human judgment substantially more closely than a naive single-pass judge, raising Pearson $r$ from $0.716$ to $0.922$, and a prompt-ensemble control recovers only about a third of this gap, isolating genuine persona and evidence grounding as the dominant source of improvement. Beyond this fidelity gain, retaining each panelist's individual rating further reveals that user subgroups agree on overall model rankings yet diverge sharply on specific rating dimensions, a structural disagreement a single homogeneous judge would systematically erase. The codes are available at https://github.com/Wuzheng02/ESPP.",
+        "authors": [
+          {
+            "authorId": "2348359519",
+            "name": "Zheng Wu"
+          },
+          {
+            "authorId": "2454445347",
+            "name": "Yibo Luo"
+          },
+          {
+            "authorId": "2454574489",
+            "name": "Pu Zhang"
+          },
+          {
+            "authorId": "2454447992",
+            "name": "Cheng Yang"
+          },
+          {
+            "authorId": "2284695096",
+            "name": "Zhuosheng Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28439",
+          "CorpusId": 290694988
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28439, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "07b544abefa3d581828c863eeb20878ec38d6f7a",
+        "title": "Beyond a Single Judge: Simulating Social Persona Panels for Generative UI Evaluation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The Evidence-Grounded, Social-Weighted Persona Panel is proposed, a three-stage GenUI evaluation method in which a panel of psychologically diverse, evidence-grounded personas independently rates a screenshot, exchanges opinions under a trait-derived, semantically-gated bounded-confidence mechanism, and is aggregated via Delphi-inspired social weighting into a single judgment."
+        },
+        "url": "https://www.semanticscholar.org/paper/07b544abefa3d581828c863eeb20878ec38d6f7a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28478": {
+      "cached_at": "2026-08-01T04:02:53.133962+00:00",
+      "data": {
+        "abstract": "As large language models (LLMs) continue to advance in complex reasoning tasks, they have learned to heavily prioritize explicit conditions provided in the input. However, in everyday commonsense reasoning, this mechanism exposes a critical vulnerability which we term Salience Bias: models become easily hijacked by useless explicit distractors (e.g., numerical values), leading them to ignore the implicit physical or commonsense prerequisites of a task. A critical open question is whether this failure reflects a genuine gap in commonsense knowledge or merely its suppression under misleading task framing. To investigate this, we construct the SaliTrap Benchmark, a high-quality dataset across four trap dimensions. Evaluating 12 state-of-the-art LLMs, we find that all mainstream models suffer significantly from salience bias, with severity scaling with distractor density and detecting the trap often decoupled from actually avoiding it. Crucially, by re-eliciting the same models with the task framing stripped away, we show that this is overwhelmingly a failure of \\textbf{knowledge suppression rather than knowledge absence}: a context-free knowledge probe alone recovers over 90\\% of sycophantic-compliance failures, revealing that the requisite commonsense is intrinsically present but actively crowded out by salient distractors that lure the model into over-compliant, unnecessary computation. Building on this diagnosis, we further show that lightweight, inference-time prompting alone substantially closes the gap without any retraining. Our findings relocate the bottleneck of commonsense reasoning failures from model competence to elicitation, and we release SaliTrap as a testbed for this blind spot. The codes are available at https://github.com/Wuzheng02/SaliTrap.",
+        "authors": [
+          {
+            "authorId": "2348359519",
+            "name": "Zheng Wu"
+          },
+          {
+            "authorId": "2381835692",
+            "name": "Chenhao Xue"
+          },
+          {
+            "authorId": null,
+            "name": "Shijie Zheng"
+          },
+          {
+            "authorId": "2341987139",
+            "name": "Yijie Lu"
+          },
+          {
+            "authorId": "2454447992",
+            "name": "Cheng Yang"
+          },
+          {
+            "authorId": "2284695096",
+            "name": "Zhuosheng Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28478",
+          "CorpusId": 290694806
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28478, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7d04cb72a2cd300d058a1da6f2d14213f589c870",
+        "title": "Would You Walk to the Car Wash? Revealing the Salience Bias of Large Language Models in Commonsense Reasoning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The findings relocate the bottleneck of commonsense reasoning failures from model competence to elicitation, and release SaliTrap as a testbed for this blind spot, to show that lightweight, inference-time prompting alone substantially closes the gap without any retraining."
+        },
+        "url": "https://www.semanticscholar.org/paper/7d04cb72a2cd300d058a1da6f2d14213f589c870",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28545": {
+      "cached_at": "2026-08-01T04:03:30.305069+00:00",
+      "data": {
+        "abstract": "Large language models can write, patch, and search code, but oncall root cause analysis (RCA) demands something different: reasoning over noisy metrics, logs, traces, and source code, starting from ambiguous user-facing reports, often hours after the incident began. We introduce ORCA-bench, a benchmark that puts general-purpose coding agents in a production-fidelity oncall setting. ORCA-bench pairs a live OpenTelemetry-instrumented microservice system--exposing six days of metrics, logs, and traces through real telemetry interfaces (Prometheus, Jaeger, and OpenSearch via Grafana) and full source-code access--with 1,079 RCA tasks that systematically vary report specificity, time-to-detection, and co-occurring fault scenarios. Ground-truth symptoms are curated and signed off by expert SREs, and our LLM-as-judge is independently re-scored by humans (Cohen's $\\kappa_w=0.90$). Across five frontier agents, the best RCA Accuracy is 25.3% on Medium-difficulty tasks (the realistic-input setting) and 10.0% on Hard--a gap that remains even with Claude Fable 5. The weakest model hallucinates an implausible root cause in 40% of incident reports, and removing source-code access degrades every metric. Crucially, these are performances on a curated 50 GB / six-day testbed with tasks investigated in isolation on a system whose code and instrumentation are public. Since real production systems are order of magnitudes larger, more dynamic, and more idiosyncratic, the gap we report is a lower bound on the engineering investment required before frontier coding agents can be safely entrusted with production reliability. We release the public set at https://hub.harborframework.com/datasets/orca-bench/ORCA-bench.",
+        "authors": [
+          {
+            "authorId": "2326294627",
+            "name": "Albert Gong"
+          },
+          {
+            "authorId": "2326682264",
+            "name": "Kyuseong Choi"
+          },
+          {
+            "authorId": "79162085",
+            "name": "Abhineet Agarwal"
+          },
+          {
+            "authorId": "2454422846",
+            "name": "Jason Schechner"
+          },
+          {
+            "authorId": "2454695529",
+            "name": "Ryan Huang"
+          },
+          {
+            "authorId": "2445974523",
+            "name": "Rajat Agrawal"
+          },
+          {
+            "authorId": "2326447138",
+            "name": "Anish Agarwal"
+          },
+          {
+            "authorId": "35688808",
+            "name": "Raaz Dwivedi"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28545",
+          "CorpusId": 290695258
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28545, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "cf390e769d884cf7201a7bcceedd652c509babc4",
+        "title": "ORCA-bench: How Ready Are Language Model Agents for Oncall?",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The ORCA-bench benchmark is introduced, a benchmark that puts general-purpose coding agents in a production-fidelity oncall setting and is a lower bound on the engineering investment required before frontier coding agents can be safely entrusted with production reliability."
+        },
+        "url": "https://www.semanticscholar.org/paper/cf390e769d884cf7201a7bcceedd652c509babc4",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28560": {
+      "cached_at": "2026-08-01T04:04:00.381256+00:00",
+      "data": {
+        "abstract": "Pretraining navigation diffusion policies rely on large-scale expert demonstrations. These data are typically generated by a fully-informed oracle planner suited to a single nominal robot. This limits the policy's generalization to diverse embodiments and challenging scenarios (e.g., escaping dead ends or detouring long obstacles) that demand diverse local reactive behaviors with only onboard local observations. Post-training the policy with reinforcement learning (RL) offers a principled remedy. However, previous RL for diffusion approaches lead to only marginal improvements. This is because the intractable likelihood of diffusion policies renders policy gradients unstable in addition to inefficient policy exploration. To address these challenges, we propose a data-efficient diffusion RL post-training framework - GQRM (Group Q-score Reweighted Matching). Our framework introduces two complementary designs: (i) a self-bootstrapped exploration strategy with behavior perturbation that preserves the pretrained policy prior, and (ii) a group Q-score normalization mechanism that computes per-trajectory values on each state for efficient reweighted score matching. By conducting distributed online RL training across heterogeneous embodiments, the resulting fine-tuned policy, X-NavDP, achieves state-of-the-art cross-embodiment visual navigation performance, improving the overall success rate from 61.20% to 84.28% in simulation and 10% to 65% in real-world hard cases. The code and model are publicly available at https://yty-sky.github.io/x-navdp-project-page.",
+        "authors": [
+          {
+            "authorId": "2454470093",
+            "name": "Tianyu Yang"
+          },
+          {
+            "authorId": null,
+            "name": "Yiming Zeng"
+          },
+          {
+            "authorId": "2362197963",
+            "name": "Wenzhe Cai"
+          },
+          {
+            "authorId": "2360919920",
+            "name": "Yuqiang Yang"
+          },
+          {
+            "authorId": "2357982673",
+            "name": "Jiaqi Peng"
+          },
+          {
+            "authorId": "2269708435",
+            "name": "Hui Cheng"
+          },
+          {
+            "authorId": "2277447920",
+            "name": "Jiangmiao Pang"
+          },
+          {
+            "authorId": "2359108866",
+            "name": "Tai Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28560",
+          "CorpusId": 290695391
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28560, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "1aad4660a772abd5e81ec55075a919b77f026689",
+        "title": "X-NavDP: Generalizing Navigation Diffusion Policy to Novel Behavior and Embodiments with Group Q-score Reweighted Matching",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A data-efficient diffusion RL post-training framework - GQRM (Group Q-score Reweighted Matching), which achieves state-of-the-art cross-embodiment visual navigation performance and introduces two complementary designs: a self-bootstrapped exploration strategy with behavior perturbation that preserves the pretrained policy prior, and a group Q-score normalization mechanism that computes per-trajectory values on each state for efficient reweighted score matching."
+        },
+        "url": "https://www.semanticscholar.org/paper/1aad4660a772abd5e81ec55075a919b77f026689",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28568": {
+      "cached_at": "2026-08-01T04:04:02.511613+00:00",
+      "data": {
+        "abstract": "Recursive self-improvement (RSI) requires AI systems that improve the process of building AI (i.e., AI4AI); machine learning engineering (MLE) offers a concrete, executable testbed for studying this capability. We introduce OpenMLE, an open full-stack system for RSI research in MLE, spanning verifiable task environments with execution feedback (OpenMLE-Gym), operator learning (OpenMLE-RL), and long-horizon search (OpenMLE-Evo). On this stack we post-train Frontis-MA1 (35B) as a meta-evolution agent for MLE, aligning post-training and inference around four atomic program-evolution operators (Draft, Improve, Debug, Crossover): the same operators are trained via execution-grounded SFT and RL on data deduplicated against all evaluation benchmarks, then composed into long-horizon search, coupling learning and evolution in a single loop. On MLE-Bench Lite under a 12-hour per-task budget on one RTX 4090 capped at 12 GB VRAM, Frontis-MA1 (35B) improves Medal Average from 39.39% to 60.61% over its base model with OpenMLE-Evo, and reaches 71.21% with OpenMLE-Evo-Max (benchmark-independent experience priors and asynchronous search), exceeding GPT-5.5 + Codex and approaching GPT-5.6 Sol and the 2.8T Kimi K3. On held-out NatureBench Lite, both components transfer: with the framework fixed, swapping in the trained model raises Match-SOTA from 50% to 70%; with the model fixed, swapping in OpenMLE-Evo raises it from 20% to 50%. We release the model weights and the full OpenMLE stack to enable reproducible research on executable AI4AI toward RSI. Code: https://github.com/FrontisAI/OpenRSI",
+        "authors": [
+          {
+            "authorId": "2362512516",
+            "name": "Junlin Yang"
+          },
+          {
+            "authorId": "2294321480",
+            "name": "Che Jiang"
+          },
+          {
+            "authorId": null,
+            "name": "Yu Fu"
+          },
+          {
+            "authorId": "2313639472",
+            "name": "Tian-Yuan Luo"
+          },
+          {
+            "authorId": "2375006193",
+            "name": "Can Ren"
+          },
+          {
+            "authorId": "2445482889",
+            "name": "Weizhi Wang"
+          },
+          {
+            "authorId": "2292895401",
+            "name": "Kaikai Zhao"
+          },
+          {
+            "authorId": "2454698219",
+            "name": "Hongyi Liu"
+          },
+          {
+            "authorId": "2329372501",
+            "name": "Yuxin Zuo"
+          },
+          {
+            "authorId": null,
+            "name": "Yuru Wang"
+          },
+          {
+            "authorId": "2295138535",
+            "name": "Yuchen Fan"
+          },
+          {
+            "authorId": "2266239026",
+            "name": "Kai Tian"
+          },
+          {
+            "authorId": "2380440889",
+            "name": "Zhenzhao Yuan"
+          },
+          {
+            "authorId": null,
+            "name": "Xiaojian Lin"
+          },
+          {
+            "authorId": "2344146234",
+            "name": "Li Sheng"
+          },
+          {
+            "authorId": "2291135314",
+            "name": "Rushi Qiang"
+          },
+          {
+            "authorId": "2273925124",
+            "name": "Guoli Jia"
+          },
+          {
+            "authorId": "2221271501",
+            "name": "Xingtai Lv"
+          },
+          {
+            "authorId": "2290020564",
+            "name": "Ermo Hua"
+          },
+          {
+            "authorId": "2426881653",
+            "name": "Dianqiao Lei"
+          },
+          {
+            "authorId": null,
+            "name": "Youbang Sun"
+          },
+          {
+            "authorId": "2261392087",
+            "name": "Ning Ding"
+          },
+          {
+            "authorId": null,
+            "name": "Bowen Zhou"
+          },
+          {
+            "authorId": null,
+            "name": "Kaiyan Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28568",
+          "CorpusId": 290695364
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28568, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "58868100128e2fb1d0ee642b5f20bc01bda86b1e",
+        "title": "Frontis-MA1: Training an AI4AI Model towards Recursive Self-Improvement in Machine Learning Engineering",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "OpenMLE is introduced, an open full-stack system for RSI research in MLE, spanning verifiable task environments with execution feedback, operator learning, and long-horizon search (OpenMLE-Evo) and enabling reproducible research on executable AI4AI toward RSI."
+        },
+        "url": "https://www.semanticscholar.org/paper/58868100128e2fb1d0ee642b5f20bc01bda86b1e",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2607.28609": {
+      "cached_at": "2026-08-01T04:03:39.597579+00:00",
+      "data": {
+        "abstract": "Computer-using agents (CUAs) are advancing rapidly across the digital world. A CUA trajectory records the agent's actions, states, and reasoning. Verifying whether it fulfilled the task instruction is central to CUA evaluation, data curation, and reinforcement learning. Neither human-written verifiers nor human annotators can provide such verification at scale, so the field increasingly turns to vision-language models (VLMs) as judges of CUA trajectories. But a fundamental question has long gone unexamined: are these VLM judges reliable enough? To study it systematically, we introduce OSReward, a realistic, high-quality benchmark that evaluates VLM judges on CUA trajectories. The trajectories come from diverse agent backbones executing human-verified instructions across platforms, then rigorously labeled with ground-truth verdicts through multi-stage human annotation. Building on it, we derive OSReward-Hard, a challenge set concentrating genuinely hard cases, and OSReward-Multi for fine-grained efficiency and alignment scoring. The most comprehensive evaluation of VLM judges to date finds even state-of-the-art models fall short of an ideal judge, sharing a systematic leniency bias that mislabels failed runs as successes. The few reliable enough to trust are too expensive to run at scale, while affordable open models trail far behind. To close this gap, we construct and release OS-Shepherd-100K, an open corpus of reasoning-annotated trajectory judgments for the CUA community. On it, we train OS-Shepherd (9B and 35B), open reward models that supply low-cost, stable, and reliable reward signals, matching commercial judges at 30-60% lower cost than the frontier. Extensive analyses further inform the design of reliable CUA reward at scale. Our code, benchmark, dataset, and model checkpoints are available at https://os-copilot.github.io/OSReward-Home/.",
+        "authors": [
+          {
+            "authorId": "2350520649",
+            "name": "Qiushi Sun"
+          },
+          {
+            "authorId": "2273946511",
+            "name": "Kanzhi Cheng"
+          },
+          {
+            "authorId": null,
+            "name": "Yian Wang"
+          },
+          {
+            "authorId": "2370441971",
+            "name": "Bowen Yang"
+          },
+          {
+            "authorId": "2350982840",
+            "name": "Hang Yan"
+          },
+          {
+            "authorId": "2283870581",
+            "name": "Liheng Chen"
+          },
+          {
+            "authorId": "2330168859",
+            "name": "Fangzhi Xu"
+          },
+          {
+            "authorId": "2284245211",
+            "name": "Zichen Ding"
+          },
+          {
+            "authorId": "2263638230",
+            "name": "Nuo Chen"
+          },
+          {
+            "authorId": "2430687146",
+            "name": "Jialin Cao"
+          },
+          {
+            "authorId": "2454506992",
+            "name": "Xingdong Gong"
+          },
+          {
+            "authorId": "2372471293",
+            "name": "Zehao Li"
+          },
+          {
+            "authorId": "2326128155",
+            "name": "Kaiming Jin"
+          },
+          {
+            "authorId": "2295749596",
+            "name": "Xinfeng Yuan"
+          },
+          {
+            "authorId": null,
+            "name": "Zhoumianze Liu"
+          },
+          {
+            "authorId": "2386497480",
+            "name": "Jingyang Gong"
+          },
+          {
+            "authorId": "2155273086",
+            "name": "Zhangyue Yin"
+          },
+          {
+            "authorId": null,
+            "name": "Jiahui Gao"
+          },
+          {
+            "authorId": null,
+            "name": "Zhiyong Wu"
+          },
+          {
+            "authorId": "2327336946",
+            "name": "Tianbao Xie"
+          },
+          {
+            "authorId": "2329112854",
+            "name": "Jianbing Zhang"
+          },
+          {
+            "authorId": "2337691835",
+            "name": "Ben Kao"
+          },
+          {
+            "authorId": "2280992367",
+            "name": "Lingpeng Kong"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2607.28609",
+          "CorpusId": 290695298
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2607.28609, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "61247ab85522a06c3d593357e809311f3db51425",
+        "title": "OSReward: Instituting Standardized Evaluation for Cross-Platform Computer-Use Reward Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "OSReward is introduced, a realistic, high-quality benchmark that evaluates VLM judges on CUA trajectories, and an open corpus of reasoning-annotated trajectory judgments for the CUA community, to close the gap in reliable CUA reward at scale."
+        },
+        "url": "https://www.semanticscholar.org/paper/61247ab85522a06c3d593357e809311f3db51425",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
