@@ -3528,6 +3528,915 @@
         "year": 2026
       }
     },
+    "arxiv:2608.01777": {
+      "cached_at": "2026-08-09T06:34:34.748244+00:00",
+      "data": {
+        "abstract": "An ensemble of surrogate models helps improve the prediction quality and robustness of surrogate models, and in turn, the search performance of surrogate-assisted evolutionary algorithms (SAEAs). Although different degrees of smoothness of the approximated fitness landscapes need to be carefully designed for an effective ensemble, little attention has been paid to the explicit tuning of the degree of smoothness derived by surrogate models. This study proposes an adaptive ensemble SAEA, which automatically constructs plausible ensemble models by optimizing their parameter settings. Unlike existing adaptive/ensemble SAEAs, which consider prediction accuracy alone, the proposed algorithm optimizes the structure of radial basis function networks (RBFNs) by solving bi-objective minimization problems of approximation error and model complexity, resulting in robust ensemble models of accurate surrogate models with different degrees of smoothness of the approximated fitness landscapes. As a result, the over/under-fittings are reduced. Additionally, an infill criterion is designed so that surrogate models with different degrees of smoothness can contribute to the solution prescreening. The experimental results demonstrated the statistical superiority of our algorithm over state-of-the-art SAEAs on a single-objective benchmark and real-world problem sets under an expensive optimization scenario. The source code of the proposed algorithm is available at https://github.com/haranychan/EPOS.",
+        "authors": [
+          {
+            "authorId": "2092979010",
+            "name": "Keisuke Nishihara"
+          },
+          {
+            "authorId": "2277570613",
+            "name": "Yaochu Jin"
+          },
+          {
+            "authorId": "2275500707",
+            "name": "Masaya Nakata"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.01777",
+          "CorpusId": 289697192,
+          "DOI": "10.1109/TCYB.2026.3702665",
+          "PubMed": "42378155"
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Medicine"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.01777, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": "GREEN",
+          "url": "https://arxiv.org/pdf/2608.01777"
+        },
+        "paperId": "e338a4f718c64b5e5ee4f649ff18ad7807bfc7ef",
+        "title": "An Evolutionary Algorithm Assisted by an Ensemble of Pareto-Optimal Surrogate Models.",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This study proposes an adaptive ensemble SAEA, which automatically constructs plausible ensemble models by optimizing their parameter settings by solving bi-objective minimization problems of approximation error and model complexity, resulting in robust ensemble models of accurate surrogate models with different degrees of smoothness of the approximated fitness landscapes."
+        },
+        "url": "https://www.semanticscholar.org/paper/e338a4f718c64b5e5ee4f649ff18ad7807bfc7ef",
+        "venue": "IEEE Transactions on Cybernetics",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.05586": {
+      "cached_at": "2026-08-09T06:35:13.887478+00:00",
+      "data": {
+        "abstract": "Autonomous robot navigation requires the rapid generation of obstacle-free regions for trajectory planning. However, existing corridor generators struggle to meet real-time, sensor-rate computational constraints. To resolve this bottleneck, we introduce PathCover, a framework driven by RISP; a novel randomized algorithm that constructs convex polytopes directly from raw point cloud data in expected linear time under a mild probabilistic elimination condition. PathCover generates sequences of overlapping, obstacle-free polytopes that safely constrain downstream MPC and trajectory optimization. We mathematically guarantee that the algorithm terminates in finite steps while ensuring continuous progress along any obstacle-free reference path. Extensive benchmarks on synthetic and real-world LiDAR datasets demonstrate an order-of-magnitude speedup over state-of-the-art methods while maintaining comparable corridor volumes. The complete pipeline is validated via high-fidelity quadrotor simulations and physical deployment on a quadrupedal robot navigating constrained environments using live LiDAR perception.",
+        "authors": [
+          {
+            "authorId": "51937588",
+            "name": "K. S. Narkhede"
+          },
+          {
+            "authorId": "2164038075",
+            "name": "Abhijeet M. Kulkarni"
+          },
+          {
+            "authorId": "2243256784",
+            "name": "Guoquan Huang"
+          },
+          {
+            "authorId": "2378864343",
+            "name": "Ioannis Poulakakis"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.05586",
+          "CorpusId": 290852357
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.05586, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "b028ddcf8bd3b4bec10b7d46d462e32083ee1469",
+        "title": "PathCover: A Fast Convex Decomposition along a Path via Randomized Iterative Space Partitioning (RISP) on Point Clouds",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "PathCover is introduced, a framework driven by RISP; a novel randomized algorithm that constructs convex polytopes directly from raw point cloud data in expected linear time under a mild probabilistic elimination condition, which guarantees that the algorithm terminates in finite steps while ensuring continuous progress along any obstacle-free reference path."
+        },
+        "url": "https://www.semanticscholar.org/paper/b028ddcf8bd3b4bec10b7d46d462e32083ee1469",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.05674": {
+      "cached_at": "2026-08-09T06:34:56.007348+00:00",
+      "data": {
+        "abstract": "Robot data is scarce, so generalist policies need to learn from heterogeneous sources, including human egocentric video, simulation, and real robots, which differ in supervision and embodiment, with action labels missing or mutually incompatible. Human egocentric data scale best but sit farthest from robot data, and naive pooling causes negative transfer rather than knowledge sharing. We propose JoyAI-RA 0.5, a generalist Vision-Language-World-Action (VLWA) framework that couples physical world-dynamics priors with visual semantics and scales manipulation learning across such data via dual action alignment. Implicit action alignment infers latent actions from visual transitions, enabling action-free human, simulation, and robot data to guide a latent-action-conditioned world model in learning physical dynamics. Explicit alignment grounds reliable human and robot trajectories in a unified physical action space through a canonical action representation and camera-frame chunk-relative end-effector actions. An inner-outer-loop reinforcement stage then pairs efficient task adaptation with foundation-policy improvement. On a real-world AgiBot benchmark, JoyAI-RA performs strongly on both seen tasks and unseen variations. The task score improves consistently as the volume of human egocentric pretraining data increases and shows no sign of plateauing at our largest scale. This suggests that abundant but weakly labeled human experience can be converted into a transferable training signal, making human video not merely a weak auxiliary source but a primary axis along which manipulation capability can be scaled. Project page can be found at https://joyai-ra-05.github.io/.",
+        "authors": [
+          {
+            "authorId": "2455673731",
+            "name": "JoyAI-RA Team"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.05674",
+          "CorpusId": 290852585
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.05674, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "19fa110cd5c5a4164e9493ecbb1ee7d4733f3b27",
+        "title": "JoyAI-RA 0.5: Scaling Robot Manipulation Learning via Dual Action Alignment",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "JoyAI-RA 0.5 is proposed, a generalist Vision-Language-World-Action framework that couples physical world-dynamics priors with visual semantics and scales manipulation learning across such data via dual action alignment, suggesting that abundant but weakly labeled human experience can be converted into a transferable training signal."
+        },
+        "url": "https://www.semanticscholar.org/paper/19fa110cd5c5a4164e9493ecbb1ee7d4733f3b27",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.05825": {
+      "cached_at": "2026-08-09T06:35:11.691157+00:00",
+      "data": {
+        "abstract": "Human social communication, such as affection and intent, is often conveyed in highly implicit ways, where underlying meanings are expressed through indirect, socially and culturally grounded signals rather than explicit statements. Such implicit social contexts are pervasive in real-world interactions, yet there remains a lack of a formal and systematic framework for studying them. In this paper, we introduce Implicit Social Context Analysis (MoCA), a novel task that systematically models implicit social scenarios along three key dimensions: affection, intent, and stance. We construct a high-quality benchmark containing 3,108 multimodal instances collected from real-world sources, with fine-grained cognitive annotations revealing who expresses what toward whom, as well as how and why it is conveyed. Using the MoCA dataset, we show that state-of-the-art multimodal large language models struggle significantly with this task because of their reliance on explicit cues and limited ability to reason over latent social contexts. To address this challenge, we propose Conflict-Driven Abductive Reasoning (CoDAR), a novel framework that models the discrepancy between observed expressions and expected truthful behavior as cognitive conflict, thereby enabling the inference of hidden mental states. Extensive experiments demonstrate that CoDAR substantially improves model performance. Nevertheless, a large gap from human reasoning remains, highlighting the fundamental difficulty of implicit social understanding.",
+        "authors": [
+          {
+            "authorId": "2215623676",
+            "name": "Wenhao Xu"
+          },
+          {
+            "authorId": "2273778850",
+            "name": "Kaiwen Zhang"
+          },
+          {
+            "authorId": "2455705374",
+            "name": "Hao Li"
+          },
+          {
+            "authorId": "2358251285",
+            "name": "Maowei You"
+          },
+          {
+            "authorId": "2455790103",
+            "name": "Yongzheng Ji"
+          },
+          {
+            "authorId": "2455673429",
+            "name": "Siyuan Zuo"
+          },
+          {
+            "authorId": "2455803585",
+            "name": "Jingxuan Yu"
+          },
+          {
+            "authorId": "2277921682",
+            "name": "Sina Ahmadi"
+          },
+          {
+            "authorId": "2455710179",
+            "name": "Xinyao Tan"
+          },
+          {
+            "authorId": "2132446579",
+            "name": "Bobo Li"
+          },
+          {
+            "authorId": "2303470150",
+            "name": "Hao Fei"
+          },
+          {
+            "authorId": "2237598359",
+            "name": "Mong Li Lee"
+          },
+          {
+            "authorId": "2279540836",
+            "name": "Wynne Hsu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.05825",
+          "CorpusId": 290852640
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.05825, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "af414eb6e1659fde93ca3c02469c0fdad0306a26",
+        "title": "MoCA: Implicit Social Context Analysis",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This paper introduces Implicit Social Context Analysis (MoCA), a novel task that systematically models implicit social scenarios along three key dimensions: affection, intent, and stance, and proposes Conflict-Driven Abductive Reasoning (CoDAR), a novel framework that models the discrepancy between observed expressions and expected truthful behavior as cognitive conflict, thereby enabling the inference of hidden mental states."
+        },
+        "url": "https://www.semanticscholar.org/paper/af414eb6e1659fde93ca3c02469c0fdad0306a26",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.05872": {
+      "cached_at": "2026-08-09T06:34:07.729551+00:00",
+      "data": {
+        "abstract": "Standard Large Language Models (LLMs) execute layers sequentially. Dynamic layer routing, i.e. search for a different execution path through layers involving layer repetitions, skips and other moves, can improve performance. Existing routing approaches often require updating model weights, running expensive search loops per test instance, or demand ground-truth labels during inference. In this work, we propose Markov Chain Routing of Transformer Layers (MACRO), a framework that learns task-specific routes over LLM architectures without modifying underlying parameters. MACRO models layer routing as a context-dependent Markov policy conditioned on layer indices, computation budget phases, directional displacements, and operator context, supporting skip, repeat, and residual hidden-state addition operations. The Markov route distribution is updated via feedback on training data and decoded using a top-k Viterbi algorithm to isolate high-probability candidate programs. We evaluate MACRO across diverse reasoning and knowledge benchmarks on multiple open-weight LLMs. MACRO achieves a +5.0% average accuracy improvement over the unrouted baselines, with largest gains on small models. We outperform the best dynamic routing approach Dr. LLM by +7.2%, while reducing route-search time 9.4x (from 14.8 to 1.6 hours). Our code is publicly available at https://github.com/Batorskq/MACRO.",
+        "authors": [
+          {
+            "authorId": "2339006464",
+            "name": "Pawe\u0142 Batorski"
+          },
+          {
+            "authorId": "2351810878",
+            "name": "Abtin Pourhadi"
+          },
+          {
+            "authorId": "2455672912",
+            "name": "Akylgali Aitaza"
+          },
+          {
+            "authorId": "1790922",
+            "name": "P. Spurek"
+          },
+          {
+            "authorId": "2284685141",
+            "name": "Paul Swoboda"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.05872",
+          "CorpusId": 290852207
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.05872, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4960b31077cd43c7d39a805f918dada573d482ce",
+        "title": "MACRO: Markov Chain Routing of Transformer Layers",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes Markov Chain Routing of Transformer Layers (MACRO), a framework that learns task-specific routes over LLM architectures without modifying underlying parameters, and achieves a +5.0% average accuracy improvement over the unrouted baselines, with largest gains on small models."
+        },
+        "url": "https://www.semanticscholar.org/paper/4960b31077cd43c7d39a805f918dada573d482ce",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06165": {
+      "cached_at": "2026-08-09T06:35:05.251281+00:00",
+      "data": {
+        "abstract": "Existing audio-to-score (A2S) systems primarily focus on classical music, and the application to popular music remains underexplored. This paper first presents the new SheetSage-A2S Dataset, which includes 61 hours of audio with \\texttt{**kern} score encodings for 9,468 clips originating from 6,066 unique songs, the first of its kind to facilitate A2S research for popular music. Additionally, we improve on existing A2S approaches by using data augmentation and MuQ, a pretrained feature-extraction model for music audio, to enhance generalisation abilities and extract meaningful audio features. Results show that the proposed A2S model achieves 4.98\\% symbol error rate (SER) on the Quartets collection for classical music, which significantly outperforms the 15.3\\% SER from the existing state-of-the-art \\cite{alfaro-contrerasTransformer2024}. Additionally, our model achieves 20.92\\% SER on the SheetSage-A2S dataset for popular music, serving as a strong benchmark for future research. The dataset, model, and code are made publicly available at: https://github.com/Multimodal-Music-Research-Lab/SheetSage2Kern_model.",
+        "authors": [
+          {
+            "authorId": "2455710939",
+            "name": "Eoin Cummins"
+          },
+          {
+            "authorId": "2456323335",
+            "name": "Zhongyi Huang"
+          },
+          {
+            "authorId": "2408922749",
+            "name": "Alexandre D'Hooge"
+          },
+          {
+            "authorId": "2455710769",
+            "name": "Zhuoro Mo"
+          },
+          {
+            "authorId": "35648416",
+            "name": "Yaolong Ju"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06165",
+          "CorpusId": 290856827,
+          "DOI": "10.1145/3767308.3835653"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06165, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "36bb458f0388310336e8ed7db5a813c831383b0e",
+        "title": "Audio-to-Score Transcription using Pre-trained Features, Data Augmentation, and the New SheetSage-A2S Dataset",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The proposed A2S model achieves 4.98% symbol error rate on the Quartets collection for classical music, which significantly outperforms the existing state-of-the-art model, and achieves 20.92% on the SheetSage-A2S dataset for popular music, serving as a strong benchmark for future research."
+        },
+        "url": "https://www.semanticscholar.org/paper/36bb458f0388310336e8ed7db5a813c831383b0e",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06183": {
+      "cached_at": "2026-08-09T06:34:32.644111+00:00",
+      "data": {
+        "abstract": "Microarchitecture design space exploration suffers from expansive search spaces and expensive PPA evaluation, leaving only a small simulation budget for design decision-making. Existing methods perform blind search without considering microarchitectural dependencies and fail to learn from the iterative search effectively, leading to wasted evaluations and weak Pareto convergence. In this paper, we propose MicroEvo, a knowledge-guided framework that couples off-the-shelf LLMs with Monte Carlo Tree Search (MCTS) for multi-objective microarchitecture optimization. MicroEvo combines LLM-driven evolutionary operators, a Pareto-aware tree policy that balances Pareto contribution and diversity, an active knowledge accumulation mechanism that extracts and reuses optimization insights, and state-aware directives that adapt the search behavior online. Experiments show that MicroEvo improves Pareto-front quality by up to 36.2% over NSGA-II and achieves 10.6x higher search efficiency, and also demonstrates strong scalability to a complex industrial-scale core. The code repository is available at: https://github.com/GEAR-SEU/MicroEvo-ICCAD-26.",
+        "authors": [
+          {
+            "authorId": "2365473944",
+            "name": "Jia Xiong"
+          },
+          {
+            "authorId": "2363847464",
+            "name": "Runkai Li"
+          },
+          {
+            "authorId": "2055722360",
+            "name": "Chenxu Niu"
+          },
+          {
+            "authorId": "2455710357",
+            "name": "Guangyuan Gao"
+          },
+          {
+            "authorId": "2397183788",
+            "name": "Changwen Xing"
+          },
+          {
+            "authorId": "2455780903",
+            "name": "Yifan Zhang"
+          },
+          {
+            "authorId": "2375202005",
+            "name": "Xinlai Wan"
+          },
+          {
+            "authorId": "2438733582",
+            "name": "Jieran Cui"
+          },
+          {
+            "authorId": "2354661593",
+            "name": "Chen Bai"
+          },
+          {
+            "authorId": "2455710669",
+            "name": "Yusheng Hua"
+          },
+          {
+            "authorId": "2455804919",
+            "name": "Ying Wang"
+          },
+          {
+            "authorId": "2455710533",
+            "name": "Ming Ling"
+          },
+          {
+            "authorId": "2363931439",
+            "name": "Xi Wang"
+          },
+          {
+            "authorId": "2448267140",
+            "name": "Tao Xie"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06183",
+          "CorpusId": 290857038
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06183, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c2de337a720cafd5e08171b8de0cc9018277c621",
+        "title": "MicroEvo: Knowledge-Guided LLM Sampling for Efficient Microarchitecture Design Space Exploration",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "MicroEvo is a knowledge-guided framework that couples off-the-shelf LLMs with Monte Carlo Tree Search (MCTS) for multi-objective microarchitecture optimization and demonstrates strong scalability to a complex industrial-scale core."
+        },
+        "url": "https://www.semanticscholar.org/paper/c2de337a720cafd5e08171b8de0cc9018277c621",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06197": {
+      "cached_at": "2026-08-09T06:34:30.517566+00:00",
+      "data": {
+        "abstract": "Training large language model agents for long-horizon tool use typically relies on interactions with real or synthesized executable environments, whose construction and verification are costly, or on external simulators that are difficult to ground. We introduce EnvACE, an agentic reinforcement learning method that replaces external environment interaction during training with world rehearsal. The policy alternates between acting and rehearsal: it first generates a tool call, then plays the role of the environment to produce the response induced by that action, and conditions subsequent decisions on the rehearsed response. Both roles are jointly optimized end-to-end using task-success rewards. Through world rehearsal, the policy internalizes the relationship between actions and their environment responses in its parameters, yielding an agent world model that directly supports decision making. Across BFCL-v4, tau^2-Bench, VitaBench, and FinMCP-Bench, EnvACE achieves strong and transferable performance, outperforming environment-scaling baselines in the overall evaluation. Controlled studies further show that world rehearsal consistently improves policy learning across model scales. At test time, the internalized world model enables private rehearsal before committed execution, yielding further gains under a moderate rehearsal budget without additional external interaction. Our findings establish world rehearsal as a new path toward scaling LLM agent training beyond the constraints of external environments. Our code is publicly available at https://github.com/Within-yao/EnvACE.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Zishan Xu"
+          },
+          {
+            "authorId": "2282316397",
+            "name": "Zhiyuan Yao"
+          },
+          {
+            "authorId": "2408585413",
+            "name": "Yuxin Chen"
+          },
+          {
+            "authorId": "2363943363",
+            "name": "Yifu Guo"
+          },
+          {
+            "authorId": "2373465967",
+            "name": "Zhengxi Lu"
+          },
+          {
+            "authorId": "2334350015",
+            "name": "Yuquan Lu"
+          },
+          {
+            "authorId": "2455714321",
+            "name": "Jinyang Huang"
+          },
+          {
+            "authorId": "2346013934",
+            "name": "Yan Xu"
+          },
+          {
+            "authorId": "2282544603",
+            "name": "Yasheng Wang"
+          },
+          {
+            "authorId": "2401625176",
+            "name": "Weinan Zhang"
+          },
+          {
+            "authorId": "2329903868",
+            "name": "Xingshan Zeng"
+          },
+          {
+            "authorId": "2375764292",
+            "name": "Weiwen Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06197",
+          "CorpusId": 290856847
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06197, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c17e9846989fbe439158a015e3a205280adf828d",
+        "title": "EnvACE: Internalizing Environment Dynamics via World Rehearsal for Agentic Reinforcement Learning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "EnvACE is introduced, an agentic reinforcement learning method that replaces external environment interaction during training with world rehearsal, establishing world rehearsal as a new path toward scaling LLM agent training beyond the constraints of external environments."
+        },
+        "url": "https://www.semanticscholar.org/paper/c17e9846989fbe439158a015e3a205280adf828d",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06236": {
+      "cached_at": "2026-08-09T06:34:46.508720+00:00",
+      "data": {
+        "abstract": "Our primary objective is to advance video object counting in crowded scenes, aiming to robustly count all instances of a target category based on given text or visual prompts. Existing methods rely on RGB information, limiting their discriminative ability in crowded and occluded conditions. To address this, we propose a Depth-Guided Detector (DG-Det) along with a general post-processing pipeline. By integrating depth cues with multi-scale RGB-D cross-attention and explicit occlusion prediction, our method enhances spatial understanding and achieves robust detection in crowded and occluded scenes. Furthermore, we introduce a unified de-duplication framework to eliminate cross-frame redundant counting. To facilitate future research, we also release a new RGB-D Video Object Counting dataset featuring depth information and multiple object categories persequence. Extensive experiments demonstrate that our method achieves a 62.01\\% reduction in MAE compared to existing baselines, and also produces consistent improvements in RMSE. We provide the source code at https://github.com/streamer-AP/DG-Net and the dataset at https://huggingface.co/datasets/aerospace123/RGBD-VideoCount.",
+        "authors": [
+          {
+            "authorId": "2243328146",
+            "name": "Yuanjing Xu"
+          },
+          {
+            "authorId": "2299104243",
+            "name": "Xinyan Liu"
+          },
+          {
+            "authorId": "2355565506",
+            "name": "Weidong Chen"
+          },
+          {
+            "authorId": "2449642391",
+            "name": "Zixuan Zou"
+          },
+          {
+            "authorId": null,
+            "name": "Linhao Zhang"
+          },
+          {
+            "authorId": "2455733095",
+            "name": "Zhuangzhe Meng"
+          },
+          {
+            "authorId": "2310421148",
+            "name": "Antoni B. Chan"
+          },
+          {
+            "authorId": "2337766467",
+            "name": "Weigang Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06236",
+          "CorpusId": 290856860,
+          "DOI": "10.1145/3767308.3835482"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06236, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "110b2842b03f54d13d35d9e8c7aaeeb133421cdc",
+        "title": "Depth-Guided Video Object Counting in Crowded Scenes",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A Depth-Guided Detector (DG-Det) along with a general post-processing pipeline is proposed to advance video object counting in crowded scenes, aiming to robustly count all instances of a target category based on given text or visual prompts."
+        },
+        "url": "https://www.semanticscholar.org/paper/110b2842b03f54d13d35d9e8c7aaeeb133421cdc",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06243": {
+      "cached_at": "2026-08-09T06:34:28.386525+00:00",
+      "data": {
+        "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves the reasoning capabilities of large language models using automatically verifiable outcome signals, but these signals are typically sparse and at the sequence-level. On-policy self-distillation (OPSD) mitigates this sparsity by querying a privileged teacher at student-visited prefixes and providing dense token-level distributional supervision. Although this dense supervision alleviates signal sparsity, we find that standard OPSD still underexploits the temporal structure of the rollout. It assigns every local divergence the same coefficient, regardless of its position or the divergence sequence in which it occurs. In on-policy autoregressive generation, the same divergence magnitude can follow different discrepancy histories, reflecting different evolutions of the mismatch between the teacher and student. Since the local scalar alone cannot distinguish these temporal contexts, standard OPSD cannot adapt its token-level weights to the realized discrepancy sequence. To address this limitation, we propose Divergence-Adaptive Supervision Horizons (DASH). DASH maps the gap between each local distillation signal and the sequence-level mean to an adaptive propagation gate and then uses these gates to control backward multi-step aggregation. By doing so, DASH adjusts token-level supervision weights according to how local divergences evolve during generation. Experiments on three mathematical reasoning benchmarks across three model scales show that DASH improves over our matched vanilla OPSD reruns on every benchmark at all three scales. DASH reuses the teacher and student distributions that OPSD already computes, so the gains require no additional teacher or student forward pass. Code: https://github.com/DBtxy/DASH-OPSD",
+        "authors": [
+          {
+            "authorId": "2376430723",
+            "name": "Zhiyan Hou"
+          },
+          {
+            "authorId": "2109887979",
+            "name": "Xinyu Tang"
+          },
+          {
+            "authorId": "2329763153",
+            "name": "Hongyan An"
+          },
+          {
+            "authorId": "2144231046",
+            "name": "Jianjin Zhang"
+          },
+          {
+            "authorId": "2321872767",
+            "name": "Weizhen Wang"
+          },
+          {
+            "authorId": "2395743323",
+            "name": "Yunyun Han"
+          },
+          {
+            "authorId": "2410984313",
+            "name": "Gengsheng Li"
+          },
+          {
+            "authorId": "2371013539",
+            "name": "Xiangzhao Hao"
+          },
+          {
+            "authorId": "2313045",
+            "name": "Haiyun Guo"
+          },
+          {
+            "authorId": "2349777479",
+            "name": "Wenbin Hu"
+          },
+          {
+            "authorId": "2405834383",
+            "name": "Jinqiao Wang"
+          },
+          {
+            "authorId": "2403131370",
+            "name": "Yafeng Deng"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06243",
+          "CorpusId": 290857070
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06243, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "6bc91bf42eab3099b9269f6b2642664bc3ec9a39",
+        "title": "DASH: Divergence-Adaptive Supervision Horizons for On-Policy Self-Distillation of Reasoning Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "DASH maps the gap between each local distillation signal and the sequence-level mean to an adaptive propagation gate and then uses these gates to control backward multi-step aggregation and improves over matched vanilla OPSD reruns on every benchmark at all three model scales."
+        },
+        "url": "https://www.semanticscholar.org/paper/6bc91bf42eab3099b9269f6b2642664bc3ec9a39",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06246": {
+      "cached_at": "2026-08-09T06:35:09.573202+00:00",
+      "data": {
+        "abstract": "Post-training adaptation has become central to modern machine learning practice and includes techniques such as retraining, fine-tuning, parameter-efficient adaptation, alignment, retrieval augmentation, model editing, unlearning, calibration, and Multimodal Instruction Tuning. However, the literature remains fragmented across technique families, model classes, and deployment contexts, making it difficult to compare methods or describe how a trained model has been modified. This survey synthesizes the post-training adaptation literature and introduces a six-dimensional taxonomy organized by mechanism, goal, data requirement, persistence, structural scope, and model type. The taxonomy distinguishes commonly conflated terms such as fine-tuning, retrieval augmentation, and prompting, and shows how adaptation strategies evolve from traditional machine learning through deep learning, foundation models, large language models, and multimodal large language models. It also maps relationships among techniques, including inheritance, supersession, hybridization, and layered deployment stacks. The resulting vocabulary can support technical documentation, model-change tracking, and governance analysis. The survey concludes by identifying open challenges in evaluation, reproducibility, persistent inference-time adaptation, unlearning, multimodal adaptation, and governance-aware post-training workflows.",
+        "authors": [
+          {
+            "authorId": "2347747984",
+            "name": "Fardin Afdideh"
+          },
+          {
+            "authorId": "2151733435",
+            "name": "Fernando Seoane"
+          },
+          {
+            "authorId": "31284027",
+            "name": "F. Abtahi"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06246",
+          "CorpusId": 290856957
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06246, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "eb0949900b6b1fd58cfbb07f1a7c522ee02a596e",
+        "title": "A Six-Dimensional Taxonomy of Post-Training Adaptation Techniques with Applications in AI Governance",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A six-dimensional taxonomy organized by mechanism, goal, data requirement, persistence, structural scope, and model type is introduced and shows how adaptation strategies evolve from traditional machine learning through deep learning, foundation models, large language models, and multimodal large language models."
+        },
+        "url": "https://www.semanticscholar.org/paper/eb0949900b6b1fd58cfbb07f1a7c522ee02a596e",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06270": {
+      "cached_at": "2026-08-09T06:34:36.964678+00:00",
+      "data": {
+        "abstract": "The\"thinking-with-images\"paradigm equips multimodal LLMs with active visual operations such as crop-and-zoom. However, models using these operations often achieve only marginal or negative gains over direct inference at substantially higher token cost. They may also repeatedly crop irrelevant regions and fail on questions that direct inference answers correctly. We ask whether the returned visual evidence causally affects the answer. To answer this question, we formulate visual tool-use as a causal graph that separates observation-mediated paths from action-induced shortcuts. We then audit it through interventions at the three levels: policy (comparing tool-use with direct inference), trajectory (corrupting all observations during rollout), and step (counterfactually replacing one individual observation under a fixed prefix). Our step-level estimand, Visual Evidence Gain, isolates the contribution of each returned observation. Across six representative models and five fine-grained perception benchmarks, we uncover policy miscalibration with two failure modes. In Calling Without Looking, returned observations have no causal effect on the answer. In Looking Without Planning, observations are informative but the call schedule is incoherent. A trajectory-level diagnostic decomposes the policy-level accuracy gain and shows that the gain is concentrated in a Calibrated minority. We term this discrepancy the illusion of visual tool-use: despite aggregate accuracy gains, visual tool-use is not causally effective across a broad range of rollouts. The code is available at https://github.com/OpenCausaLab/CauAudit.",
+        "authors": [
+          {
+            "authorId": "2108346871",
+            "name": "Zhiheng Wang"
+          },
+          {
+            "authorId": "2257044950",
+            "name": "Bo Peng"
+          },
+          {
+            "authorId": "2281903333",
+            "name": "Lai Wei"
+          },
+          {
+            "authorId": "2293680941",
+            "name": "Chaochao Lu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06270",
+          "CorpusId": 290857077
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06270, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "84d9672bd4e2cbbe5ae4da1b26c0b2f87260101c",
+        "title": "The Illusion of Visual Tool-Use: A Causal Audit of Thinking with Images",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Despite aggregate accuracy gains, visual tool-use is not causally effective across a broad range of rollouts: despite aggregate accuracy gains, visual tool-use is not causally effective across a broad range of rollouts."
+        },
+        "url": "https://www.semanticscholar.org/paper/84d9672bd4e2cbbe5ae4da1b26c0b2f87260101c",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06301": {
+      "cached_at": "2026-08-09T06:35:07.447539+00:00",
+      "data": {
+        "abstract": "As LLMs are increasingly deployed within agentic systems, their capabilities depend not only on the model weights but also on the harness: the prompts, tools, control flow, memory, and orchestration code surrounding them. This makes automated harness optimization -- the iterative and evaluation-guided improvement of a harness by an AI system -- both an important route to improving AI systems and a demanding capability for AI systems themselves. Yet the community lacks a common protocol for measuring how well frontier LLMs perform at this task. We introduce HarnessOpt-Bench, a benchmark for end-to-end harness optimization under expensive and stochastic evaluation. An optimizer, an LLM paired with a coding harness, receives a target agent's seed harness, graded evaluation feedback, and a fixed target-evaluation budget. It edits the harness and nominates a final candidate, which is scored by its normalized gain over the seed on a held-out test partition that remains inaccessible throughout search. A trusted execution environment enforces the evaluation boundary, meters target-agent resource use, and preserves candidate versions for audit. We evaluate 5 frontier LLMs as optimizers both under a shared coding harness and under their native harnesses across 4 downstream tasks, over 111 scored runs. Experiment results show that optimizer models separate more than the coding harnesses they act through, native harnesses are not consistently superior, and gains vary substantially across tasks and seed regimes. These results establish harness optimization as a measurable and discriminative capability with large space for improvement.",
+        "authors": [
+          {
+            "authorId": "93204048",
+            "name": "Varun Ursekar"
+          },
+          {
+            "authorId": "1390689296",
+            "name": "Apaar Shanker"
+          },
+          {
+            "authorId": "1990902720",
+            "name": "Yash Maurya"
+          },
+          {
+            "authorId": "2455710425",
+            "name": "Shehab Yasser"
+          },
+          {
+            "authorId": "2438605026",
+            "name": "Vijay S. Kalmath"
+          },
+          {
+            "authorId": "2249757539",
+            "name": "Veronica Chatrath"
+          },
+          {
+            "authorId": "2292754643",
+            "name": "Yuan Xue"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06301",
+          "CorpusId": 290856853
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06301, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "231c6e4f3b807ace43d74aac30358a6598e4cb52",
+        "title": "HarnessOpt-Bench: Evaluating LLMs at Harness Optimization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work evaluates 5 frontier LLMs as optimizers both under a shared coding harness and under their native harnesses across 4 downstream tasks, and establishes harness optimization as a measurable and discriminative capability with large space for improvement."
+        },
+        "url": "https://www.semanticscholar.org/paper/231c6e4f3b807ace43d74aac30358a6598e4cb52",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06310": {
+      "cached_at": "2026-08-09T06:34:12.021085+00:00",
+      "data": {
+        "abstract": "Recent advances in reward modeling show a paradigm shift from discriminative reward models to generative reward models. However, despite their strong capabilities in response ranking, generative reward models have not realized their potential in reinforcement learning (RL). Our analysis reveals that this limitation arises from a mismatch between the comparative nature of generative reward modeling and the scalar scoring paradigm adopted by existing RL algorithms. To bridge this gap, we propose a Ranking-based Reward Construction (RRC) approach, which enables generative reward models to provide more effective RL learning signals by deriving rewards from relative preference rankings. RRC introduces two complementary strategies: self-competitive ranking, which exploits comparisons among sampled responses, and anchor-guided ranking, which enables scalable ranking-based reward construction with a small set of reference responses. Experiments across open-ended chat and reasoning benchmarks demonstrate that RRC substantially improves RL training with generative reward models, achieving consistent gains over existing reward construction approaches. Our code can be found at https://github.com/wangclnlp/RRC.",
+        "authors": [
+          {
+            "authorId": "2109452621",
+            "name": "Chenglong Wang"
+          },
+          {
+            "authorId": "2377538062",
+            "name": "Ziming Zhu"
+          },
+          {
+            "authorId": "2316637910",
+            "name": "Yifu Huo"
+          },
+          {
+            "authorId": "2291200534",
+            "name": "Bei Li"
+          },
+          {
+            "authorId": "2315065015",
+            "name": "Qiaozhi He"
+          },
+          {
+            "authorId": "2455790114",
+            "name": "Yan Ding"
+          },
+          {
+            "authorId": "2340401886",
+            "name": "Xiaoyang Hao"
+          },
+          {
+            "authorId": "2455791936",
+            "name": "Yuxin Gao"
+          },
+          {
+            "authorId": "2202533879",
+            "name": "Tianhua Zhou"
+          },
+          {
+            "authorId": "2353854723",
+            "name": "Xiao-Wen Chang"
+          },
+          {
+            "authorId": "2111149004",
+            "name": "Tongran Liu"
+          },
+          {
+            "authorId": "2240940961",
+            "name": "Jingbo Zhu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06310",
+          "CorpusId": 290856970
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06310, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "eec0cbddaaa599ba91a53b75074a145774cd37ec",
+        "title": "RRC: Unlocking Generative Reward Models in LLM Reinforcement Learning via Ranking-Based Reward Construction",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "RRC introduces two complementary strategies: self-competitive ranking, which exploits comparisons among sampled responses, and anchor-guided ranking, which enables scalable ranking-based reward construction with a small set of reference responses."
+        },
+        "url": "https://www.semanticscholar.org/paper/eec0cbddaaa599ba91a53b75074a145774cd37ec",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.06347": {
+      "cached_at": "2026-08-09T06:34:09.886740+00:00",
+      "data": {
+        "abstract": "Multilingual reasoning transfer is crucial for extending reasoning capabilities of large language models (LLMs) beyond high-resource languages. On-policy self-distillation (OPSD) and its variants have emerged as a promising paradigm, providing dense token-level supervision on student-generated rollouts, yet their objectives do not explicitly prioritize reasoning signals most critical to cross-lingual transfer. We characterize that target-language reasoning comprises the generation of both surface text and reasoning pivots, which are decisions that advance or redirect the reasoning process and shape subsequent inference. This motivates concentrating privileged distillation around such pivots. We therefore propose RP-OPSD, Reasoning-Pivot-guided On-Policy Self-Distillation, using the distributional shift between matched teacher views with and without an English reference solution as an operational proxy to guide privileged distillation and reference anchoring. Experiments on mathematical reasoning benchmarks covering 17 languages and multiple difficulty levels show that our method outperforms strong multilingual reasoning baselines and OPSD variants. Further analysis reveals that RP-OPSD concentrates privileged distillation on reasoning-control and problem-condistioned state-update tokens, while downweighting it for tokens that mainly support surface realization. Our code is available at https://github.com/NJUNLP/RP-OPSD.",
+        "authors": [
+          {
+            "authorId": "2374496040",
+            "name": "X. Wang"
+          },
+          {
+            "authorId": "2348595596",
+            "name": "Junxiao Liu"
+          },
+          {
+            "authorId": "2406920122",
+            "name": "Shujian Huang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.06347",
+          "CorpusId": 290857037
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.06347, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "35f05e55483def7c06957a0409e9428235ada13a",
+        "title": "RP-OPSD: Reasoning-Pivot-Guided On-Policy Self-Distillation for Multilingual Reasoning Transfer",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "RP-OPSD, Reasoning-Pivot-guided On-Policy Self-Distillation is proposed, using the distributional shift between matched teacher views with and without an English reference solution as an operational proxy to guide privileged distillation and reference anchoring."
+        },
+        "url": "https://www.semanticscholar.org/paper/35f05e55483def7c06957a0409e9428235ada13a",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
