@@ -3528,6 +3528,62 @@
         "year": 2026
       }
     },
+    "arxiv:2608.01646": {
+      "cached_at": "2026-08-10T02:43:09.584017+00:00",
+      "data": {
+        "abstract": "Handwritten Text Recognition (HTR) is computationally imbalanced in two ways: most image pixels are background, and many width-axis sequence positions are blank-dominated. This creates a mismatch for Spiking Neural Networks (SNNs): handwriting is observed as a static image, whereas spiking computation unfolds over timesteps. We propose Spike-HTR, a hybrid spiking recognizer that controls both the number of spiking steps and the number of width positions processed by the deep sequence mixer. To make a static image suitable for short-horizon spiking inference, InkCoder converts it into a coarse-to-fine input stream, where early steps cover broad stroke regions and later steps emphasize sharper stroke details. To reduce sequence computation, a CTC-guided length reducer keeps likely character or uncertain positions and compresses long blank-dominated stretches before deep mixing. With $T{=}2$, Spike-HTR trains only on target data, decodes without language models or lexicons, and reaches validation/test CERs of 3.5/5.4, 2.3/2.5, and 4.2/3.9 on IAM, LAM, and READ2016. Codes are available at https://github.com/QomolangmaH/SpikeHTR.",
+        "authors": [
+          {
+            "authorId": "2307503697",
+            "name": "Xiubo Liang"
+          },
+          {
+            "authorId": "2376460541",
+            "name": "Jinxing Han"
+          },
+          {
+            "authorId": "2368478650",
+            "name": "Yuke Li"
+          },
+          {
+            "authorId": "2279067454",
+            "name": "Haoqi Zhu"
+          },
+          {
+            "authorId": "2155474009",
+            "name": "Yu Zhao"
+          },
+          {
+            "authorId": "2307497901",
+            "name": "Hongzhi Wang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.01646",
+          "CorpusId": 290829215
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.01646, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "95fba03895264b60963a543bd83f33060191f438",
+        "title": "Spike-HTR: Spiking Neural Transformer for Handwritten Text Recognition",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes Spike-HTR, a hybrid spiking recognizer that controls both the number of spiking steps and the number of width positions processed by the deep sequence mixer, and proposes a CTC-guided length reducer to reduce sequence computation."
+        },
+        "url": "https://www.semanticscholar.org/paper/95fba03895264b60963a543bd83f33060191f438",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2608.01777": {
       "cached_at": "2026-08-09T06:34:34.748244+00:00",
       "data": {
