@@ -4493,6 +4493,42 @@
         "year": 2026
       }
     },
+    "arxiv:2608.08156": {
+      "cached_at": "2026-08-13T03:09:32.333110+00:00",
+      "data": {
+        "abstract": "In evolutionary algorithms powered by language models, the LLM acts as a single operator that simultaneously updates structural components (like control flow) and continuous parameters. While LLMs can be good at the first, they are not efficient at the second, wasting tokens taking discrete jumps inside a trial and error loop. We resolve this by formalizing a hybrid nested search, in which an outer loop has the LLM propose a structural sketch, with numeric gaps, and an inner numerical optimizer tunes the sketch. Both the outer and inner solvers are pluggable: any text-based optimizer can be combined with a zero-order optimizer (CMA-ES), gradient-based routines, or MCMC samplers. We validate our framework across three scientific domains: (i) meta-optimizers on closed-form test functions, (ii) code-based policies for systems research and social dilemmas; and (iii) approximate Bayesian inference tasks. Across all three, the hybrid optimizer is superior to both vanilla LLM-driven search and pure numerical optimization baselines. Code at: https://github.com/vicgalle/hybrid-nested-search",
+        "authors": [
+          {
+            "authorId": "115105860",
+            "name": "V\u00edctor Gallego"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.08156",
+          "CorpusId": 290984875
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.08156, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "548436b83445354a4b5c2d5bfe6ee4709dedfb1f",
+        "title": "A Hybrid Nested Harness for Decoupling Structure and Parameters in LLM-Driven Optimization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A hybrid nested search is formalized, in which an outer loop has the LLM propose a structural sketch, with numeric gaps, and an inner numerical optimizer tunes the sketch."
+        },
+        "url": "https://www.semanticscholar.org/paper/548436b83445354a4b5c2d5bfe6ee4709dedfb1f",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2608.09351": {
       "cached_at": "2026-08-12T03:05:42.962105+00:00",
       "data": {
