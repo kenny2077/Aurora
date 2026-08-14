@@ -4574,6 +4574,59 @@
         "year": 2026
       }
     },
+    "arxiv:2608.11749": {
+      "cached_at": "2026-08-14T03:08:15.504754+00:00",
+      "data": {
+        "abstract": "Multi-objective optimization (MOO) has demonstrated significant success in multi-task learning by mitigating task conflicts through gradient manipulation. However, most existing methods flatten model parameters into vectors and perform gradient manipulation under Euclidean geometry, thereby overlooking the matrix structure prevalent in modern architectures such as Transformers. In this paper, we show that gradient manipulation in Euclidean space does not generally yield the steepest descent direction under matrix geometry, potentially limiting optimization efficiency. Drawing from the theory of steepest descent for matrix-valued parameters, we propose MOON (Multi-Objective OrthoNormalized Updates), which performs gradient manipulation under spectral--nuclear norm geometry and uses the orthonormalized manipulated gradient for parameter updates. Theoretically, for smooth non-convex objectives, we establish convergence of the averaged Pareto-stationarity measure at rates of $\\mathcal{O}(T^{-1/2})$ in the deterministic setting and $\\mathcal{O}(T^{-1/4})$ under stochastic gradients. Empirical results across various benchmarks show that MOON consistently improves both optimization efficiency and final multi-task performance. Our code is available at https://github.com/KunlinLyu/MOON.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Shiji Zhou"
+          },
+          {
+            "authorId": "2385471961",
+            "name": "Kunlin Lyu"
+          },
+          {
+            "authorId": null,
+            "name": "Lei Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Ruodong Wang"
+          },
+          {
+            "authorId": "2362290272",
+            "name": "Yifan Sun"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.11749",
+          "CorpusId": 291033967
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.11749, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "00122d9c426349bdc0b7759e5b4c53d702be3d5d",
+        "title": "MOON: Multi-Objective OrthoNormalized Updates for Multitask Learning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This paper proposes MOON (Multi-Objective OrthoNormalized Updates), which performs gradient manipulation under spectral--nuclear norm geometry and uses the orthonormalized manipulated gradient for parameter updates and empirical results show that MOON consistently improves both optimization efficiency and final multi-task performance."
+        },
+        "url": "https://www.semanticscholar.org/paper/00122d9c426349bdc0b7759e5b4c53d702be3d5d",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
