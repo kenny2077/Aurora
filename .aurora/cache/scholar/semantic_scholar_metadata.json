@@ -4675,6 +4675,151 @@
         "year": 2026
       }
     },
+    "arxiv:2608.17172": {
+      "cached_at": "2026-08-24T02:10:53.662661+00:00",
+      "data": {
+        "abstract": "We investigate whether agentic artificial intelligence can automate parts of the process of designing genetic programming systems by introducing an agentic framework that identifies and implements parent selection algorithms using large language model (LLM) reasoning and retrieval-augmented generation. Using symbolic regression as a test bed, we first conduct an ablation study across four LLM types to evaluate the effects of agentic reasoning and retrieval on generated algorithm categories, validity, implementation similarity, and downstream performance. Results show that these components substantially influence the types of algorithms generated, but their downstream performance largely depends on the underlying LLM. The strongest configuration, the full agentic setup with 5 mini (5 mini--AR), consistently generated established $\\epsilon$-lexicase implementations while maintaining competitive downstream performance. We then benchmark this configuration against fixed implementations of tournament selection and semi-dynamic MAD $\\epsilon$-lexicase. Across six symbolic regression problems, 5 mini--AR performed similarly to $\\epsilon$-lexicase while generally outperforming tournament selection. These findings demonstrate the potential of agentic AI to translate domain knowledge into generating executable components, providing a step toward automated configuration and design of evolutionary systems.",
+        "authors": [
+          {
+            "authorId": "2307403850",
+            "name": "Jose Guadalupe Hernandez"
+          },
+          {
+            "authorId": "2275541926",
+            "name": "Jui-Hsuan Chang"
+          },
+          {
+            "authorId": "145788192",
+            "name": "A. Saini"
+          },
+          {
+            "authorId": "2265715643",
+            "name": "Xi Li"
+          },
+          {
+            "authorId": "2308984012",
+            "name": "Jason H. Moore"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.17172",
+          "CorpusId": 291184605
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.17172, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d1334efee7939ad3f3067b77760463124061728c",
+        "title": "Automating Parent Selection Configuration in Genetic Programming with Agentic AI",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Findings demonstrate the potential of agentic AI to translate domain knowledge into generating executable components, providing a step toward automated configuration and design of evolutionary systems."
+        },
+        "url": "https://www.semanticscholar.org/paper/d1334efee7939ad3f3067b77760463124061728c",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.19487": {
+      "cached_at": "2026-08-24T02:10:51.049247+00:00",
+      "data": {
+        "abstract": "Python is widely used in scientific research because it enables rapid development and provides rich ecosystems for data analysis, artificial intelligence (AI), and machine learning. However, customized research code can become prohibitively slow as experiments scale. This challenge is particularly acute in discrete-event project-scheduling simulations, where sequential state updates, nested loops, conditional evaluations, and object-oriented structures limit the benefits of compiled numerical and GPU-accelerated libraries. Addressing these bottlenecks typically requires iterative profiling, refactoring, testing, and validation, yet researchers may lack the time or specialized software-engineering expertise for low-level optimization. This paper presents a systematic refactoring approach using Claude agentic AI on real-world project-scheduling workloads in a high-performance computing (HPC) environment. Guided by representative benchmarks and correctness checks, the agent identifies bottlenecks, implements targeted optimizations, and evaluates their effects, while the researcher retains final control. Testing runtime reduced from 1,298 seconds to under 200 seconds without changing outputs, saving four million core-hours (NZ\\$320,000) annually.",
+        "authors": [
+          {
+            "authorId": "2456543725",
+            "name": "H. Li"
+          },
+          {
+            "authorId": "3238724",
+            "name": "A. Pletzer"
+          },
+          {
+            "authorId": "2315841301",
+            "name": "Yuan Tian"
+          },
+          {
+            "authorId": "2260001223",
+            "name": "Yi Mei"
+          },
+          {
+            "authorId": "2153206835",
+            "name": "Mengjie Zhang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.19487",
+          "CorpusId": 291252295
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.19487, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2ffb56a2dde2ffe28cab7d7392a1fce19063ae76",
+        "title": "Accelerated Genetic Programming Hyper-Heuristics for Simulation-Based Scheduling via Agentic AI",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This paper presents a systematic refactoring approach using Claude agentic AI on real-world project-scheduling workloads in a high-performance computing (HPC) environment, where the agent identifies bottlenecks, implements targeted optimizations, and evaluates their effects, while the researcher retains final control."
+        },
+        "url": "https://www.semanticscholar.org/paper/2ffb56a2dde2ffe28cab7d7392a1fce19063ae76",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.19762": {
+      "cached_at": "2026-08-24T02:10:40.461882+00:00",
+      "data": {
+        "abstract": "A minibatch can influence training beyond the update at which it is observed because AdamW stores past gradient information in its optimizer states. We study this delayed effect through paired trajectories that differ only in one gradient update and share the same subsequent training sequence. We formulate AdamW as a finite-horizon input--state--output (ISO) system whose state contains the model parameters and first- and second-moment estimates. Linearizing the joint dynamics yields a signed response operator that maps a localized gradient perturbation to its future loss effects, revealing how optimizer memory shapes their magnitude, timing, and sign. We further derive an exact multistep error decomposition and establish first-order finite-horizon accuracy under local smoothness and controlled activation switching. Experiments validate the response mechanism and optimizer-state effects, while repeated-future analyses reveal substantial prospective structure in delayed influence that can be partially recovered from ISO approximations. Code is available at https://github.com/Kanyooo/Loss_ISO.",
+        "authors": [
+          {
+            "authorId": "2457962043",
+            "name": "Kangning Liu"
+          },
+          {
+            "authorId": "2450908442",
+            "name": "Suyan Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.19762",
+          "CorpusId": 291257259
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.19762, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "feb2cd251f6d695b1df38565b1404bcb9b4566e5",
+        "title": "Finite-Horizon Input-Output Dynamics of Minibatch Perturbations in AdamW",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work forms AdamW as a finite-horizon input--state--output (ISO) system whose state contains the model parameters and first- and second-moment estimates, and derives an exact multistep error decomposition and establishes first-order finite-horizon accuracy under local smoothness and controlled activation switching."
+        },
+        "url": "https://www.semanticscholar.org/paper/feb2cd251f6d695b1df38565b1404bcb9b4566e5",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
