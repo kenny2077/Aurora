@@ -4820,6 +4820,130 @@
         "year": 2026
       }
     },
+    "arxiv:2608.22862": {
+      "cached_at": "2026-08-28T11:42:08.299933+00:00",
+      "data": {
+        "abstract": "Population optimizers such as CMA-ES, DE, and multi-objective evolutionary algorithms drive search mainly through selection signals that are scalar or rank based: such a signal indicates that one candidate outperforms another, but not the local direction responsible for the improvement. JANUS (\\emph{Jacobian-Aligned Newton-Unified Search}) is a plug-and-play infill module that extracts this missing local geometric signal without replacing the host optimizer. It estimates a local Jacobian from the recent evaluation trace; the same Jacobian yields both a damped Gauss--Newton exploitation candidate and a trace-preserving exploration metric, reserving a fraction of the host's per-generation candidate slots for geometry-guided infill rather than spending evaluations on top of the host's budget. Unlike MetaBBO methods, JANUS needs no offline training or task distribution, estimating this geometry on the fly from the current run alone, while the host keeps full control of selection, survival, covariance adaptation, and step-size control. Under same-protocol comparisons, JANUS improves the CMA-ES host on \\textbf{11--15/16} BBOB functions across $d\\in\\{30,100,500\\}$. It also attains the best mean error on \\textbf{13 of the 16} functions at $d{=}500$ in the complete NN-BBO/MetaBBO baseline comparison, with no training cost, and yields a $936\\times$ geometric-mean improvement over the host on a $d{=}1000$ BBOB subset. On structured and multi-objective tasks, JANUS gives the best mean cost on 1135-dimensional UAV path planning ($-12.8\\%$ vs.\\ the strongest baseline), and it improves SMS-EMOA/AGE-MOEA2 hosts on 12/38 multi-objective tasks with zero significant regressions. Code is available at https://github.com/hongyuanyu/JANUS.",
+        "authors": [
+          {
+            "authorId": "2459267889",
+            "name": "Hongyuan Yu"
+          },
+          {
+            "authorId": "2359217122",
+            "name": "Pufan Xu"
+          },
+          {
+            "authorId": "2459199290",
+            "name": "Jiaojiao Yi"
+          },
+          {
+            "authorId": "2459230189",
+            "name": "Yiding Tian"
+          },
+          {
+            "authorId": "2454764679",
+            "name": "Mingrui Sun"
+          },
+          {
+            "authorId": "2459230915",
+            "name": "Jiayuan Lu"
+          },
+          {
+            "authorId": "2459190789",
+            "name": "Changyuan Wen"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.22862",
+          "CorpusId": 291328434
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.22862, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "843cc7bc63af21722e09689e18b2dc916639c701",
+        "title": "JANUS: Online Jacobian-Aligned Infill for Black-Box Optimization",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "JANUS is a plug-and-play infill module that extracts a local Jacobian from the recent evaluation trace, and gives the best mean cost on 1135-dimensional UAV path planning and improves SMS-EMOA/AGE-MOEA2 hosts on 12/38 multi-objective tasks with zero significant regressions."
+        },
+        "url": "https://www.semanticscholar.org/paper/843cc7bc63af21722e09689e18b2dc916639c701",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27348": {
+      "cached_at": "2026-08-28T11:41:51.545405+00:00",
+      "data": {
+        "abstract": "As large language models (LLMs) are deployed as autonomous agents, safety failures increasingly involve consequential actions. We study agentic misalignment, where agents take harmful actions under goal conflicts and pressures. Using chain-of-thought (CoT) monitoring, we find that harmful execution is often preceded by intent signals in reasoning. However, post-hoc CoT labels are too coarse to show how intent changes during generation. We introduce INTENT-AS-A-TOOL, an approach that adds intent-targeted tools to give the model a dedicated channel for expressing commitment to a target behavior. The probability of calling an intent tool provides a judge-free, fine-grained signal of the model's tendency to pursue that behavior. Our results show that INTENT-AS-A-TOOL complements CoT monitoring, expands post-hoc CoT labels into dense trajectories, and identifies critical steps for online intervention. These findings suggest that action preferences are useful for tracking agentic misalignment during reasoning. Our code and data are accessible: https://github.com/RebeccaZhang22/intent-as-a-tool.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yu-Tong Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Jian-Shuo Dong"
+          },
+          {
+            "authorId": null,
+            "name": "Peng Xu"
+          },
+          {
+            "authorId": null,
+            "name": "Long Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Jie Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Tian-Wei Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Xiao-Ping Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Han Qiu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27348",
+          "CorpusId": 291387301
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27348, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2cc586c784a3ca6a25eef785a409f08a0339db8d",
+        "title": "INTENT-AS-A-TOOL Makes it Easy to Track Agentic Misalignment",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The results show that INTENT-AS-A-TOOL complements CoT monitoring, expands post-hoc CoT labels into dense trajectories, and identifies critical steps for online intervention, suggesting that action preferences are useful for tracking agentic misalignment during reasoning."
+        },
+        "url": "https://www.semanticscholar.org/paper/2cc586c784a3ca6a25eef785a409f08a0339db8d",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
