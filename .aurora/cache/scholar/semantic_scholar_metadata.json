@@ -4880,6 +4880,288 @@
         "year": 2026
       }
     },
+    "arxiv:2608.25907": {
+      "cached_at": "2026-08-29T07:18:22.496563+00:00",
+      "data": {
+        "abstract": "Driver behavior is heterogeneous, context-dependent, and changes over time, and these properties shape the traffic phenomena we observe. Most models, however, fix in advance which behavioral variables interact and how. Behavior outside that form is absorbed as noise, while models flexible enough to capture it tend to lose interpretability. We introduce a quantum-inspired representation of driver behavior that combines properties usually treated separately or in part: it is continuous, probabilistic, context-dependent, history-dependent, and represents interactions among behavioral variables as learned from data. Each driver is encoded as an evolving density matrix, providing a unified representation of behavioral uncertainty, temporal evolution, and context-dependent behavioral variation. Trained without supervision on the I-24 MOTION dataset, the framework recovers three interpretable driving profiles representing three regimes: free flow, transition, and congestion. The profiles capture the behavioral range of the data and the smooth transitions drivers make between regimes as conditions change. The same representation also reproduces known macroscopic phenomena, aligning with the fundamental diagram and reproducing hysteresis loops. We also show how the representation supports practical use: it supplies context-dependent parameters to classical car-following models, and gives an autonomous vehicle a live behavioral read of the surrounding drivers with a short-horizon forecast of their motion. The framework points toward models of traffic that are interpretable and trustworthy by construction. We release an open-source toolkit on GitHub (https://github.com/mselayan/quantum-driver-representation) spanning data processing, training, inference, and analysis.",
+        "authors": [
+          {
+            "authorId": "2359452795",
+            "name": "Mohammad Elayan"
+          },
+          {
+            "authorId": "2366036637",
+            "name": "Omid Armantalab"
+          },
+          {
+            "authorId": "2042102296",
+            "name": "Wissam Kontar"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.25907",
+          "CorpusId": 291371257
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Engineering",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.25907, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "1c6a8b6a9370c51f015678dfd0bb21ef6a5cfcf6",
+        "title": "Quantum-Inspired Modeling of Driving Behavior",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A quantum-inspired representation of driver behavior that combines properties usually treated separately or in part is introduced: it is continuous, probabilistic, context-dependent, history-dependent, and represents interactions among behavioral variables as learned from data."
+        },
+        "url": "https://www.semanticscholar.org/paper/1c6a8b6a9370c51f015678dfd0bb21ef6a5cfcf6",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27110": {
+      "cached_at": "2026-08-29T07:18:24.681064+00:00",
+      "data": {
+        "abstract": "Reliable medical conversational AI requires authentic expert--patient interaction data, yet such datasets remain scarce, especially for low-resource languages such as Bengali. We present DocTalkBN, a large-scale multimodal dataset of real-world expert telemedicine conversations in Bengali, collected from nationally broadcast telemedicine programs featuring board-certified physicians. DocTalkBN contains 557.63 hours of paired audio and text, 1,515 multi-turn patient calls, 10,274 host--doctor question--answer exchanges, totaling 1.7M tokens, spanning 26 medical specialties. Unlike prior resources derived from medical forums, written health content, or synthetic data, our dataset preserves the spontaneity, contextual richness, and spoken characteristics of authentic medical interactions in a low-resource setting. To support benchmark-driven research, we further construct three downstream tasks from the corpus, medical triage classification, advice safety evaluation, and medical named entity recognition, and benchmark a diverse set of large language models and encoder-based baselines. Our results show that DocTalkBN is a practically useful resource, particularly for clinically grounded reasoning tasks. We release this resource to facilitate future research on reliable medical NLP and safer, more culturally grounded healthcare systems for low-resource languages. Our source codes and dataset are publicly available at https://anonymous.4open.science/r/doctalk.",
+        "authors": [
+          {
+            "authorId": "2186554280",
+            "name": "Anik Saha"
+          },
+          {
+            "authorId": "2460119001",
+            "name": "Fahmida Sultana Naznin"
+          },
+          {
+            "authorId": "2374056987",
+            "name": "Sadatul Islam Sadi"
+          },
+          {
+            "authorId": "2460118852",
+            "name": "Ananya Shahrin Promi"
+          },
+          {
+            "authorId": "2460118605",
+            "name": "Wahid Al Azad Navid"
+          },
+          {
+            "authorId": "2046603",
+            "name": "Rifat Shahriyar"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27110",
+          "CorpusId": 291387561
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27110, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d8e8109ff24c195f5c7ecb143b5a53a623948ba2",
+        "title": "DocTalkBN: A Novel Dataset of Expert Telemedicine Conversations in Bengali",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A large-scale multimodal dataset of real-world expert telemedicine conversations in Bengali, collected from nationally broadcast telemedicine programs featuring board-certified physicians, showing that DocTalkBN is a practically useful resource, particularly for clinically grounded reasoning tasks."
+        },
+        "url": "https://www.semanticscholar.org/paper/d8e8109ff24c195f5c7ecb143b5a53a623948ba2",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27206": {
+      "cached_at": "2026-08-29T07:18:26.910493+00:00",
+      "data": {
+        "abstract": "Vision-Language Models (VLMs) demonstrate exceptional visual reasoning capabilities, yet their inference costs escalate rapidly with the proliferation of visual tokens. Existing visual token pruning methods exhibit two fundamental limitations. First, most approaches operate exclusively post-vision encoder, leaving the substantial latency of the visual encoding phase unoptimized. Second, under strict token budgets, these methods often fail to jointly preserve holistic visual contexts and fine-grained details, leading to performance degradation. To address these bottlenecks, we propose PACE (Pixel-Adaptive Condense and Extract), a training-free inference framework that accelerates both the vision encoder and the Large Language Model (LLM) via a unified Condense-and-Extract paradigm. During the Condense stage, an Adaptive Pixel Compressor (APC) evaluates visual information density prior to encoding, adaptively downsampling redundant inputs, curtailing encoder computation while preserving global context and essential visual cues. In the Extract stage, a Dynamic Dual-Attention Extractor (DDAE) selectively retains visual tokens via a fusion of internal visual signals from the encoder and semantic signals from the LLM, safeguarding task-critical details. By integrating PACE into Qwen2.5-VL-7B, the model retains 93.8% of its original performance while utilizing only 10% of the visual tokens, yielding a 3.1x speedup in time to first token (TTFT). Our code is available at https://github.com/jjL357/PACE.",
+        "authors": [
+          {
+            "authorId": "2460241852",
+            "name": "Jun-Jie Liu"
+          },
+          {
+            "authorId": "2200525415",
+            "name": "Shengyuan Ye"
+          },
+          {
+            "authorId": null,
+            "name": "Xu Chen"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27206",
+          "CorpusId": 291387523
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27206, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9ae06e67a9010753ba529f3ab66c904f18a5daea",
+        "title": "PACE: A Unified Condense-and-Extract Paradigm for Fast VLM Inference",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "PACE (Pixel-Adaptive Condense and Extract), a training-free inference framework that accelerates both the vision encoder and the Large Language Model (LLM) via a unified Condense-and-Extract paradigm, is proposed."
+        },
+        "url": "https://www.semanticscholar.org/paper/9ae06e67a9010753ba529f3ab66c904f18a5daea",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27233": {
+      "cached_at": "2026-08-29T07:18:45.965260+00:00",
+      "data": {
+        "abstract": "Human Activity Recognition (HAR) using inertial measurement units (IMUs) enables a wide range of applications, yet the field still lacks a unified model that can generalize across diverse subjects, devices, and activities. Training such a model is difficult due to two key challenges: sensing heterogeneity -- differences in sampling rates, channel configurations, and sensor placements -- and poor generalization to unseen activities and label vocabularies. We introduce HALO (Heterogeneity-Aware Language-aligned Open-set model), a domain-specific IMU foundation model that addresses both challenges through a two-stage training framework. Stage 1 pretrains the IMU encoder with heterogeneity-aware self-supervised learning, including adaptive-pooling tokenization, channel-independent feature extraction, and contextualized sensor conditioning that injects natural-language sensor descriptions into each channel embedding. Stage 2 aligns this IMU encoder with text embeddings via synonym-aware soft contrastive learning, enabling open-set recognition via cosine-similarity retrieval without per-dataset classifiers. Trained on 10 public HAR datasets and evaluated on 7 held-out datasets, HALO outperforms five state-of-the-art baselines on all 8 aggregate metrics, and still leads on 3 of 4 settings under baseline-matched inputs. Despite using only ~35M trainable parameters -- 10x fewer than the latest foundation model MOMENT (341.2M) -- HALO improves zero-shot open-set accuracy, measured over all 87 training labels, by 13.7 percentage points. On two further datasets with severe distribution shift, every model including HALO collapses zero-shot. A video demonstration of HALO's performance in real world is available at https://youtu.be/rooVKragtFU",
+        "authors": [
+          {
+            "authorId": "2446561256",
+            "name": "Zike Ding"
+          },
+          {
+            "authorId": "2460242723",
+            "name": "Li-Yu Zhang"
+          },
+          {
+            "authorId": "2114616736",
+            "name": "Xiaomin Ouyang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27233",
+          "CorpusId": 291387271
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27233, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "34ba4093df74663402747268719eb9a4a1e4a8e5",
+        "title": "HALO: A Heterogeneity-Aware Language-Aligned IMU Foundation Model for Open-Set Human Activity Recognition",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Heterogeneity-Aware Language-aligned Open-set model is introduced, a domain-specific IMU foundation model that addresses both challenges through a two-stage training framework and outperforms five state-of-the-art baselines on all 8 aggregate metrics, and still leads on 3 of 4 settings under baseline-matched inputs."
+        },
+        "url": "https://www.semanticscholar.org/paper/34ba4093df74663402747268719eb9a4a1e4a8e5",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27311": {
+      "cached_at": "2026-08-29T07:19:19.852495+00:00",
+      "data": {
+        "abstract": "Agent harnesses shape how language-model agents use instructions, tools, and runtime components, but adapting these harnesses requires costly verification. Existing propose-and-verify methods typically score every candidate on a fixed task set, wasting rollouts on unrelated behaviors and allowing aggregate scores to obscure specific regressions. We introduce HarnessLens, a budget-aware framework for automated harness evolution. HarnessLens jointly explores the task space and user-configurable components, derives candidate modifications from execution trajectories, and selectively verifies each candidate on behavior-relevant tasks using an attributable-evidence gate. Across three agent harnesses and four benchmarks, HarnessLens improves average held-out performance by 7.6-13.6% while consuming substantially less evaluation budget than competing baselines. These results demonstrate that behavior-aware verification with explicit attribution enables more reliable and sample-efficient harness evolution under constrained interaction budgets. Our code is available at https://github.com/jhxu5214/HarnessLens.",
+        "authors": [
+          {
+            "authorId": "2457134019",
+            "name": "Jingheng Xu"
+          },
+          {
+            "authorId": null,
+            "name": "Yi-Kai Zhang"
+          },
+          {
+            "authorId": "2439124180",
+            "name": "Aiden Chen"
+          },
+          {
+            "authorId": "2460221967",
+            "name": "Wei-Yuan Li"
+          },
+          {
+            "authorId": "2459169895",
+            "name": "Jianpeng Liang"
+          },
+          {
+            "authorId": "2386082159",
+            "name": "Devin Yang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27311",
+          "CorpusId": 291387568
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27311, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "aebb23999014d0b144e937a1394b034a0ac5afbf",
+        "title": "Verify Smarter, Evolve Further: Efficient Harness Evolution through Behavior-Aware Verification",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "HarnessLens is introduced, a budget-aware framework for automated harness evolution that jointly explores the task space and user-configurable components, derives candidate modifications from execution trajectories, and selectively verifies each candidate on behavior-relevant tasks using an attributable-evidence gate."
+        },
+        "url": "https://www.semanticscholar.org/paper/aebb23999014d0b144e937a1394b034a0ac5afbf",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27334": {
+      "cached_at": "2026-08-29T07:19:24.168018+00:00",
+      "data": {
+        "abstract": "Industrial sites contain large volumes of read-only telemetry, but few benchmarks specify how to compile these records into executable multi-turn agent tasks. We present a telemetry-to-episode construction method instantiated as BTS-AgentBench. The pipeline normalizes BTS metadata and raw histories into a read-only tool store, compiles static tasks with tool-derived gold answers and evidence, and lifts retained tasks into typed, bounded operator-facing episodes. The 532-row release adds clarification, goal revision, timestamp policy, quality-gated reporting, and evidence attribution while preserving the source computation and split. Coded contract preflight reports zero findings, and the construction-exclusion controller completes 0/532 rows. Two independent raw-to-episode builds match all 11 logical tool-store exports and reproduce the released 356/87/89 train/dev/test artifact exactly. Applying the shared construction path to XAI4HEAT produces 204 episodes; on its 41-row held-out test split, the controller completes 0 rows and the retained GPT-5.5 execution completes all 41. Code, artifacts, and replay reports are available at https://github.com/kjy7567/BTS-AgentBench.",
+        "authors": [
+          {
+            "authorId": "2450454199",
+            "name": "Jeonghoon Kim"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27334",
+          "CorpusId": 291387323
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27334, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "ff74d453b1c922e6a50e1f6219ba45eb94b09546",
+        "title": "BTS-AgentBench: A Deterministic, Replayable Pipeline from Read-Only Telemetry Logs to Agent Benchmarks",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A telemetry-to-episode construction method instantiated as BTS-AgentBench is presented, which normalizes BTS metadata and raw histories into a read-only tool store, compiles static tasks with tool-derived gold answers and evidence, and lifts retained tasks into typed, bounded operator-facing episodes."
+        },
+        "url": "https://www.semanticscholar.org/paper/ff74d453b1c922e6a50e1f6219ba45eb94b09546",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2608.27348": {
       "cached_at": "2026-08-28T11:41:51.545405+00:00",
       "data": {
@@ -4940,6 +5222,303 @@
           "text": "The results show that INTENT-AS-A-TOOL complements CoT monitoring, expands post-hoc CoT labels into dense trajectories, and identifies critical steps for online intervention, suggesting that action preferences are useful for tracking agentic misalignment during reasoning."
         },
         "url": "https://www.semanticscholar.org/paper/2cc586c784a3ca6a25eef785a409f08a0339db8d",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27360": {
+      "cached_at": "2026-08-29T07:19:26.370545+00:00",
+      "data": {
+        "abstract": "Speaker anonymization suppresses speaker-identifying attributes from speech while preserving linguistic content and quality. We propose repurposing XTTSv2, a multilingual voice cloning model trained on 27k hours of speech, for speaker anonymization without retraining. Our key insight is that XTTSv2's voice cloning capabilities preserve prosodic structure independently of speaker identity, enabling voice conversion by conditioning on a pseudo-speaker. We introduce an iterative refinement strategy that balances privacy and utility by maximizing a harmonic mean of speaker dissimilarity and intelligibility. Evaluated on seven European languages across CommonVoice and Multilingual LibriSpeech, our system achieves near-optimal privacy (EER $\\approx$ 0.49), competitive intelligibility, and substantially better speech quality than dedicated anonymization baselines, while requiring no language-specific training. We release the code here: https://github.com/rm00cr/coqui-tts.",
+        "authors": [
+          {
+            "authorId": "2460118198",
+            "name": "Romolo Muletta"
+          },
+          {
+            "authorId": "2425947005",
+            "name": "Felix Matthias Saaro"
+          },
+          {
+            "authorId": "2648584",
+            "name": "Mark Cieliebak"
+          },
+          {
+            "authorId": "145116511",
+            "name": "Jan Deriu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27360",
+          "CorpusId": 291387328
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27360, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "0cd875eb4cf6b24070dc84ed5e1b1f4fb36bbad0",
+        "title": "Your Voice Cloning System is Secretly a Voice Anonymizer",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes repurposing XTTSv2, a multilingual voice cloning model trained on 27k hours of speech, for speaker anonymization without retraining, and introduces an iterative refinement strategy that balances privacy and utility by maximizing a harmonic mean of speaker dissimilarity and intelligibility."
+        },
+        "url": "https://www.semanticscholar.org/paper/0cd875eb4cf6b24070dc84ed5e1b1f4fb36bbad0",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27370": {
+      "cached_at": "2026-08-29T07:19:10.360003+00:00",
+      "data": {
+        "abstract": "Language model pretraining has become almost synonymous with prohibitive cost, placing it out of reach for much of the academic and open-source communities. Although strong open-source efforts already exist, including open-weight models and open-source training recipes, a cost-efficient, hardware-accessible, and open-source pretraining recipe has long been missing. Even at a small scale, training Llama-3.2-3B costs over \\$1.5M, and reproducing SmolLM3-3B needs over \\$700K. In this report, we present an open pretraining recipe designed to lower this barrier. Using this recipe, we train a collection of Puro-2B models from scratch on up to 1.4 trillion tokens with FP8 precision on consumer-grade RTX 5090 GPUs. The models in the collection differ in token budgets and selected recipe variants. Our best model is trained at a compute cost of less than \\$6.9K and approaches Qwen2.5-1.5B performance under our evaluation protocol. This cost efficiency is enabled by a combination of approaches, including hardware selection, low-precision training, hyperball optimization, curriculum model averaging, and the data recipe. Beyond the recipe itself, we provide two additional results. First, across the Puro-2B collection, we derive a Puro Cost Scaling Law that relates training cost to average model performance; the fitted law suggests that about \\$4.4K, less than \\$5,090, is sufficient to reach the performance of Qwen2-1.5B. Second, as an end-to-end case study, we examine how pretraining data curricula shape downstream performance after post-training. Such controlled studies are enabled by having access to the full pretraining pipeline rather than model weights alone. We release the full training recipe for Puro-2B, including data, code, and model weights under Apache 2.0 at https://huggingface.co/collections/thu-pacman/puro-2b.",
+        "authors": [
+          {
+            "authorId": "2350513479",
+            "name": "Kairong Luo"
+          },
+          {
+            "authorId": "2460151463",
+            "name": "Jia-Rui Cui"
+          },
+          {
+            "authorId": null,
+            "name": "Yao-Rui Yin"
+          },
+          {
+            "authorId": "2118529462",
+            "name": "Shengqi Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Yi-Ming Yang"
+          },
+          {
+            "authorId": "2460232316",
+            "name": "Lin-Xiang Gao"
+          },
+          {
+            "authorId": "2460234914",
+            "name": "Yanmohan Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Ming-Zhe Zhang"
+          },
+          {
+            "authorId": "2351959765",
+            "name": "Kaiyue Wen"
+          },
+          {
+            "authorId": "2352110784",
+            "name": "Kaifeng Lyu"
+          },
+          {
+            "authorId": "2350504859",
+            "name": "Wenguang Chen"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27370",
+          "CorpusId": 291387384
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27370, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "fc81bb27b03140cfb0ad57b102f8c3aad6a7ebba",
+        "title": "Puro-2B: Poor Lab's Qwen2-1.5B Trained on RTX 5090 within $5090",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This report presents an open pretraining recipe that trains a collection of Puro-2B models from scratch on up to 1.4 trillion tokens with FP8 precision on consumer-grade RTX 5090 GPUs, and derives a Puro Cost Scaling Law that relates training cost to average model performance."
+        },
+        "url": "https://www.semanticscholar.org/paper/fc81bb27b03140cfb0ad57b102f8c3aad6a7ebba",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27371": {
+      "cached_at": "2026-08-29T07:18:36.499764+00:00",
+      "data": {
+        "abstract": "This paper introduces Embodied Scene Rearrangement Planning (ESRP), a novel task requiring embodied agents to rearrange furniture in 3D scenes to match a target configuration using only egocentric observations and a top-down target layout. Unlike prior rearrangement tasks, ESRP precludes global state access and introduces mutual object occlusions, reflecting the practical constraints of real-world robotic deployment. These factors make aligning partial egocentric observations with the global target layout particularly challenging for long-horizon planning. To facilitate research, we present ESRP-Bench, a comprehensive benchmark built on OmniGibson featuring over 5,400 scene pairs and 8,200 objects. We define three multi-level metrics to evaluate rearrangement quality and provide four baselines: a hierarchical task-and-motion planning method, a vision-language-model-based method, and two learning-based approaches (IL and RL). Experimental results demonstrate that current methods struggle to complete the task efficiently, highlighting ESRP as a challenging frontier for embodied agents in scene understanding and long-horizon task planning. This work serves as a stepping stone toward deploying intelligent agents in real-world scenarios. Project page: https://pie-lab.cn/ESRP/.",
+        "authors": [
+          {
+            "authorId": "2460220792",
+            "name": "Can-Zhi Chen"
+          },
+          {
+            "authorId": "2337028259",
+            "name": "Zan Wang"
+          },
+          {
+            "authorId": "2342364808",
+            "name": "Siqi Zhu"
+          },
+          {
+            "authorId": "2306951336",
+            "name": "Qi Wu"
+          },
+          {
+            "authorId": null,
+            "name": "Yi-Xuan Li"
+          },
+          {
+            "authorId": "2317041087",
+            "name": "Wei Liang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27371",
+          "CorpusId": 291387467,
+          "DOI": "10.1109/LRA.2026.3728329"
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27371, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": "CLOSED",
+          "url": ""
+        },
+        "paperId": "7ea84829f33eece30d402074c7d2a6672bdd6088",
+        "title": "Embodied Scene Rearrangement Planning",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Experimental results demonstrate that current methods struggle to complete the ESRP task efficiently, highlighting ESRP as a challenging frontier for embodied agents in scene understanding and long-horizon task planning."
+        },
+        "url": "https://www.semanticscholar.org/paper/7ea84829f33eece30d402074c7d2a6672bdd6088",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27380": {
+      "cached_at": "2026-08-29T07:19:22.059109+00:00",
+      "data": {
+        "abstract": "AI-generated text detection is commonly framed as a binary document-level judgment about whether a text is human-written or machine-generated. This framing breaks down for mixed-origin writing, where content origin and expression origin may differ. We cast mixed-origin detection as dimension-to-composition source attribution, inferring content origin and expression origin before composing them into four collaboration types. We propose Dimension-to-Composition Routing (D2C-Routing), which routes content-side and expression-side evidence to supervised dimension heads before a learned gated composition layer predicts the final label. On MixD2C, a reconstructed split derived from the HART mixed-origin benchmark, our disclosed D2C-Routing-based detector system reaches 0.8603 four-way Avg TPR@1%FPR, 6.5 points above the same-split RACE-local rerun. Core ablations support the routing design, while error analysis shows that distinguishing AI-content/human-expression from fully AI-generated text remains the hardest boundary. Code is available at https://github.com/bystander563/d2c-routing-artifact.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Xin Chen"
+          },
+          {
+            "authorId": "2460241552",
+            "name": "Fu-Wei Zhang"
+          },
+          {
+            "authorId": "2290004510",
+            "name": "Yiqi Tong"
+          },
+          {
+            "authorId": "2306827279",
+            "name": "Wei Guo"
+          },
+          {
+            "authorId": "2457958939",
+            "name": "Yuchi Xiao"
+          },
+          {
+            "authorId": "2382589264",
+            "name": "Fuzhen Zhuang"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27380",
+          "CorpusId": 291387554
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27380, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7ed02dce2a914ecfbdf1851f63a011660bf7c06a",
+        "title": "D2C-Routing: Dimension-to-Composition Evidence Routing for Mixed-Origin AI-Generated Text Detection",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes Dimension-to-Composition Routing (D2C-Routing), which routes content-side and expression-side evidence to supervised dimension heads before a learned gated composition layer predicts the final label."
+        },
+        "url": "https://www.semanticscholar.org/paper/7ed02dce2a914ecfbdf1851f63a011660bf7c06a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27455": {
+      "cached_at": "2026-08-29T07:18:20.302129+00:00",
+      "data": {
+        "abstract": "Recent advances in inference-time scaling have significantly improved the reasoning performance of large language models (LLMs). However, these methods typically rely on repeated generation or external verification. To address this limitation, we introduce CritICL, a novel inference-time framework that improves reasoning while maintaining high efficiency. Our key insight is that LLM failure modes exhibit structured patterns across model scales within the same family. Instead of treating failures as undesirable outputs, CritICL leverages them as a source of guidance. Specifically, we utilize failure modes derived from weaker models and incorporate them into inference through critique-based in-context examples. We propose two variants: CritICL-dynamic, which adaptively predicts input-specific failure modes and retrieves critiques, and CritICL-static, which uses a global failure mode profile to provide stable guidance. Experimental results show that CritICL consistently outperforms standard in-context learning and achieves performance competitive with or superior to test-time scaling methods, while requiring significantly fewer generations and lower token cost. Code available at: https://github.com/umwyf/CRITICL",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yu-Fan Wu"
+          },
+          {
+            "authorId": "2358793814",
+            "name": "Yinghui He"
+          },
+          {
+            "authorId": "2447734977",
+            "name": "Zhengyi Hu"
+          },
+          {
+            "authorId": "2460220684",
+            "name": "Lang Wei"
+          },
+          {
+            "authorId": "2460214040",
+            "name": "Rui-Chen Li"
+          },
+          {
+            "authorId": "2460231463",
+            "name": "Qi-Fan Yang"
+          },
+          {
+            "authorId": "2304239921",
+            "name": "Ting Zhu"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2608.27455",
+          "CorpusId": 291387524
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27455, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "ec3859e438022aa592845eaa78e59be39ead3231",
+        "title": "CritICL: Inference-Time Weak-to-Strong Generalization from Small Language Model Failure Modes",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Experimental results show that CritICL consistently outperforms standard in-context learning and achieves performance competitive with or superior to test-time scaling methods, while requiring significantly fewer generations and lower token cost."
+        },
+        "url": "https://www.semanticscholar.org/paper/ec3859e438022aa592845eaa78e59be39ead3231",
         "venue": "",
         "year": 2026
       }
