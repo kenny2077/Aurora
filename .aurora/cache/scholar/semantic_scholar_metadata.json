@@ -4926,6 +4926,82 @@
         "year": 2026
       }
     },
+    "arxiv:2608.27073": {
+      "cached_at": "2026-08-30T05:43:08.461820+00:00",
+      "data": {
+        "abstract": "Explorable image-to-scene generation is essential for applications in gaming, robotics, and virtual reality. Existing methods based on video diffusion model (VDM) commonly rely on incomplete conditioning signals such as sparse point clouds or 2D panoramas, leading to stochastic hallucinations, long-term drifts and suboptimal 3D consistency. We present SpatialCrafter, a novel two-stage framework that addresses these issues by introducing a global 3D proxy for high-fidelity image-to-scene generation. Specifically, we decompose the generation process into global proxy generation and appearance refinement. For proxy generation, we propose a Point-anchored Sparse Structure~(PaSS) Flow module that predicts a spatially aligned and geometrically consistent 3D proxy. For appearance refinement, we re-frame the VDM as a Generative Deferred Refiner which synthesizes high-frequency photorealistic details upon proxy-defined scene geometry. To better integrate the proxy with the pre-trained VDM, we introduce Parallel Geometry Injection and Proxy-Aware Corruption training strategies, which improve robustness to proxy artifacts without disrupting the pretrained generative manifold. Furthermore, as no suitable dataset exists for this explorable scene generation task, we construct a new large-scale dataset of 115K scenes. To the best of our knowledge, it is the first hybrid dataset for image-to-scene generation. Extensive experiments on both synthetic and real-world datasets show that SpatialCrafter outperforms state-of-the-art methods, mitigates long-term drift, and remains robust and consistent under rapid camera motion and extreme viewpoint changes. Code, models, and the newly constructed dataset will be publicly released. See more at https://fangchuan.github.io/SpatialCrafter/.",
+        "authors": [
+          {
+            "authorId": "2256271906",
+            "name": "Chuan Fang"
+          },
+          {
+            "authorId": "73555520",
+            "name": "Lingteng Qiu"
+          },
+          {
+            "authorId": "2337664318",
+            "name": "Yixun Liang"
+          },
+          {
+            "authorId": "2255346681",
+            "name": "Rui Chen"
+          },
+          {
+            "authorId": "2254273920",
+            "name": "Kunming Luo"
+          },
+          {
+            "authorId": "2460221375",
+            "name": "Zhao-Hua Zheng"
+          },
+          {
+            "authorId": "2346324741",
+            "name": "Tongyuan Bai"
+          },
+          {
+            "authorId": "2360714178",
+            "name": "Fei-Peng Tian"
+          },
+          {
+            "authorId": "2268646063",
+            "name": "Zilong Dong"
+          },
+          {
+            "authorId": "2454425964",
+            "name": "Zilei Zhou"
+          },
+          {
+            "authorId": "2292189585",
+            "name": "Ping Tan"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27073",
+          "CorpusId": 291387622
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27073, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5f82990bfede910a100185f536605e912d0245c1",
+        "title": "SpatialCrafter: Single Image World Modeling with Generative 3D Proxies",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Extensive experiments show that SpatialCrafter outperforms state-of-the-art methods, mitigates long-term drift, and remains robust and consistent under rapid camera motion and extreme viewpoint changes."
+        },
+        "url": "https://www.semanticscholar.org/paper/5f82990bfede910a100185f536605e912d0245c1",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2608.27110": {
       "cached_at": "2026-08-29T07:18:24.681064+00:00",
       "data": {
@@ -4982,6 +5058,215 @@
         "year": 2026
       }
     },
+    "arxiv:2608.27153": {
+      "cached_at": "2026-08-30T05:43:10.578803+00:00",
+      "data": {
+        "abstract": "Correlation Clustering (CC) is a natural formulation of clustering in combinatorial optimization, which uses a graph representation of the input and does not require a pre-specified number of clusters. Given $n$ objects and a pairwise similarity function, the goal is to cluster the objects so that similar objects are put in the same cluster and dissimilar objects are put in different clusters. Despite its versatility, existing CC algorithms suffer from significant scalability issues and are inherently transductive: i.e., the algorithm must be executed from scratch for any new problem instance. In this work, we bridge this gap by leveraging Graph Neural Networks (GNNs) to solve Inductive Correlation Clustering, a novel generalization of the CC problem designed to handle unseen graph instances. By learning to exploit common structural patterns and node features during training, our framework generalizes to new graphs drawn from the same distribution with minimal computational overhead with respect to standard algorithms. We demonstrate the effectiveness and scalability of our approach through extensive experiments. Our framework not only excels in the inductive setting, e.g., lowering the inference time up to $5$ order of magnitude, while maintaining an approximation ratio within $~10\\%$ of the best baseline solution, but also achieves competitive results on standard (transductive) CC benchmarks. Finally, we showcase a practical application of our framework as a learnable pooling mechanism for graph classification. Our results indicate that our method serves as an efficient pooling layer, enhancing the ability of GNNs to capture hierarchical structural information in networks.",
+        "authors": [
+          {
+            "authorId": "2220960764",
+            "name": "Francesco Paolo Nerini"
+          },
+          {
+            "authorId": "2327561018",
+            "name": "Francesco Bonchi"
+          },
+          {
+            "authorId": "2277810640",
+            "name": "Arijit Khan"
+          },
+          {
+            "authorId": "2735649",
+            "name": "A. Panisson"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27153",
+          "CorpusId": 291387159
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27153, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "8d5c2a595af217eddeee244bfbc474b7a24317d3",
+        "title": "Inductive Correlation Clustering with Graph Neural Networks",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work uses Graph Neural Networks (GNNs) to solve Inductive Correlation Clustering, a novel generalization of the CC problem designed to handle unseen graph instances, and indicates that the method serves as an efficient pooling layer, enhancing the ability of GNNs to capture hierarchical structural information in networks."
+        },
+        "url": "https://www.semanticscholar.org/paper/8d5c2a595af217eddeee244bfbc474b7a24317d3",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27158": {
+      "cached_at": "2026-08-30T05:42:25.978434+00:00",
+      "data": {
+        "abstract": "Robot crowd navigation requires safe and efficient decision-making under dense, dynamic, and multimodal human--robot interactions. Existing reinforcement-learning methods typically output a single reactive action at each timestep, which limits their ability to represent diverse short-term avoidance strategies. We propose Planning Diffusion Policy Optimization (PDPO), an offline-to-online reinforcement-learning framework that uses a diffusion policy to generate short-horizon action chunks for crowd navigation. PDPO is first pretrained on collision-avoidance demonstrations and then fine-tuned online with PPO by treating the denoising process as an internal decision process. During execution, the policy generates a five-step action chunk and applies it in a receding-horizon manner. Furthermore, we observe an evaluation artifact in common crowd-navigation benchmarks: without explicit boundary constraints, learned agents may leave the valid domain and bypass dense crowds. To address this, we introduce a setting in which boundary violations are treated as collisions. Experiments show that PDPO obtains an improved success rate over strong baselines, and ablations demonstrate that action chunks are especially important for the modified bounded benchmark.",
+        "authors": [
+          {
+            "authorId": "2460222194",
+            "name": "Wen-Dong Li"
+          },
+          {
+            "authorId": "2279864",
+            "name": "J. Garcke"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27158",
+          "CorpusId": 291387469
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27158, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2cd989721326e219e04b78ff112f9679806d3d1b",
+        "title": "Diffusion Policies for Short-Horizon Planning in Robot Crowd Navigation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Planning Diffusion Policy Optimization is proposed, an offline-to-online reinforcement-learning framework that uses a diffusion policy to generate short-horizon action chunks for crowd navigation and obtains an improved success rate over strong baselines and ablations demonstrate that action chunks are especially important for the modified bounded benchmark."
+        },
+        "url": "https://www.semanticscholar.org/paper/2cd989721326e219e04b78ff112f9679806d3d1b",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27176": {
+      "cached_at": "2026-08-30T05:42:16.687033+00:00",
+      "data": {
+        "abstract": "Understanding spoken dialogue requires joint reasoning over lexical content and paralinguistic acoustic signals such as emotion and conversational intent. However, existing evaluations often allow shortcuts based on transcripts or single-modality solutions, obscuring whether models genuinely ground predictions in speech. We formalize this failure mode as cross-modal disagreement, where transcripts suggest plausible but incorrect surface interpretations while acoustic cues such as prosody or speaking style support different answers. We develop a scalable framework that identifies text-biased surface interpretations and converts disagreement regions into conflict QA examples. We also include consistent cases where transcript-based and speech-grounded interpretations agree, enabling evaluation beyond adversarial audio dependence. This results in ContraTalk, a controlled benchmark containing 501 questions across five discourse dimensions: interaction behavior, emotion state, dialogue act, social stance, and conversational intent. We further develop an agentic-style reasoning framework that converts speech into an Audio Twin, a text-readable representation of localized acoustic cues that exposes acoustic evidence to the reasoning model. Experiments show that strong text-only LLMs exceed 90% accuracy in consistent cases but drop to 33-48% in conflict cases. Direct AudioLLMs provide only partial grounding, still selecting the transcript-biased trap in roughly 30-40% of conflict cases. Our Audio Twin framework improves conflict-case accuracy while reducing trap selection, but its consistent-case behavior remains backbone-dependent. These results identify transcript-based shortcuts as an important failure mode in spoken dialogue understanding and show that explicit acoustic evidence aggregation provides a more controllable interface for diagnosing and improving speech-grounded reasoning.",
+        "authors": [
+          {
+            "authorId": "2384375062",
+            "name": "Yen-Ju Lu"
+          },
+          {
+            "authorId": "2319385554",
+            "name": "Yuzhe Wang"
+          },
+          {
+            "authorId": "2329144372",
+            "name": "Yaohan Guan"
+          },
+          {
+            "authorId": "2161615637",
+            "name": "Xiluo He"
+          },
+          {
+            "authorId": "2241615260",
+            "name": "Jiarui Hai"
+          },
+          {
+            "authorId": "2402465734",
+            "name": "Mingrui Liang"
+          },
+          {
+            "authorId": "2294874625",
+            "name": "Kaavya Chaparala"
+          },
+          {
+            "authorId": "2344833155",
+            "name": "Thomas Thebaud"
+          },
+          {
+            "authorId": "1456296436",
+            "name": "Laureano Moro-Vel'azquez"
+          },
+          {
+            "authorId": "3135554",
+            "name": "N. Dehak"
+          },
+          {
+            "authorId": "120678702",
+            "name": "J. Villalba"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27176",
+          "CorpusId": 291387173
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Engineering"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27176, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9a8786eafdec56c3be8922e30e69bad95e12db1b",
+        "title": "When Text Misleads: Inconsistent-Aware Reasoning for Audio-Grounded Dialogue",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A scalable framework that identifies text-biased surface interpretations and converts disagreement regions into conflict QA examples and develops an agentic-style reasoning framework that converts speech into an Audio Twin, a text-readable representation of localized acoustic cues that exposes acoustic evidence to the reasoning model."
+        },
+        "url": "https://www.semanticscholar.org/paper/9a8786eafdec56c3be8922e30e69bad95e12db1b",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27182": {
+      "cached_at": "2026-08-30T05:43:32.522112+00:00",
+      "data": {
+        "abstract": "LLM agents are increasingly applied to anomaly detection and root-cause analysis in time-series observations collected from real-world systems; however, their performance on these tasks has not been systematically evaluated under controlled conditions. We introduce TraceBench, a simulation-based framework for generating controlled root-cause attribution tasks. In each generated task, an agent receives time-series observations produced by simulating a physical dynamical system and must determine whether a system parameter was altered during the simulation and, if so, which one. Using TraceBench, we generate tasks from three interpretable mechanical systems and systematically evaluate four LLM agents across controlled experimental conditions, yielding new insights into how these agents analyze time-series observations from dynamical systems. Our results show that agents benefit substantially from domain context and explore data primarily through numerical console output rather than visualizations. We also find that agents generally perform worse when required to produce a Python script that maps each time-series sample to a predicted root-cause label than when they submit predictions directly. We release our datasets, agent trajectories, experimental results, and a leaderboard on our website, tracebench.github.io.",
+        "authors": [
+          {
+            "authorId": "2111681605",
+            "name": "Tommaso Bendinelli"
+          },
+          {
+            "authorId": "2302400586",
+            "name": "Artur Dox"
+          },
+          {
+            "authorId": "2304441803",
+            "name": "Christian Holz"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27182",
+          "CorpusId": 291387652
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27182, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "fcf6bf6201677220c63fd626af6e08539b069fb1",
+        "title": "TraceBench: Controlled Evaluation of LLM Agents for Time-Series Root-Cause Attribution",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The results show that agents benefit substantially from domain context and explore data primarily through numerical console output rather than visualizations, and generally perform worse when required to produce a Python script that maps each time-series sample to a predicted root-cause label than when they submit predictions directly."
+        },
+        "url": "https://www.semanticscholar.org/paper/fcf6bf6201677220c63fd626af6e08539b069fb1",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2608.27206": {
       "cached_at": "2026-08-29T07:18:26.910493+00:00",
       "data": {
@@ -5022,6 +5307,78 @@
           "text": "PACE (Pixel-Adaptive Condense and Extract), a training-free inference framework that accelerates both the vision encoder and the Large Language Model (LLM) via a unified Condense-and-Extract paradigm, is proposed."
         },
         "url": "https://www.semanticscholar.org/paper/9ae06e67a9010753ba529f3ab66c904f18a5daea",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27219": {
+      "cached_at": "2026-08-30T05:42:14.561157+00:00",
+      "data": {
+        "abstract": "Mental health assessment relies on episodic self-report scales, which convert subjective states such as stress into numerical scores but provide only sparse snapshots of wellbeing. Wearable devices offer longitudinal behavioral and physiological signals for continuous, low-burden monitoring. Recent LLM-driven personal-health agents enable natural language queries over wearable signals, but mainly handle short-term, retrieval-based lookups (e.g., highest step count over a week). They do not evaluate whether agents can reason over long-term signals to predict wellbeing scores paired with evidence-grounded rationales. To address this gap, we introduce BALMS, the first systematic benchmark of LLM-based agentic systems for longitudinal mental health sensing. BALMS spans 3 real-world longitudinal datasets, 2 task families (closed-form wellbeing-score prediction and rationale generation auto-graded by an LLM-as-Judge), 3 agentic paradigms evaluated across 5 open- and closed-source LLM backbones. We find that zero-shot agents rarely outperform a simple mean baseline, except with stronger backbones or compact, semantically meaningful features. Chain-of-thought prompting improves reasoning-oriented backbones, but does not guarantee temporal grounding or numerical correctness. Together with more analysis on efficiency and temporal scaling, BALMS highlights the need for longitudinal mental health agents that selectively retrieve history, ground temporal evidence, and reason over interpretable behavioral features.",
+        "authors": [
+          {
+            "authorId": "2405827201",
+            "name": "Y. Wu"
+          },
+          {
+            "authorId": "2063005195",
+            "name": "Arvind Pillai"
+          },
+          {
+            "authorId": "2109405540",
+            "name": "Yuliang Chen"
+          },
+          {
+            "authorId": "2460663649",
+            "name": "Yu-Wei Zhang"
+          },
+          {
+            "authorId": "2156485219",
+            "name": "Sudarshan Regmi"
+          },
+          {
+            "authorId": "2278462735",
+            "name": "Tess Z. Griffin"
+          },
+          {
+            "authorId": "2278471298",
+            "name": "Michael V. Heinz"
+          },
+          {
+            "authorId": "2540249",
+            "name": "L. Marsch"
+          },
+          {
+            "authorId": "2332099469",
+            "name": "Nicholas C. Jacobson"
+          },
+          {
+            "authorId": "2267250374",
+            "name": "Andrew T. Campbell"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27219",
+          "CorpusId": 291387300
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27219, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "13575dc62e3f21066bd8c4cfb488e69c264f5583",
+        "title": "BALMS: Benchmarking Agentic LLMs for Longitudinal Mental Health Sensing",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "BALMS is the first systematic benchmark of LLM-based agentic systems for longitudinal mental health sensing and highlights the need for longitudinal mental health agents that selectively retrieve history, ground temporal evidence, and reason over interpretable behavioral features."
+        },
+        "url": "https://www.semanticscholar.org/paper/13575dc62e3f21066bd8c4cfb488e69c264f5583",
         "venue": "",
         "year": 2026
       }
@@ -5459,6 +5816,254 @@
           "text": "This work proposes Dimension-to-Composition Routing (D2C-Routing), which routes content-side and expression-side evidence to supervised dimension heads before a learned gated composition layer predicts the final label."
         },
         "url": "https://www.semanticscholar.org/paper/7ed02dce2a914ecfbdf1851f63a011660bf7c06a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27409": {
+      "cached_at": "2026-08-30T05:42:44.584259+00:00",
+      "data": {
+        "abstract": "Reinforcement learning with verifiable rewards (RLVR) improves specific capabilities of large language models, but covering multiple capabilities often involves training separate domain experts and subsequently consolidating them. We organize three fusion paradigms by the artefacts they reuse: Merge combines expert task vectors, Mix RL pools their datasets, and multi-teacher on-policy distillation (MOPD) uses both. Because they have largely been studied in isolation, how they compare and how to choose among them remain unclear. We compare all three using shared experts and data across model scales and a multi-domain benchmark suite. Although their average performance differs by at most 1.4 points, the gap reaches 8.6 points on a single benchmark, with domain-level variation tracking cross-domain relations visible in task-vector geometry. Training dynamics expose distinct constraints: Mix RL depends on domain mixture proportions, MOPD remains bounded by its teachers, and Merge compresses all expert updates into one. All three improve single-sample accuracy without measurable gains in solution coverage or losses in held-out capabilities. These results yield a practical guideline: use Merge when experts already exist and cheap fusion is paramount; Mix RL when training a unified model without experts, with domain proportions adjusted for cross-domain transfer; and MOPD when preserving domain-specific gains matters more than surpassing teachers or minimizing end-to-end cost.",
+        "authors": [
+          {
+            "authorId": "2456971019",
+            "name": "Sicheng Wu"
+          },
+          {
+            "authorId": "2239414219",
+            "name": "Kai Yang"
+          },
+          {
+            "authorId": "2292681106",
+            "name": "Yuchen Cai"
+          },
+          {
+            "authorId": "2284822089",
+            "name": "Xin Xu"
+          },
+          {
+            "authorId": "2460231467",
+            "name": "Peng-Yuan Wang"
+          },
+          {
+            "authorId": "2460237674",
+            "name": "Jia-Xuan Wang"
+          },
+          {
+            "authorId": "2325201520",
+            "name": "Jiashun Liu"
+          },
+          {
+            "authorId": "2008151131",
+            "name": "Jiafei Lyu"
+          },
+          {
+            "authorId": "2336866249",
+            "name": "Yangkun Chen"
+          },
+          {
+            "authorId": "2329223241",
+            "name": "Saiyong Yang"
+          },
+          {
+            "authorId": "2447053334",
+            "name": "Yanghua Xiao"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27409",
+          "CorpusId": 291387319
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27409, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "73654ec9544de408deecb4e2d8a9cadd1cec0b9d",
+        "title": "Consolidating RLVR Capabilities Across Domains: A Deep Dive into Fusion Paradigms",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work compares three fusion paradigms by the artefacts they reuse and suggests that Merge when experts already exist and cheap fusion is paramount; Mix RL when training a unified model without experts, with domain proportions adjusted for cross-domain transfer; and MOPD when preserving domain-specific gains matters more than surpassing teachers or minimizing end-to-end cost."
+        },
+        "url": "https://www.semanticscholar.org/paper/73654ec9544de408deecb4e2d8a9cadd1cec0b9d",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27420": {
+      "cached_at": "2026-08-30T05:43:15.013565+00:00",
+      "data": {
+        "abstract": "Reinforcement Learning with Verifiable Rewards (RLVR) significantly improves LLM reasoning but often causes a drop in policy entropy, leading to narrowed reasoning coverage and degraded pass@$k$ for large $k$. While existing methods mitigate this entropy collapse through algorithmic regularizations, cross-model non-parametric perturbation is also neglected. In this work, we propose a simple yet effective approach to preserve the generative diversity of LLMs during RLVR. Instead of relying solely on internal exploration, we force the target model to generate answers based on partial reasoning trajectories generated by a smaller, weaker language models. These unfamiliar prefixes effectively disrupt over-confidence and encourage the exploration of distinct reasoning paths. We empirically study the potential of outer prefixes, revealing the mechanism of the impact of distributional discrepancy to the exploration dynamics in RLVR training. Experiments across multiple mathematical benchmarks show that our method consistently outperforms vanilla RLVR. Notably, the performance gain becomes increasingly pronounced as $k$ scales up, demonstrating a substantial expansion of reasoning coverage. Furthermore, our approach efficiently mitigates entropy collapse without requiring additional SFT, intricate reward designs, or complex prompting.",
+        "authors": [
+          {
+            "authorId": "2456547934",
+            "name": "Xin Shen"
+          },
+          {
+            "authorId": "2302812779",
+            "name": "Huishuai Zhang"
+          },
+          {
+            "authorId": "2460226642",
+            "name": "Peng Li"
+          },
+          {
+            "authorId": "2292668738",
+            "name": "Yinchun Wang"
+          },
+          {
+            "authorId": "2455174955",
+            "name": "Dongni Zhao"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27420",
+          "CorpusId": 291387187
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27420, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "bcf46f24081c277a52c13c9905cf4b378cd69ba8",
+        "title": "Boosting LLM Exploration via Weak-Model Guidance in RLVR",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work empirically study the potential of outer prefixes, revealing the mechanism of the impact of distributional discrepancy to the exploration dynamics in RLVR training and efficiently mitigates entropy collapse without requiring additional SFT, intricate reward designs, or complex prompting."
+        },
+        "url": "https://www.semanticscholar.org/paper/bcf46f24081c277a52c13c9905cf4b378cd69ba8",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27439": {
+      "cached_at": "2026-08-30T05:42:28.091585+00:00",
+      "data": {
+        "abstract": "LLM-based agents are increasingly deployed in product-level execution harnesses, where jailbreaks can trigger harmful tool use and persistent state changes, creating greater risks than unsafe text generation alone. Existing automatic red-teaming methods often rely on fixed attacks, while recent agentic attackers coordinate multiple jailbreak tools and show stronger potential through trajectory-based retrieval. However, such retrieval can reuse misleading experiences due to retrieval bias and unclear tool credit, and full trajectories add context overhead while reducing interpretability. We propose RedEvoAgent, a black-box red-teaming agent that distills cross-case attack trajectories into a concise, human-readable attack skill. The attack skill adaptively evolves through tool-effectiveness profiling and Deciding-Tool Attribution for skill updates, and a validation ratchet that retains only updates improving validation performance. Experiments on multiple benchmarks, target models, and target execution harnesses show that RedEvoAgent outperforms fixed and agentic baselines, improves tool efficiency, and transfers across attacker models and target execution harnesses.",
+        "authors": [
+          {
+            "authorId": "2457528403",
+            "name": "Jun-Jie Zhang"
+          },
+          {
+            "authorId": "2456553254",
+            "name": "Hui Liu"
+          },
+          {
+            "authorId": "2283975295",
+            "name": "Kecheng Chen"
+          },
+          {
+            "authorId": "2460119179",
+            "name": "Xian-Bo Mo"
+          },
+          {
+            "authorId": "2447417300",
+            "name": "Changyou Chen"
+          },
+          {
+            "authorId": "2382828869",
+            "name": "Haoliang Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27439",
+          "CorpusId": 291387617
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27439, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "172e7063803664b7e7329ce16087691cda1e1e73",
+        "title": "RedEvoAgent: Automatic Red-Teaming Agent with Experience-Driven Skill Evolution",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "RedEvoAgent is proposed, a black-box red-teaming agent that distills cross-case attack trajectories into a concise, human-readable attack skill that outperforms fixed and agentic baselines, improves tool efficiency, and transfers across attacker models and target execution harnesses."
+        },
+        "url": "https://www.semanticscholar.org/paper/172e7063803664b7e7329ce16087691cda1e1e73",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2608.27442": {
+      "cached_at": "2026-08-30T05:43:12.795391+00:00",
+      "data": {
+        "abstract": "In real-world software development, code review typically involves iterative interactions between developers and reviewers to improve software quality, making the process costly and time-consuming. Although recent work explores large language models (LLMs) for automated code review, most approaches oversimplify code review into a single-round, static decision task, which fails to capture the multi-round interactive nature and the complex problem-solving processes inherent in realistic review scenarios. To bridge this gap, we introduce MCR-Bench, the first defect state-aware benchmark designed for realistic multi-round code review. MCR-Bench covers five commonly-used programming languages and consists of 2,269 real-world multi-round code review tasks, each of which is annotated with fine-grained defect information and cross-round state labels. Each task in MCR-Bench is equipped with fine-grained defect metadata (e.g., description, type, severity) alongside dynamic state annotations, capturing the complete evolutionary trajectory of a defect throughout the multi-round process. We obtain several findings through extensive experiments on MCR-Bench with mainstream LLMs. (1) Limited overall capability: experiments reveal that mainstream LLMs exhibit limited overall performance in defect detection and defect lifecycle state tracking, with performance degrading significantly as the number of interaction rounds increases; (2) Defect-sensitive performance: LLMs'performance varies substantially across different defect types and severity levels, with semantically complex or low-salience defects being significantly more likely to be missed; (3) Underlying Failure Mechanisms: our in-depth error analysis dissects the distinct drivers of false positives and false negatives, revealing critical weaknesses such as cross-round temporal misalignment and inadequate long-range memory.",
+        "authors": [
+          {
+            "authorId": "2267245031",
+            "name": "Dewu Zheng"
+          },
+          {
+            "authorId": "2279774134",
+            "name": "Yanlin Wang"
+          },
+          {
+            "authorId": "2460119840",
+            "name": "Xi-Wen Wang"
+          },
+          {
+            "authorId": "2312037201",
+            "name": "Kefeng Duan"
+          },
+          {
+            "authorId": "2243157248",
+            "name": "Hongyu Zhang"
+          },
+          {
+            "authorId": "2304137483",
+            "name": "Xilin Liu"
+          },
+          {
+            "authorId": "2305694096",
+            "name": "Yuchi Ma"
+          },
+          {
+            "authorId": "2267902535",
+            "name": "Zibin Zheng"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.27442",
+          "CorpusId": 291387655
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.27442, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "154c7450249a1648934803c77eecbac75093449d",
+        "title": "From Static to Dynamic: Benchmarking Real-World Code Review with MCR-Bench",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "MCR-Bench is introduced, the first defect state-aware benchmark designed for realistic multi-round code review, and in-depth error analysis dissects the distinct drivers of false positives and false negatives, revealing critical weaknesses such as cross-round temporal misalignment and inadequate long-range memory."
+        },
+        "url": "https://www.semanticscholar.org/paper/154c7450249a1648934803c77eecbac75093449d",
         "venue": "",
         "year": 2026
       }
