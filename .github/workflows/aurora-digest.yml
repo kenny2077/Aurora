@@ -82,7 +82,7 @@ jobs:
       - name: Install
         run: |
           uv sync --dev
-          npm --prefix web ci
+          npm --prefix web ci --no-audit
       - name: Test Python
         run: uv run pytest -q
       - name: Security scan
