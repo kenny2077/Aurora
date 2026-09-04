@@ -94,7 +94,24 @@ jobs:
           timeout 90s uvx --from pip-audit pip-audit -r "$REQ_FILE" --no-deps --timeout 10
           rm "$REQ_FILE"
       - name: Audit web dependencies
-        run: npm --prefix web audit --audit-level=high --registry=https://registry.npmjs.org
+        run: |
+          AUDIT_REPORT="$(mktemp)"
+          for ATTEMPT in 1 2; do
+            if timeout 90s npm --prefix web audit --audit-level=high --registry=https://registry.npmjs.org --json > "$AUDIT_REPORT"; then
+              cat "$AUDIT_REPORT"
+              exit 0
+            else
+              STATUS=$?
+            fi
+            cat "$AUDIT_REPORT"
+            if jq -e '(.metadata.vulnerabilities.high + .metadata.vulnerabilities.critical) > 0' "$AUDIT_REPORT" >/dev/null 2>&1; then
+              exit "$STATUS"
+            fi
+            if [ "$ATTEMPT" -eq 2 ]; then
+              exit "$STATUS"
+            fi
+            echo "npm audit transport failed; retrying once."
+          done
       - name: Restore Aurora state
         if: ${{ github.event.inputs.dry_run != 'true' }}
         run: |
