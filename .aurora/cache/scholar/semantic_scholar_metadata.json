@@ -6128,6 +6128,485 @@
         "year": 2026
       }
     },
+    "arxiv:2609.02196": {
+      "cached_at": "2026-09-05T04:52:40.012741+00:00",
+      "data": {
+        "abstract": "Generative modeling directly on geometric manifolds can avoid errors introduced by flattening non-Euclidean data, repeated ambient projection, and coordinate inconsistency in Euclidean representations. Schrodinger bridges provide a probabilistic generative framework for entropy-regularized transport between prescribed endpoint distributions. We study Schrodinger bridges for kinetic dynamics on Lie group manifolds with state X_t = (g_t, xi_t) in G x g, allowing endpoint observations to constrain only the variables that are actually measured. In particular, the entropy projection determines the conditional law of the unobserved endpoint velocities. For the same observed endpoint bridge, we develop two computational realizations: Wrapped-Kernel Bridge Calibration (WKBC) uses an explicit periodized kinetic kernel on compact Abelian groups, whereas Reciprocal Conditional-Control Bridge Matching (RCCBM) handles compact non-Abelian groups through two-sided endpoint calibration and mollified conditional-control matching. The canonical teacher-mixture path law is itself a Markov reciprocal law, so forward generation uses a calibrated initial law and one learned Doob controller. Moreover, we establish a modular error bound in the bounded-Lipschitz path metric that provides a clean separation of errors due to endpoints, control regression, initialization, discretization, and related approximations. Experiments on multiple Lie group manifold datasets validate the feasibility and consistency of our proposed method, covering protein and RNA torsions, SO(3), U(n), and the Protein Conformational Transition Pathway Generation task using mdCATH trajectories in a compact reduced representation. The source code is publicly available at https://github.com/cafferyzhang12/Schr-dinger_Bridge_on_LieGroup.",
+        "authors": [
+          {
+            "authorId": "2450394558",
+            "name": "Shizeng Zhang"
+          },
+          {
+            "authorId": "2328109636",
+            "name": "Mingyang Zhao"
+          },
+          {
+            "authorId": "2308563895",
+            "name": "Lei Ma"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.02196",
+          "CorpusId": 291611623
+        },
+        "fieldsOfStudy": [
+          "Mathematics",
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.02196, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "1876035c69221f9896d37ed9b4304b73b6901944",
+        "title": "Schr\\\"odinger Bridges on Lie Group Manifolds for Probabilistic Intrinsic Generation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A modular error bound in the bounded-Lipschitz path metric that provides a clean separation of errors due to endpoints, control regression, initialization, discretization, and related approximations is established."
+        },
+        "url": "https://www.semanticscholar.org/paper/1876035c69221f9896d37ed9b4304b73b6901944",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.02993": {
+      "cached_at": "2026-09-05T04:52:30.669456+00:00",
+      "data": {
+        "abstract": "Gaussian-process Bayesian optimization (GP-BO) excels at black-box optimization of costly functions, e.g., hyperparameter optimization (HPO) and multi-agent system (MAS) design. Convergence-rate guarantees exist for select methods, notably GP upper confidence bound (GP-UCB), but require a fixed kernel. Critically, the kernel encodes how input proximity affects objective value similarity. When raw coordinates poorly match this geometry - as with log-scaled hyperparameters or localized peaks - input warping can greatly improve sample efficiency, yet known GP-UCB proofs require a fixed kernel. We propose Finite-Library Input-Warped Bayesian Optimization (FLIWBO), which selects warps from a finite library of smooth input maps by any history-dependent rule. It adapts the input geometry to accelerate learning while retaining high-probability convergence guarantees under mild hypotheses, with an explicit $\\sqrt(N_\\varepsilon)$ library-size cost. Controlled diagnostics show that finite-library warping repairs planted geometry mismatches and identify FLIWBO failure cases. Across four repeated benchmarks - warped synthetic objectives, a confidence-fence trap, and Fashion-MNIST HPO - FLIWBO-UCB beats raw-coordinate GP-UCB under misspecified geometry, escapes traps that defeat even oracle-warp expected improvement, and recovers much of the gain from manual log scaling, while leading the tested methods that admit a matching regret guarantee. A 20-dimensional MAS design study further shows feasibility under costly noisy evaluations. Code for experiments is available: https://github.com/edvin-ketabati/bogp-paper-experiments.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Edvin Ketabati Augustinsson"
+          },
+          {
+            "authorId": null,
+            "name": "Robert A. Bridges"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.02993",
+          "CorpusId": 291677986
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.02993, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "1d325822bfb32c2b676b94a3c7ba315238f35ccf",
+        "title": "No-Regret Bayesian Optimization with Finite-Library Input-Warped Kernels",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Finite-Library Input-Warped Bayesian Optimization (FLIWBO), which selects warps from a finite library of smooth input maps by any history-dependent rule, and adapts the input geometry to accelerate learning while retaining high-probability convergence guarantees under mild hypotheses, with an explicit library-size cost."
+        },
+        "url": "https://www.semanticscholar.org/paper/1d325822bfb32c2b676b94a3c7ba315238f35ccf",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03352": {
+      "cached_at": "2026-09-05T04:53:27.453552+00:00",
+      "data": {
+        "abstract": "Constant optimization refines the numerical coefficients of candidate expressions in tree-based genetic programming for symbolic regression. But its per-generation cost has led modern GPU-accelerated frameworks to omit it or restrict it to lightweight forms. We present a GPU-resident, batched Levenberg--Marquardt solver that optimizes constants across a structurally heterogeneous population of expression trees using a fixed number of population-wide CUDA launches per iteration. Reverse-mode automatic differentiation assembles the per-tree Jacobian in one backward sweep, making the dominant per-iteration cost independent of the number of constants per tree, and a double-precision delivery guard guarantees that returned constants are never worse than their initial values. On early-generation populations, the solver sustains up to $5.1{\\times}10^{5}$ trees per second on an NVIDIA A100; at a GPU-saturated benchmark configuration it delivers roughly $9.9{\\times}$ the throughput of Operon running on a 64-core EPYC 7763, while matching fp64-reference quality. Integrated in-process into EvoGP, the solver enables end-to-end search to recover governing equations on $10$ of $18$ constructed problems versus 0 for stock EvoGP. Our code is at https://github.com/TensorConv/CuSR.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Hao Mao"
+          },
+          {
+            "authorId": null,
+            "name": "Xu Tony Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Shuai Lu"
+          },
+          {
+            "authorId": null,
+            "name": "Peng Zhao"
+          },
+          {
+            "authorId": null,
+            "name": "Wen-Zheng Jiang"
+          },
+          {
+            "authorId": null,
+            "name": "Yun-Tian Chen"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03352",
+          "CorpusId": 291677943
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03352, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4425110d1f495d17da7f02b19063107bffdba28a",
+        "title": "Efficient Constant Optimization for Symbolic Regression with GPU-Accelerated Tree-Based Genetic Programming",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A GPU-resident, batched Levenberg--Marquardt solver that optimizes constants across a structurally heterogeneous population of expression trees using a fixed number of population-wide CUDA launches per iteration."
+        },
+        "url": "https://www.semanticscholar.org/paper/4425110d1f495d17da7f02b19063107bffdba28a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03561": {
+      "cached_at": "2026-09-05T04:53:03.662205+00:00",
+      "data": {
+        "abstract": "Existing radar-LiDAR fusion methods rely on fixed residual weights, even though the informativeness of radar Doppler and LiDAR geometry is scan- and direction-dependent, leading to uniform radar weighting that misallocates Doppler information across translational directions. To address this limitation, we propose two degeneracy-aware Doppler reweighting modules within a tightly coupled Radar-IMU-LiDAR odometry framework: per-point radar reweighting and scan-wise radar gain scheduling. Since geometric degeneracy is directional, we first identify weak translational directions from the LiDAR geometry and reweight individual radar Doppler constraints based on their alignment with the weak subspace. We further adjust the overall radar contribution using LiDAR geometric anisotropy such that radar is emphasized when LiDAR observability is poor and suppressed when LiDAR constraints are already reliable. Across 13 evaluated sequences, TRaIL-Odom achieves state-of-the-art overall performance, with clear advantages in geometrically degenerate scenes. In ablation experiments on three degenerate sequences, combining the two adaptive weighting modules reduces RMSE ATE and RTE by 86.0% and 78.5% relative to the fixed-weight baseline. We make our code and an accompanying dataset publicly available at https://github.com/ChiyunNoh/TRaIL-Odom.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Chiyun Noh"
+          },
+          {
+            "authorId": null,
+            "name": "Turcan Tuna"
+          },
+          {
+            "authorId": null,
+            "name": "William Talbot"
+          },
+          {
+            "authorId": null,
+            "name": "Marco Hutter"
+          },
+          {
+            "authorId": null,
+            "name": "Laurent Kneip"
+          },
+          {
+            "authorId": null,
+            "name": "Ayoung Kim"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03561",
+          "CorpusId": 291678013
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03561, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "508682765515788b68e872dc29945e4385a6c169",
+        "title": "TRaIL-Odom: Tightly Coupled Continuous Time Radar-IMU-LiDAR Odometry with Adaptive Doppler Weighting",
+        "tldr": null,
+        "url": "https://www.semanticscholar.org/paper/508682765515788b68e872dc29945e4385a6c169",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03887": {
+      "cached_at": "2026-09-05T04:53:29.636173+00:00",
+      "data": {
+        "abstract": "How do the methods used to train language models to refuse harmful requests shape how that refusal actually works inside the model? We compare three post-training methods - supervised fine-tuning, reasoning-augmented fine-tuning (training on reasoning chains that justify a safety decision), and preference optimization (ORPO) - across three architecturally distinct models (Llama-3.1-8B, Gemma-2-9B, Qwen3-8B). We find that training method, not just data, reshapes how refusal is computed internally: reasoning-augmented training consistently produces a distinct kind of refusal computation, visible across all three models, while architecture independently shapes internal structure and how reliably refusal can be steered. Most importantly, no method we study achieves all three properties we would want from safe alignment at once: refusal that isn't concentrated in a few fragile components, safety gains that don't cost general capability, and safety behavior correctable through small, targeted edits. We caution against treating current post-training methods as a solved, reliable defense, especially for security-critical use. Code and models are available in https://github.com/hoangcuongnguyen2001/Beyond-Shallow-Alignment.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Hoang Cuong Nguyen"
+          },
+          {
+            "authorId": null,
+            "name": "Mark Dras"
+          },
+          {
+            "authorId": null,
+            "name": "Usman Naseem"
+          }
+        ],
+        "citationCount": 1,
+        "externalIds": {
+          "ArXiv": "2609.03887",
+          "CorpusId": 291682732
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03887, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "24bb8e465bad18c70ca1aca12c65eeb22ca3202b",
+        "title": "Beyond Shallow Alignment: How Post-Training Methods Determine Refusal Circuits And Steering Robustness",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "No post-training method achieves all three properties the authors would want from safe alignment at once: refusal that isn't concentrated in a few fragile components, safety gains that don't cost general capability, and safety behavior correctable through small, targeted edits."
+        },
+        "url": "https://www.semanticscholar.org/paper/24bb8e465bad18c70ca1aca12c65eeb22ca3202b",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03894": {
+      "cached_at": "2026-09-05T04:52:07.051421+00:00",
+      "data": {
+        "abstract": "Large language models (LLMs) have become ubiquitous tools for code generation and editing. However, development teams often use multiple LLM assistants. Different developers may prefer different models, and individual developers may switch between models across different coding sessions. Because of this, the edits any one model makes are frequently applied to foreign code originally generated by another model. These LLMs are often trained on different datasets, and as a result have different stylistic preferences. Do LLMs behave differently when they edit foreign code originally written by a different LLM with a different coding style? We find that models tend to make more, and often excessive, edits on foreign code. We introduce CROCODIL (Cross-model Code Editing with LLMs), a post-training framework for reducing excessive edits while preserving functional correctness. CROCODIL's similarity reward penalizes large changes, while its execution reward scores build and test success. We use the product of these two rewards to encourage the policy to decrease the edit size without decreasing the edit task success rate. CROCODIL is available at https://github.com/EngineeringSoftware/Crocodil.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Ling-Han Zhong"
+          },
+          {
+            "authorId": null,
+            "name": "Aditya Thimmaiah"
+          },
+          {
+            "authorId": null,
+            "name": "Jayanth Srinivasa"
+          },
+          {
+            "authorId": null,
+            "name": "Milos Gligoric"
+          },
+          {
+            "authorId": null,
+            "name": "Junyi Jessy Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03894",
+          "CorpusId": 291682864
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03894, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "9f820388833afd2aa6afdb98ba0efe2dd039bc83",
+        "title": "CROCODIL: Cross-Model Code Editing with LLMs",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work introduces CROCODIL (Cross-model Code Editing with LLMs), a post-training framework for reducing excessive edits while preserving functional correctness and CROCODIL's similarity reward penalizes large changes, while its execution reward scores build and test success."
+        },
+        "url": "https://www.semanticscholar.org/paper/9f820388833afd2aa6afdb98ba0efe2dd039bc83",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04010": {
+      "cached_at": "2026-09-05T04:53:33.916190+00:00",
+      "data": {
+        "abstract": "Large Language Models (LLMs) owe much of their success to next-token prediction (NTP), but their autoregressive (AR) structure requires slow, sequential token generation. To overcome this bottleneck, we introduce diffusion-augmented LLMs, a new class of models that defines an AR model distribution while using diffusion to draw multiple tokens in parallel from that distribution. We decouple the parameters of these models into two sets: AR weights, trained using the standard NTP objective, and lightweight diffusion weights, trained to generate multiple tokens simultaneously. The diffusion weights are learned through a simple Diffusion Distillation phase that adds negligible overhead to existing LLM training pipelines. We also introduce $\\Psi$-Spec, a family of samplers that enables lossless acceleration and inference-time scaling at a fixed context length. Unlike speculative decoding, our method requires no separate draft model. Unlike diffusion LLMs (d-LLMs), it accelerates generation without sacrificing the quality of the underlying AR model. The resulting models, called Uno, can be trained from scratch or built by augmenting existing open-weight AR LLMs. Uno achieves higher throughput than leading speculative-decoding methods at every evaluated batch size and delivers up to $3\\times$ speedups over the base AR model, including at the largest batch size supported by the device. Notably, our 8B Uno model outperforms the leading open d-LLM, the 26B DiffusionGemma, and the proprietary Mercury 2 across all evaluated benchmarks in agentic tool use, coding, and long-context reasoning. We release code and checkpoints at: https://s-sahoo.github.io/uno/",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Subham Sekhar Sahoo"
+          },
+          {
+            "authorId": null,
+            "name": "Ling-Jie Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Khiem Pham"
+          },
+          {
+            "authorId": null,
+            "name": "Jonathan Geuter"
+          },
+          {
+            "authorId": null,
+            "name": "Chaitanya Dwivedi"
+          },
+          {
+            "authorId": null,
+            "name": "Varad Pimpalkhute"
+          },
+          {
+            "authorId": null,
+            "name": "Yash Akhauri"
+          },
+          {
+            "authorId": null,
+            "name": "Alexander Moreno"
+          },
+          {
+            "authorId": null,
+            "name": "Mikhail Yurochkin"
+          },
+          {
+            "authorId": null,
+            "name": "Zhen-Ting Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Mostafa Elhoushi"
+          },
+          {
+            "authorId": null,
+            "name": "Nolan Dey"
+          },
+          {
+            "authorId": null,
+            "name": "Shane Bergsma"
+          },
+          {
+            "authorId": null,
+            "name": "Joel Hestness"
+          },
+          {
+            "authorId": null,
+            "name": "John Thickstun"
+          },
+          {
+            "authorId": null,
+            "name": "Eric Xing"
+          },
+          {
+            "authorId": null,
+            "name": "Zheng-Zhong Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04010",
+          "CorpusId": 291683127
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04010, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "c2019862956bd853317e65baf0adfb53df24408a",
+        "title": "Unlocking Lossless Speedups in LLMs via Discrete Diffusion",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": null
+        },
+        "url": "https://www.semanticscholar.org/paper/c2019862956bd853317e65baf0adfb53df24408a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04066": {
+      "cached_at": "2026-09-05T04:51:57.826042+00:00",
+      "data": {
+        "abstract": "Reinforcement learning from human feedback (RLHF) has emerged as a powerful yet sample-inefficient approach for learning reward models from human preferences, making active learning a critical component in synthesizing informative preference queries. However, effective uncertainty quantification required for active learning remains a key challenge for large neural network reward models. In this paper, we introduce PreferenceEKF, a sample-efficient approach that tracks reward model uncertainty by framing active preference learning as a sequential Bayesian filtering problem. Instead of relying on computationally prohibitive posterior inference over the full neural network parameter space, our method performs sequential inference via an extended Kalman filter within a low-dimensional parameter subspace, continuously updating the reward model posterior as new preference queries arrive. Our approach enables scalable sampling of neural network parameters to efficiently compute acquisition functions for active reward learning. Experiments on the D4RL and V-D4RL benchmarks demonstrate that our approach achieves better sample efficiency, runtime, scalability, and calibration compared to other Bayesian deep learning approaches, and the learned reward models lead to competitive offline reinforcement learning policy performance. This highlights the potential of scalable Bayesian methods for preference-based reward modeling in RLHF. Our code is available at https://github.com/yutaizhou/bnn_pref.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yu-Tai Zhou"
+          },
+          {
+            "authorId": null,
+            "name": "Erdem B\u0131y\u0131k"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04066",
+          "CorpusId": 291682819
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04066, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "1caab0ea7b52d185e6d2328b1e1d99c817b4b01f",
+        "title": "Subspace Inference Enables Efficient Active Reward Learning from Preferences",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "PreferenceEKF is introduced, a sample-efficient approach that tracks reward model uncertainty by framing active preference learning as a sequential Bayesian filtering problem, and achieves better sample efficiency, runtime, scalability, and calibration compared to other Bayesian deep learning approaches."
+        },
+        "url": "https://www.semanticscholar.org/paper/1caab0ea7b52d185e6d2328b1e1d99c817b4b01f",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04094": {
+      "cached_at": "2026-09-05T04:53:31.731680+00:00",
+      "data": {
+        "abstract": "Reinforcement Learning from Verifiable Rewards works well when a task has a programmatic checker, but most long-horizon agent domains have none. We work in the outcome-blind setting, where ground-truth success signals are not available. Multi-criteria rubrics are a popular way to supply such a reward; they are scored once per trajectory, but a single scalar is a poor signal across tens of steps. We propose DRACO: Distributing Rubric-based Advantage for Credit Optimization. It generates rubrics dynamically during training to track the policy's evolving capability, scores those rubrics once per completed trajectory, and redistributes that judgment over the steps responsible for annotated rubrics to produce differentiated per-step advantages in GRPO. The redistribution is closed-form and does not introduce any trained attribution module. On AppWorld, DRACO gains 15.9 points over the base model and 5.3 points over GRPO trained with a sparse ground-truth reward, despite not using any verifiers itself. On out-of-domain Tau-Bench, it gains 5.3 points over the base model even without a frontier judge, beating both ground-truth-reward training and other rubric-based training settings. The code for DRACO is available at https://github.com/IBM/draco.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Shubham Gandhi"
+          },
+          {
+            "authorId": null,
+            "name": "Saurabh Goyal"
+          },
+          {
+            "authorId": null,
+            "name": "Kiran Kate"
+          },
+          {
+            "authorId": null,
+            "name": "Yara Rizk"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04094",
+          "CorpusId": 291682884
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04094, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "05263c648fa97053d44870030bc9134c2239b943",
+        "title": "DRACO: Fine-Grained Credit Assignment with Dynamic Rubrics for Long-Horizon Agent Training",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work proposes DRACO: Distributing Rubric-based Advantage for Credit Optimization, which generates rubrics dynamically during training to track the policy's evolving capability, scores those rubrics once per completed trajectory, and redistributes that judgment over the steps responsible for annotated rubrics to produce differentiated per-step advantages in GRPO."
+        },
+        "url": "https://www.semanticscholar.org/paper/05263c648fa97053d44870030bc9134c2239b943",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
