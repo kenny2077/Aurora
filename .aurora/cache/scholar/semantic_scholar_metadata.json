@@ -6128,6 +6128,58 @@
         "year": 2026
       }
     },
+    "arxiv:2608.29978": {
+      "cached_at": "2026-09-06T05:00:22.484524+00:00",
+      "data": {
+        "abstract": "Large language models are increasingly required to generate responses that satisfy multiple competing objectives. Since optimal trade-offs depend on both user preferences and input prompts, controllable multi-objective generation must dynamically adapt models at inference time without retraining. To address this, we propose Evolutionary Soups, a mixture-of-experts framework for fine-grained generation control, with gating networks trained via an evolutionary algorithm. The per-layer gating networks dynamically produce expert-merging coefficients from hidden-state representations, while the evolutionary algorithm incorporates greedy hypervolume contribution for effective evolution of these gating networks, achieving consistent improvements on large and noisy training datasets and broader coverage of the non-convex Pareto front. Experiments across three tasks demonstrate the effectiveness of Evolutionary Soups over baselines: it achieves the best hypervolume, linear utility, and Tchebyshev utility (~20% improvement) among controllable methods on all tasks.",
+        "authors": [
+          {
+            "authorId": "2362056192",
+            "name": "Lingxiao Kong"
+          },
+          {
+            "authorId": "2265653443",
+            "name": "Steffen Staab"
+          },
+          {
+            "authorId": "2359164385",
+            "name": "Cong Yang"
+          },
+          {
+            "authorId": "2316693114",
+            "name": "O. Beyan"
+          },
+          {
+            "authorId": "2316963850",
+            "name": "Z. Boukhers"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2608.29978",
+          "CorpusId": 291542359
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2608.29978, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2706a551ae72c85de9aaf6ad02c3458c3355371d",
+        "title": "Evolutionary Soups: Evolving Mixture-of-Experts for Multi-Objective LLM Alignment",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Evolutionary Soups, a mixture-of-experts framework for fine-grained generation control, with gating networks trained via an evolutionary algorithm, achieves the best hypervolume, linear utility, and Tchebyshev utility among controllable methods on all tasks."
+        },
+        "url": "https://www.semanticscholar.org/paper/2706a551ae72c85de9aaf6ad02c3458c3355371d",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2609.02196": {
       "cached_at": "2026-09-05T04:52:40.012741+00:00",
       "data": {
@@ -6169,6 +6221,111 @@
           "text": "A modular error bound in the bounded-Lipschitz path metric that provides a clean separation of errors due to endpoints, control regression, initialization, discretization, and related approximations is established."
         },
         "url": "https://www.semanticscholar.org/paper/1876035c69221f9896d37ed9b4304b73b6901944",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.02684": {
+      "cached_at": "2026-09-06T04:59:52.384370+00:00",
+      "data": {
+        "abstract": "Deploying 3D point cloud models on edge hardware such as the NVIDIA Jetson Orin Nano is severely constrained by compute and memory budgets. Existing compression methods require access to the model's original source code, rendering them inapplicable to the Open Neural Network Exchange (ONNX) binaries commonly distributed by vendors and model repositories. We present \\textbf{H3DNAS}, a hardware-aware model compression framework that operates directly on ONNX computational graphs without requiring original source code, architecture class definition, or gradient access during search. H3DNAS makes three contributions: (1) a \\textbf{Channel Dependency Graph (CDG)} that classifies ONNX operators into four constraint classes and formally establishes that the free parameter fraction $\\rho_f$ is topological invariant, a provable compression ceiling computable in $\\mathcal{O}(|V|+|E|)$; (2) a \\textbf{Two-Stage Hierarchical Search} that prunes candidate architectures by $L_1$-importance channel selection, ranks them by output fidelity as a zero-shot label-free proxy, and applies GhostConv structural mutation to Pareto-optimal candidates; and (3) the \\textbf{first source-code-free compression pipeline for 3D point cloud models}, operating entirely via ONNX graph surgery with no original architecture definition required. On ModelNet40, H3DNAS reduces the number of parameters in PointNet, PointNet++, and PointMLP by $65.5\\%$, $43.2\\%$, and $49.1\\%$, respectively, while achieving $1.99\\times$, $1.29\\times$, and $1.67\\times$ inference speedups with negligible loss in accuracy. The source code is publicly available\\footnote{https://github.com/ClarityLab-Org/h3dnas}.",
+        "authors": [
+          {
+            "authorId": "2474883147",
+            "name": "Anchit Mulye"
+          },
+          {
+            "authorId": "2474890787",
+            "name": "Rhythm Baghel"
+          },
+          {
+            "authorId": "2376539096",
+            "name": "Sujay Kumar Ingle"
+          },
+          {
+            "authorId": "40069489",
+            "name": "Hardik Jain"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.02684",
+          "CorpusId": 291615316
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.02684, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "7a266d544b718e65318920c6a65c8f59a985f8b3",
+        "title": "H3DNAS: Hardware-Aware ONNX-Native 3D Point Cloud Model Compression",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "H3DNAS is presented, a hardware-aware model compression framework that operates directly on ONNX computational graphs without requiring original source code, architecture class definition, or gradient access during search during search, and is the first source-code-free compression pipeline for 3D point cloud models."
+        },
+        "url": "https://www.semanticscholar.org/paper/7a266d544b718e65318920c6a65c8f59a985f8b3",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.02991": {
+      "cached_at": "2026-09-06T04:59:56.825441+00:00",
+      "data": {
+        "abstract": "Learned graph simulators provide an efficient alternative to high-fidelity solvers for granular dynamics. However, granular motion depends strongly on inter-granular contact history, which is difficult to preserve when particle contacts form, break, and rearrange. Existing simulators mainly store temporal information in node features or node-level memory. Here we introduce TRACE, a graph-network simulator that stores interaction history directly on contact edges. Each edge maintains a persistent memory updated by attention-based message passing and a gated recurrent unit, while an edge-identity dictionary preserves this memory as the contact graph changes. A physics-structured decoder predicts inter-granular normal and tangential contact forces, enforces the Coulomb friction limit, and applies equal-and-opposite internal forces. The model is trained with single-step pretraining followed by autoregressive rollout fine-tuning. We evaluate TRACE on 2D and 3D granular column-collapse benchmarks. In both cases, TRACE produces stable, physically consistent long-horizon rollouts, closely reproducing the final deposit geometry and the kinetic energy released during collapse. Compared with graph network simulator (GNS) and node-memory graph neural simulator (NMGNS), TRACE reduces long-rollout position error by 31-62% and final-deposit error by 58-89% across the two benchmarks, while using fewer parameters and maintaining near-zero particle interpenetration. TRACE also achieves 12.2$\\times$ and 8.9$\\times$ speedups over the material point method (MPM) reference solver in 2D and 3D, respectively. Our code is available at https://github.com/Data-Driven-Computational-Geotechnics/TRACE.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Chang-Jian Zhou"
+          },
+          {
+            "authorId": null,
+            "name": "Negin Yousefpour"
+          },
+          {
+            "authorId": null,
+            "name": "Jie Qi"
+          },
+          {
+            "authorId": null,
+            "name": "Jun-Feng Fang"
+          },
+          {
+            "authorId": null,
+            "name": "Guillermo A. Narsilio"
+          },
+          {
+            "authorId": null,
+            "name": "Hans Petter Jostad"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.02991",
+          "CorpusId": 291677729
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.02991, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "6e28cb4d9a264c90ba6b8d0c6eb8403f1b1e12ab",
+        "title": "TRACE: Spatiotemporal Contact Memory Graph Network Simulator for Granular Dynamics",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "TRACE, a graph-network simulator that stores interaction history directly on contact edges, reduces long-rollout position error by 31-62% and final-deposit error by 58-89% across the two benchmarks, while using fewer parameters and maintaining near-zero particle interpenetration."
+        },
+        "url": "https://www.semanticscholar.org/paper/6e28cb4d9a264c90ba6b8d0c6eb8403f1b1e12ab",
         "venue": "",
         "year": 2026
       }
@@ -6323,6 +6480,54 @@
         "year": 2026
       }
     },
+    "arxiv:2609.03677": {
+      "cached_at": "2026-09-06T04:59:45.913263+00:00",
+      "data": {
+        "abstract": "Understanding the composition of large-scale autonomous driving datasets is essential for safety, robustness, and reliable operation across domains. For example, domain shift between locations could lead to the operating environment being misaligned with the training data, resulting in potentially dangerous performance degradation. Yet, existing data analysis pipelines largely rely on metadata, predefined labels, or manual inspection, which provide limited semantic insight or do not scale. This paper studies set difference captioning: given two subsets of images, the goal is to produce a natural-language hypothesis describing differences between the target and reference set. Building on a two-stage formulation, we adapt the method to autonomous driving by focusing on object-centric patches derived from object detection, which simplifies aggregation and enables attribution of differences to specific object instances or categories. To evaluate this setting in-domain, we introduce a new benchmark, AD-Diff Bench. Low-concentration experiments assess the suitability of set-difference-captioning approaches to sparse, real-world differences. We restrict our experiments to open-weight models to support reproducibility and ease of deployment. The proposed benchmark and analysis provide a step towards practical, human-interpretable dataset introspection for autonomous driving datasets. Our implementation and benchmark dataset are available at https://github.com/KIT-MRT/AD-Diff",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Julian Truetsch"
+          },
+          {
+            "authorId": null,
+            "name": "Felix Hauser"
+          },
+          {
+            "authorId": null,
+            "name": "Christoph Stiller"
+          },
+          {
+            "authorId": null,
+            "name": "Frank Bieder"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03677",
+          "CorpusId": 291683087
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03677, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4e8b3761c986a48764f6a264c171c54a0e810b09",
+        "title": "Understanding Autonomous Driving Datasets by Describing Differences between Image Subsets in Natural Language",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This paper adapts set difference captioning to autonomous driving by focusing on object-centric patches derived from object detection, which simplifies aggregation and enables attribution of differences to specific object instances or categories and introduces a new benchmark, AD-Diff Bench."
+        },
+        "url": "https://www.semanticscholar.org/paper/4e8b3761c986a48764f6a264c171c54a0e810b09",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2609.03887": {
       "cached_at": "2026-09-05T04:53:29.636173+00:00",
       "data": {
@@ -6363,6 +6568,58 @@
           "text": "No post-training method achieves all three properties the authors would want from safe alignment at once: refusal that isn't concentrated in a few fragile components, safety gains that don't cost general capability, and safety behavior correctable through small, targeted edits."
         },
         "url": "https://www.semanticscholar.org/paper/24bb8e465bad18c70ca1aca12c65eeb22ca3202b",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03892": {
+      "cached_at": "2026-09-06T05:00:18.227817+00:00",
+      "data": {
+        "abstract": "3D spatial reasoning underpins understanding and acting in the physical world, yet it remains unreliable in current multimodal large language models (MLLMs). These models falter at precise geometric measurement, at transforming between egocentric and allocentric viewpoints, and at grounding fine-grained appearance. The most common remedies fine-tune the model on large-scale curated spatial-reasoning datasets or attach dedicated encoders for 3D geometry, which typically couples the solution to costly supervision and a specific backbone. We instead introduce GraFT, a training-free framework that supplies the missing 3D structure through a compact, easily maintained 3D scene graph (3DSG). From this 3DSG, GraFT provides three spatial reasoning capabilities: (1) deterministic geometry through symbolic tools, (2) allocentric layout through a bird's-eye-view (BEV) rendering, and (3) visual-attribute grounding through task-relevant egocentric frames. On ScanQA, GraFT improves every metric over the same-backbone baseline, raising CIDEr by 27%. On VSI-Bench, GraFT improves frozen MLLMs by up to 65%, surpassing every proprietary and general-purpose open-source baseline, and several prominent fine-tuned spatial models.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Jun-Qing Du"
+          },
+          {
+            "authorId": null,
+            "name": "Fernando Ropero"
+          },
+          {
+            "authorId": null,
+            "name": "Erkin Turkoz"
+          },
+          {
+            "authorId": null,
+            "name": "Yan-Feng Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Lu Liu"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03892",
+          "CorpusId": 291683135
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03892, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "926b0974652c2178efda5fad6c74a8bda0daf45c",
+        "title": "GraFT: A Training-Free Framework for Spatial Reasoning in Multimodal Large Language Models via 3D Scene Graphs",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "GraFT is introduced, a training-free framework that supplies the missing 3D structure through a compact, easily maintained 3D scene graph (3DSG) and provides three spatial reasoning capabilities: deterministic geometry through symbolic tools, allocentric layout through a bird's-eye-view (BEV) rendering, and visual-attribute grounding through task-relevant egocentric frames."
+        },
+        "url": "https://www.semanticscholar.org/paper/926b0974652c2178efda5fad6c74a8bda0daf45c",
         "venue": "",
         "year": 2026
       }
@@ -6415,6 +6672,118 @@
           "text": "This work introduces CROCODIL (Cross-model Code Editing with LLMs), a post-training framework for reducing excessive edits while preserving functional correctness and CROCODIL's similarity reward penalizes large changes, while its execution reward scores build and test success."
         },
         "url": "https://www.semanticscholar.org/paper/9f820388833afd2aa6afdb98ba0efe2dd039bc83",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03927": {
+      "cached_at": "2026-09-06T05:00:38.978806+00:00",
+      "data": {
+        "abstract": "For robots to operate reliably in real-world environments, they need to perceive their surroundings, act, and reason about the consequences of those actions. Rapid progress in the domains of representation learning, VLA models, and world models has significantly enhanced the capabilities of robot learning systems, enabling robots to work in increasingly complex environments. However, these paradigms are typically developed in isolation, resulting in fragmented systems that struggle with generalization, long-horizon temporal reasoning and planning, and deployment in unstructured environments. In this survey, we present a unified perspective on robot learning by organizing the existing methods along three complementary axes: understanding through representation learning, acting through VLA models, and reasoning through world models. We introduce a structured taxonomy that captures key design choices in environment representation, policy learning, and predictive modeling, and summarize the recent progress in these domains. Beyond classifying the existing works, we analyze how these components interact, discuss common limitations, and highlight emerging trends towards more integrated systems. Through this lens, we identify the challenges in the domain of robot learning, including uncertainty quantification, out-of-distribution generalization, cross-embodiment transfer, long-context understanding, and long-horizon planning. We argue that these challenges arise not only from limitations within individual components but also from the lack of integration across perception, action, and reasoning. Building on this analysis, we outline future directions towards unified, physically grounded, and probabilistic robot learning to develop robust robotic systems that maintain consistent internal representations and support decision making over extended interactions in real-world environments.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Shaunak A. Mehta"
+          },
+          {
+            "authorId": null,
+            "name": "Ananya Hazarika"
+          },
+          {
+            "authorId": null,
+            "name": "Hao-Chen Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Fan Yang"
+          },
+          {
+            "authorId": null,
+            "name": "Ryo Moriyama"
+          },
+          {
+            "authorId": null,
+            "name": "Wen-Kai Li"
+          },
+          {
+            "authorId": null,
+            "name": "Yash Patel"
+          },
+          {
+            "authorId": null,
+            "name": "Kanata Suzuki"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03927",
+          "CorpusId": 291682976
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03927, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "51e63227134934c753dbc3c367cba4ab56ed3002",
+        "title": "Toward Unified Robot Learning: Bridging Representation, Vision-Language-Action, and World Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A unified perspective on robot learning is presented by organizing the existing methods along three complementary axes: understanding through representation learning, acting through VLA models, and reasoning through world models, and a structured taxonomy is introduced that captures key design choices in environment representation, policy learning, and predictive modeling."
+        },
+        "url": "https://www.semanticscholar.org/paper/51e63227134934c753dbc3c367cba4ab56ed3002",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.03956": {
+      "cached_at": "2026-09-06T04:59:54.604675+00:00",
+      "data": {
+        "abstract": "Medical image inpainting has the potential to improve automated brain MRI analysis by reconstructing healthy tissue within pathological regions. We introduce RARF, a task-agnostic region-aware rectified flow framework for masked data generation. We instantiate the framework for 3D brain MRI inpainting as our submission to the BraTS Inpainting Challenge 2026. RARF restricts the stochastic interpolation process to the inpainting region, while the observed voxels remain fixed and provide patient-specific anatomical context. A three-dimensional neural network receives the partially voided image, with Gaussian noise filling the missing region, together with the inpainting mask and the corresponding timestep. The model is trained using masked flow-matching and reconstruction-consistency objectives, combined with mask-aware preprocessing and data augmentation. During inference, the learned velocity field transports the initial noise toward a plausible reconstruction of the missing tissue, which is then combined with the unchanged observed anatomy. Experiments under the BraTS evaluation protocol show that the proposed approach produces competitive reconstructions while maintaining anatomical consistency. Source code is available at: https://github.com/TomasGuija/rarf.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Tomas Guija-Valiente"
+          },
+          {
+            "authorId": null,
+            "name": "Blanca Rodriguez-Gonzalez"
+          },
+          {
+            "authorId": null,
+            "name": "Norberto Malpica"
+          },
+          {
+            "authorId": null,
+            "name": "Angel Torrado-Carvajal"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.03956",
+          "CorpusId": 291683124
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.03956, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "927f4410c1f30a937085c760e0c44edca74e96a3",
+        "title": "RARF: Region-Aware Rectified Flows for 3D Brain MRI Inpainting",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "RARF, a task-agnostic region-aware rectified flow framework for masked data generation that instantiate the framework for 3D brain MRI inpainting as the submission to the BraTS Inpainting Challenge 2026 is instantiated."
+        },
+        "url": "https://www.semanticscholar.org/paper/927f4410c1f30a937085c760e0c44edca74e96a3",
         "venue": "",
         "year": 2026
       }
@@ -6559,6 +6928,114 @@
         "year": 2026
       }
     },
+    "arxiv:2609.04070": {
+      "cached_at": "2026-09-06T05:00:20.345473+00:00",
+      "data": {
+        "abstract": "Bridging the gap between the discrete reasoning of Vision-Language Models and the continuous, physics-constrained nature of autonomous driving remains a significant challenge. In this work, we introduce LaPla, a unified Vision-Language-Action (VLA) framework featuring latent-aligned planning to seamlessly ground semantic understanding in precise motion execution. We first design an action tokenizer based on a residual vector-quantized variational autoencoder (VQ-VAE), capturing vehicle kinematics and encoding trajectory features into a structured latent space. Rather than discrete codebook lookups that inevitably introduce quantization errors, LaPla repurposes this representation as a physical prior to bridge the modality gap between high-dimensional semantics and the raw action space. Specifically, given multimodal inputs integrating multi-view images, historical actions, and textual instructions, LaPla incorporates concurrent action queries to causally attend to the multimodal context in a single forward pass, projecting hidden states directly into the pretrained VQ-VAE latent space. The frozen decoder then translates these continuous latents into actions, effectively eliminating quantization errors and ensuring physically plausible trajectories while bypassing time-consuming autoregressive generation. Extensive experiments on the nuScenes benchmark demonstrate that LaPla achieves competitive open-loop performance, reducing long-horizon L2 error by 15.52% compared to state-of-the-art VLA methods. Closed-loop evaluations on the NVIDIA AlpaSim simulator further confirm its superior capability in ensuring smooth driving progress, improving the success rate by 33.34 percentage points with significantly reduced inference latency.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Ruo-Yu Yao"
+          },
+          {
+            "authorId": null,
+            "name": "Yu-Sen Xie"
+          },
+          {
+            "authorId": null,
+            "name": "Qing-Zhao Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Pei Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Ze-Wei Yang"
+          },
+          {
+            "authorId": null,
+            "name": "Yi-Peng Zhu"
+          },
+          {
+            "authorId": null,
+            "name": "Xiao-Long Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Jun Ma"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04070",
+          "CorpusId": 291682744
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04070, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "f70c7fe0a3fa027a2910d30ad8404daaacc2ff84",
+        "title": "Continuous Actions from Discrete Minds: Latent-Aligned Planning for End-to-End Autonomous Driving",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "LaPla is introduced, a unified Vision-Language-Action framework featuring latent-aligned planning to seamlessly ground semantic understanding in precise motion execution to bridge the modality gap between high-dimensional semantics and the raw action space."
+        },
+        "url": "https://www.semanticscholar.org/paper/f70c7fe0a3fa027a2910d30ad8404daaacc2ff84",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04071": {
+      "cached_at": "2026-09-06T04:59:59.028889+00:00",
+      "data": {
+        "abstract": "Pathology foundation models improve transferable representation learning for histopathology, but recent gains often rely on encoders with hundreds of millions of parameters and high inference cost. We propose TAP-Path, a task-adaptive compression framework that directly restructures a pretrained Virchow2 encoder rather than distilling it into a separate student. TAP-Path combines validation-driven transformer-block selection, physical removal of redundant blocks, input-adaptive patch-token pruning, multi-depth feature recovery, and a lightweight gated task head. The final model retains 24 of 32 transformer blocks and 70% of patch tokens after pruning, reducing encoder parameters by 24.96% (631.24M to 473.70M) and analytical encoder compute by 35.20% (340.13G to 220.40G FLOPs). Across three task-head optimization seeds, TAP-Path achieved $87.98 \\pm 0.067%$ test accuracy, $81.26 \\pm 0.49%$ balanced accuracy, and $82.38 \\pm 0.48%$ macro-F1 on a 32-class histopathology benchmark, compared with 86.89% for full Virchow2 and 87.67% for UNI2-h. TAP-Path achieved a Brier score of $0.1800 \\pm 0.0005$ and failure-detection AUROC of $0.9047 \\pm 0.0060$. A validation-only rare-aware objective improved rare-class balanced accuracy in a secondary operating analysis. Frozen external evaluation on 433 CPTAC samples yielded $91.22 \\pm 0.83%$ accuracy and $91.10 \\pm 0.81%$ balanced accuracy. These results show that task-adaptive structural and token sparsification can improve the accuracy-efficiency trade-off of large pathology foundation models while preserving reliability under internal and external evaluation.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Mehedi Hasan"
+          },
+          {
+            "authorId": null,
+            "name": "Ashfak Yeafi"
+          },
+          {
+            "authorId": null,
+            "name": "Md Khairul Islam"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04071",
+          "CorpusId": 291682992
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04071, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "5b7a6fbc0be3f29f67d2e348f15011ccabb294f7",
+        "title": "TAP-Path: Task-Adaptive Structural and Token Pruning for Efficient and Trustworthy Pathology Foundation Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "The results show that task-adaptive structural and token sparsification can improve the accuracy-efficiency trade-off of large pathology foundation models while preserving reliability under internal and external evaluation."
+        },
+        "url": "https://www.semanticscholar.org/paper/5b7a6fbc0be3f29f67d2e348f15011ccabb294f7",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "arxiv:2609.04094": {
       "cached_at": "2026-09-05T04:53:31.731680+00:00",
       "data": {
@@ -6603,6 +7080,250 @@
           "text": "This work proposes DRACO: Distributing Rubric-based Advantage for Credit Optimization, which generates rubrics dynamically during training to track the policy's evolving capability, scores those rubrics once per completed trajectory, and redistributes that judgment over the steps responsible for annotated rubrics to produce differentiated per-step advantages in GRPO."
         },
         "url": "https://www.semanticscholar.org/paper/05263c648fa97053d44870030bc9134c2239b943",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04108": {
+      "cached_at": "2026-09-06T05:00:41.148488+00:00",
+      "data": {
+        "abstract": "Reinforcement learning with verifiable rewards (RLVR) and on-policy distillation (OPD) have emerged as two dominant methods for post-training reasoning LLMs. Prior work uses OPD's dense token-level supervision to complement the sparse RL reward, fusing the two signals within a single step: either as a \\emph{weighted-additive combination} or a \\emph{teacher-modulated rescaling} of the RL advantage. In this paper, we show that a simple two-stage scheme, OPD-then-RL, consistently outperforms pure OPD, pure RLVR, and all such joint baselines across logic and math reasoning benchmarks. Beyond the empirical results, we further provide a systematic understanding of this through pass@$k$ behavior, learning dynamics, and parameter updates, yielding a consistent explanation: OPD expands the student's coverage of teacher-supported solutions and RL sharpens within that support, while jointly optimizing the two signals causes them to interfere.To provide a practical recipe, we find that the OPD validation score is the key signal for when to switch to RL, and that OPD is a better cold start for RL than SFT. Together, our results establish OPD-then-RL as a simple yet strong way to combine the two methods, turning two entangled signals into complementary stages.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Bo-Yan Li"
+          },
+          {
+            "authorId": null,
+            "name": "Bing-Sen Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Cheng-Hao Yang"
+          },
+          {
+            "authorId": null,
+            "name": "Ping Nie"
+          },
+          {
+            "authorId": null,
+            "name": "Chen Zhao"
+          },
+          {
+            "authorId": null,
+            "name": "Xi Ye"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04108",
+          "CorpusId": 291682783
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04108, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "998094fcae3609e49e0b3bc69803473e1394b602",
+        "title": "Sequential Beats Joint: On the Interplay between On-Policy Distillation and RLVR",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "It is shown that a simple two-stage scheme, OPD-then-RL, consistently outperforms pure OPD, pure RLVR, and all such joint baselines across logic and math reasoning benchmarks."
+        },
+        "url": "https://www.semanticscholar.org/paper/998094fcae3609e49e0b3bc69803473e1394b602",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04159": {
+      "cached_at": "2026-09-06T05:00:01.190153+00:00",
+      "data": {
+        "abstract": "Large language model (LLM) agents are increasingly proposed as autonomous SOC analysts, but two limitations make them unreliable at enterprise scale: a finite context window cannot hold a multi-thousand-host authentication graph, and free-form generation offers no guarantee that a recommended containment action is consistent with the topology it operates on. We present Sentinel-RL, an agentic-SOC architecture that decouples topological reasoning from semantic reasoning: a heterogeneous graph attention encoder summarizes the live authentication subgraph into a fixed-dimensional state, a Proximal Policy Optimization (PPO) policy maps this state to a constrained set of investigative actions, and an LLM agent loop is restricted to consuming the policy's recommendations and producing analyst-readable narratives gated by a critic. We instantiate the system on the LANL Comprehensive, Multi-Source Cyber-Security Events dataset and the Indiana University Quartz HPC cluster, reporting four results: (i) a two-phase CREATE ingestion pattern loads a 24M-edge authentication subgraph into Neo4j in 14.2 minutes on a single 32-core node, roughly 24x faster than the canonical MERGE-based pipeline; (ii) a sliding-window alert engine reliably trips a 25-event/10-second threshold in<=2.5 s across 50 trials; (iii) PPO training over 200 iterations converges to a mean episodic return of 8.74+/-0.31, with held-out precision of 0.91 and recall of 0.87 on labeled red-team events; and (iv) the integrated containment loop completes a full detect-investigate-recommend-human-approve cycle in a median of 6.3 s. We contribute a reusable engineering pattern (the hot-node deadlock workaround), a portable HPC deployment pattern (anchor-node co-location), and an enterprise-readiness analysis covering false-positive economics, reversibility guarantees, audit compliance, and the human-approval boundary.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Uday Vallabhaneni"
+          },
+          {
+            "authorId": null,
+            "name": "Cassie L. Cagwin"
+          },
+          {
+            "authorId": null,
+            "name": "David J. Wild"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04159",
+          "CorpusId": 291683047
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04159, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "ea667b3ecb07b43e0d15ef7cd937f186f91e4c9a",
+        "title": "SENTINEL-RL: Offloading Topological Reasoning from LLM Agents in the Security Operations Center",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work presents Sentinel-RL, an agentic-SOC architecture that decouples topological reasoning from semantic reasoning, and contributes a reusable engineering pattern, a portable HPC deployment pattern, and an enterprise-readiness analysis covering false-positive economics, reversibility guarantees, audit compliance, and the human-approval boundary."
+        },
+        "url": "https://www.semanticscholar.org/paper/ea667b3ecb07b43e0d15ef7cd937f186f91e4c9a",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04167": {
+      "cached_at": "2026-09-06T04:59:48.066534+00:00",
+      "data": {
+        "abstract": "Repository-level software engineering benchmarks have significantly advanced the evaluation of coding agents, but existing benchmarks primarily measure whether generated patches pass functional tests and overlook review-derived acceptance constraints (review constraints) that often influence whether a patch is acceptable in real-world software development. We introduce SWE-Gate, a repository-level benchmark for software engineering agents that explicitly evaluates review constraint compliance alongside functional correctness. SWE-Gate derives review constraints from real pull request review comments and synthesizes repository-level repair instances around these constraints. Each instance provides separate functional and constraint tests, together with non-compliant and gold patches, enabling explicit separation between issue resolution capability and review constraint compliance. We construct SWE-Gate with 303 repository-level repair instances spanning 75 open-source Python repositories across diverse software domains. Experiments with four LLM backends spanning different capability levels under a common coding-agent scaffold reveal a substantial gap between functional success and success under the complete repair specification: among 644 repairs that pass the functional tests, 221 fail to satisfy the provided review constraints. These findings show that functional-only evaluation overestimates agents'ability to satisfy the full requirements of repository-level repair tasks. The replication package including code, data, and experimental results is available at https://github.com/DeepSoftwareAnalytics/SWE-Gate.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Xin He"
+          },
+          {
+            "authorId": null,
+            "name": "Yan-Lin Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Ming-Wei Liu"
+          },
+          {
+            "authorId": null,
+            "name": "Jia-Chi Chen"
+          },
+          {
+            "authorId": null,
+            "name": "Hong-Yu Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Guan-Bin Li"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04167",
+          "CorpusId": 291682828
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04167, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "ddce07220cd13c1c4b3cb53c13183b8162142ec4",
+        "title": "SWE-Gate: Passing Functional Tests Is Not Enough for Software Engineering Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Findings show that functional-only evaluation overestimates agents'ability to satisfy the full requirements of repository-level repair tasks, and introduces SWE-Gate, a repository-level benchmark for software engineering agents that explicitly evaluates review constraint compliance alongside functional correctness."
+        },
+        "url": "https://www.semanticscholar.org/paper/ddce07220cd13c1c4b3cb53c13183b8162142ec4",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.04193": {
+      "cached_at": "2026-09-06T04:59:50.187320+00:00",
+      "data": {
+        "abstract": "Vision-language pre-training and predictive world modeling provide robot policies with rich semantic and dynamic visual features, but their native action and visual-prediction objectives may omit critical physical and task structure while retaining control-irrelevant visual redundancy. We call this mismatch between visual richness and control utility the action-sufficiency gap. We investigate whether this gap can be bridged by guiding intermediate features to preserve three control-relevant structure in robotic manipulation: geometry governing motion feasibility, affordance encoding instruction-relevant entities, and goals grounding instructions in task-relevant regions. To this end, we present GIFT (Guided Intermediate Feature Training), an architecture-flexible framework for learning intermediate features that translates these structures into training-time constraints through geometry alignment, affordance prediction, and goal-region reconstruction. We instantiate GIFT in a Vision-Language-Action (VLA) policy, a direct-action World-Action Model (WAM), and an inverse-dynamics WAM while retaining each model's action formulation. Under zero-shot transfer to LIBERO-Plus, GIFT-VLA, GIFT-WAM-Fast, and GIFT-WAM-IDM outperform StarVLA-OFT, Fast-WAM, and Fast-WAM-IDM by 4.6, 12.6, and 5.2 points, reaching 79.6%, 72.6%, and 87.8%, respectively. On RoboCasa, the three GIFT variants reach 61.4%, 83.6%, and 82.3%, outperforming their counterparts by 12.6, 9.0, and 8.4 points, respectively. Together, these results establish learning functionally structured intermediate features as a reusable principle across model-specific action formulations, with especially large gains on articulated-object tasks and high-precision real-world manipulation under unseen visual and spatial perturbations. Project page: https://openphoenix-team.github.io/GIFT-pages.",
+        "authors": [
+          {
+            "authorId": null,
+            "name": "Yu-Peng Zheng"
+          },
+          {
+            "authorId": null,
+            "name": "Xiang Li"
+          },
+          {
+            "authorId": null,
+            "name": "Song-En Gu"
+          },
+          {
+            "authorId": null,
+            "name": "Yu-Hang Zheng"
+          },
+          {
+            "authorId": null,
+            "name": "Shuai Tian"
+          },
+          {
+            "authorId": null,
+            "name": "Wei-Ze Li"
+          },
+          {
+            "authorId": null,
+            "name": "Lin-Bo Wang"
+          },
+          {
+            "authorId": null,
+            "name": "Chao-Yue Li"
+          },
+          {
+            "authorId": null,
+            "name": "Qi-Chao Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Hao-Ran Li"
+          },
+          {
+            "authorId": null,
+            "name": "Zhong-Pu Xia"
+          },
+          {
+            "authorId": null,
+            "name": "Ya-Qin Zhang"
+          },
+          {
+            "authorId": null,
+            "name": "Shui-Cheng Yan"
+          },
+          {
+            "authorId": null,
+            "name": "Dong-Bin Zhao"
+          }
+        ],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.04193",
+          "CorpusId": 291682761
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.04193, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "eed8fe46c0d5c0533714fe99db100c23520a3c2f",
+        "title": "GIFT: Guided Intermediate Feature Training via Action-Oriented Structural Supervision for Robotic Manipulation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "GIFT (Guided Intermediate Feature Training), an architecture-flexible framework for learning intermediate features that translates these structures into training-time constraints through geometry alignment, affordance prediction, and goal-region reconstruction, establishes learning functionally structured intermediate features as a reusable principle across model-specific action formulations."
+        },
+        "url": "https://www.semanticscholar.org/paper/eed8fe46c0d5c0533714fe99db100c23520a3c2f",
         "venue": "",
         "year": 2026
       }
