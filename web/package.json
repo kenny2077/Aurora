@@ -21,7 +21,7 @@
     "@astrojs/sitemap": "^3.7.3",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^7.3.2",
-    "dayjs": "^1.11.21",
+    "dayjs": "^1.11.23",
     "lodash.kebabcase": "^4.1.1",
     "rehype-callouts": "^2.1.2",
     "remark-collapse": "^0.1.2",
