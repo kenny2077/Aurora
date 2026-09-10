@@ -34,8 +34,8 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "npm --prefix web ci" in workflow
     assert "uv run pytest -q" in workflow
     assert "uvx --from bandit bandit -q -r src" in workflow
-    assert "uvx --from pip-audit pip-audit" in workflow
-    assert "npm --prefix web audit --audit-level=high --registry=https://registry.npmjs.org" in workflow
+    assert "uvx --from pip-audit pip-audit" not in workflow
+    assert "npm --prefix web audit" not in workflow
     assert "uv run aurora config validate --config data/actions.config.json" in workflow
     assert "Missing required email secret" in workflow
     assert "Missing required LLM secret: DEEPSEEK_API_KEY" in workflow
@@ -80,3 +80,28 @@ def test_github_actions_workflow_publishes_site_to_gh_pages_branch() -> None:
     assert "actions/upload-pages-artifact" not in workflow
     assert "Aurora run did not publish a site artifact" not in workflow
     assert "target/site" not in workflow
+
+
+def test_dependency_audits_are_isolated_from_digest_delivery() -> None:
+    audit_workflow = Path(".github/workflows/dependency-audit.yml").read_text(
+        encoding="utf-8"
+    )
+    dependabot = Path(".github/dependabot.yml").read_text(encoding="utf-8")
+
+    assert "workflow_dispatch:" in audit_workflow
+    assert "schedule:" in audit_workflow
+    assert "pull_request:" in audit_workflow
+    assert "push:" in audit_workflow
+    assert "uvx --from pip-audit pip-audit" in audit_workflow
+    assert (
+        "npm --prefix web audit --audit-level=high "
+        "--registry=https://registry.npmjs.org" in audit_workflow
+    )
+    assert "for ATTEMPT in 1 2" in audit_workflow
+    assert "npm audit transport failed; retrying once." in audit_workflow
+    assert "Publish gh-pages branch" not in audit_workflow
+    assert "git -C \"$PUBLISH_DIR\" push origin gh-pages" not in audit_workflow
+    assert "package-ecosystem: npm" in dependabot
+    assert "directory: /web" in dependabot
+    assert "package-ecosystem: pip" in dependabot
+    assert "package-ecosystem: github-actions" in dependabot
