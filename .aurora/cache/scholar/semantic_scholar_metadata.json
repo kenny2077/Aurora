@@ -7328,6 +7328,346 @@
         "year": 2026
       }
     },
+    "arxiv:2609.11270": {
+      "cached_at": "2026-09-12T04:55:06.758059+00:00",
+      "data": {
+        "abstract": "Pretrained generative robot policies learn expressive action priors from demonstrations. However, existing reinforcement learning methods only steer the noisy space but fail to modulate intermediate action representations during the generation process, resulting in performance degradation and inefficiency. To address this limitation, we propose a novel Dual-Latent Space Reinforcement Learning (DLSRL) framework, which complements initial-noise steering with representation-level control inside the frozen generator. Specifically, our actor network predicts two distinct latent variables: an initial-noise latent variable that steers behavior generation, and an action-representation latent variable for intermediate feature modulation. Moreover, this representation latent variable is mapped to adapter features and ingeniously injected into the hidden states of intermediate action tokens via residual connections. Our dual-control design enables direct adjustment of action representations without updating the base policy. Experiments across generative policy architectures and robotic manipulation tasks show that DLSRL effectively accelerates online robot policy adaptation and achieves competitive performance. Our code is available at \\href{https://github.com/xianchaoxiu/DLSRL}{https://github.com/xianchaoxiu/DLSRL}.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11270",
+          "CorpusId": 291902118
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11270, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "56cd00b1e9c6a01ab2b980947571d8d451147ea4",
+        "title": "Beyond Noise Steering: Dual-Latent Space Reinforcement Learning for Generative Robot Policy",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A novel Dual-Latent Space Reinforcement Learning (DLSRL) framework, which complements initial-noise steering with representation-level control inside the frozen generator and effectively accelerates online robot policy adaptation and achieves competitive performance."
+        },
+        "url": "https://www.semanticscholar.org/paper/56cd00b1e9c6a01ab2b980947571d8d451147ea4",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11478": {
+      "cached_at": "2026-09-12T04:55:59.070806+00:00",
+      "data": {
+        "abstract": "The development of autonomous driving demands comprehensive testing in mixed-traffic scenarios involving vulnerable road users (VRUs), where purely artificial agents often fail to capture authentic human social negotiations. While human-in-the-loop (HITL) simulators enable safe investigation of these interactions, existing multi-agent platforms struggle with the network latency and synchronization constraints required for high-fidelity haptic feedback. To resolve this, we present CARLAverse, an open-source, multimodal simulation ecosystem. Extending modular hardware abstraction, CARLAverse integrates driving (DrivoCARLA), cycling (CycloCARLA), and pedestrian (WalkoCARLA) simulators into a shared virtual environment. Its core methodological contribution is a distributed physics architecture: latency-critical ego dynamics and high-frequency force feedback are computed locally on client nodes, while a central CARLA server orchestrates non-player character (NPC) physics and global traffic. By decoupling haptic control loops from network bottlenecks, CARLAverse enables scalable, cross-institutional HITL experiments without compromising physical immersion. Code and documentation: https://git.ieem-ka.de/simulator-environments/carlaverse",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11478",
+          "CorpusId": 291905895
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11478, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "4c6509585b71d0b2abb7bc1c8bafdb93aafe0065",
+        "title": "CARLAverse: A Highly Modular, Distributed, and Multimodal Framework for Human-in-the-Loop Simulation",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "By decoupling haptic control loops from network bottlenecks, CARLAverse enables scalable, cross-institutional HITL experiments without compromising physical immersion."
+        },
+        "url": "https://www.semanticscholar.org/paper/4c6509585b71d0b2abb7bc1c8bafdb93aafe0065",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11677": {
+      "cached_at": "2026-09-12T04:55:45.575094+00:00",
+      "data": {
+        "abstract": "Self-evolving runtime harnesses can substantially improve the capabilities of large language model (LLM) agents and provide a promising paradigm for optimizing agent execution. Existing harness evolution methods typically rely on iterative search, repeatedly evaluating and revising candidate harnesses based on execution feedback from task instances. While this paradigm enables continuous harness optimization, it incurs substantial time overhead due to repeated agent executions and code modifications, and may overfit to observed tasks and specific failure patterns, resulting in degraded generalization to unseen tasks. We identify the lack of principled failure diagnosis as a key bottleneck in harness evolution: an observed failure can reflect either model-specific deficiencies or systematic harness deficiencies, and directly optimizing against individual failures can lead to unnecessary model-specific accommodation. We therefore propose Ecdysis, an efficient and effective framework that distinguishes model-specific accommodation from harness-level repair and biases adaptation toward systematic harness deficiencies by identifying recurring cross-task failure patterns. Ecdysis adopts a batch-level cross-instance failure aggregation paradigm to jointly analyze failure evidence from multiple task instances and further introduces Failure-Driven Collaborative Refinement to diagnose failure causes and iteratively refine harness modification specifications. By combining cross-instance failure analysis with multi-role diagnosis, Ecdysis enables more effective harness evolution with lower training time. Experiments show that Ecdysis achieves up to a 1.84x speedup in harness training compared with existing harness evolution methods, while improving the reasoning accuracy of the resulting harnesses by 18.56%.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11677",
+          "CorpusId": 291905957
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11677, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "90ac0669fb9a5518bb1bd363b610383e2cfae303",
+        "title": "Ecdysis: Efficient and Effective Training of Runtime Harnesses for LLM Agents",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "Ecdysis is proposed, an efficient and effective framework that distinguishes model-specific accommodation from harness-level repair and biases adaptation toward systematic harness deficiencies by identifying recurring cross-task failure patterns."
+        },
+        "url": "https://www.semanticscholar.org/paper/90ac0669fb9a5518bb1bd363b610383e2cfae303",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11698": {
+      "cached_at": "2026-09-12T04:55:08.912891+00:00",
+      "data": {
+        "abstract": "This paper presents a coordinated trajectory generation and tracking control framework for a tail-sitter unmanned aerial vehicle (UAV), which does not require aerodynamic priors identified for a specific airframe while addressing the challenge of flight control under highly nonlinear aerodynamics across the full flight envelope. The core innovation lies in employing phase-specific aerodynamic modeling strategies for planning and tracking, tailored to their distinct functional characteristics, without requiring airframe-specific aerodynamic priors. Specifically, the phi-theory model under coordinated flight is employed to derive an analytic differential flatness mapping, and a simplified but locally accurate model is established for predictive control to enable real-time aerodynamic parameter estimation. The proposed framework is evaluated extensively through both simulation and challenging real-world flight tests under mild wind conditions, showing high-precision tracking and adaptability across the tested aerodynamic conditions. To the best of our knowledge, this is the first real-world demonstration of accurate trajectory tracking over tested flight regimes spanning the full envelope of a tail-sitter UAV without relying on aerodynamic identification campaigns. The source code of our framework is available at: https://github.com/SYSU-HILAB/AP-PnC.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11698",
+          "CorpusId": 291905840
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11698, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "28fae55dde7023b7d4491ebe269f17e291ef21e6",
+        "title": "Aerodynamic Prior-Free Coordinated Trajectory Generation and Tracking Control for a Tail-Sitter UAV",
+        "tldr": null,
+        "url": "https://www.semanticscholar.org/paper/28fae55dde7023b7d4491ebe269f17e291ef21e6",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11708": {
+      "cached_at": "2026-09-12T04:55:49.852302+00:00",
+      "data": {
+        "abstract": "The use of B-splines and Non-Uniform Rational B-Splines surfaces constitutes the mathematical foundation of contemporary computer-aided design (CAD) systems. Despite long-term progress, geometric kernels in traditional CAD still rely heavily on predetermined heuristic initialization for surface fitting and parameterization. Meanwhile, the procedural semantics and design intent encoded in modeling histories are largely ignored during geometry generation. This disconnect creates a gap between high-level design intent and solver-executable geometric configuration, often leading to suboptimal and semantically inconsistent fitting results. To bridge this gap, we introduce LASP, a Language-Augmented Semantic Priors framework that leverages large language models (LLMs) to infer structured, solver-usable B-spline priors from procedural modeling histories. Rather than modifying the geometric kernel itself, LASP operates as a semantic reasoning layer above existing solvers. It first translates modeling histories into rich textual descriptions that capture design intent, geometric context, and functional relationships, and then uses a fine-tuned LLM to predict structured B-spline prior parameters. LASP is trained through a two-stage scheme that combines local geometric regularities with long-range contextual dependencies, producing priors that are both interpretable and semantically coherent. This approach furnishes inductive signals that direct the conventional B-spline fitting process toward solutions that more accurately encapsulate the intended design objectives and demonstrate heightened semantic coherence. Compared to traditional machine learning schemes, the experiments demonstrate that language-driven reasoning can serve as a powerful inductive bias for geometric solving, establishing a new paradigm of language-guided geometric optimization in modern CAD systems.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11708",
+          "CorpusId": 291905778
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11708, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2b7216888a547a2d333842389dcc6bc251114583",
+        "title": "Language-Augmented Semantic Priors for B-Spline Surface Fitting",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "LASP is introduced, a Language-Augmented Semantic Priors framework that leverages large language models to infer structured, solver-usable B-spline priors from procedural modeling histories, establishing a new paradigm of language-guided geometric optimization in modern CAD systems."
+        },
+        "url": "https://www.semanticscholar.org/paper/2b7216888a547a2d333842389dcc6bc251114583",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11717": {
+      "cached_at": "2026-09-12T04:55:34.363091+00:00",
+      "data": {
+        "abstract": "Unified models for object detection and trajectory forecasting aim to merge perception and prediction for autonomous driving, refining actor trajectories directly over shared bird's-eye-view (BEV) images rasterized from LiDAR and high-definition maps. Their accuracy on dynamic, moving actors, however, remains the hardest part of the task, and the strongest such model, DeTra, has no public implementation. We contribute an openly released DeTra reimplementation with documented approximations, and on top of it MC-DeTra: a family of motion-consistency mechanisms that add supervision through two annotation-derived auxiliary signals -- each actor's observed past motion and the occupancy of the surrounding traffic that forms its social context -- and one inter-output consistency constraint that aligns an actor's predicted heading with its predicted direction of motion. Every proposed loss is train-only and inference-safe: it shapes the shared BEV representation during training and is removed at test time, adding no inference latency. On the Waymo Open Dataset, evaluated under a strict, detection-conditioned forecasting protocol, MC-DeTra improves dynamic, socially-situated trajectory forecasting while preserving or improving detection accuracy; a gradient-based loss-calibration analysis exposes how the auxiliary objectives compete at the shared backbone, and our ablation identifies which signals contribute most. We release code, configurations, and evaluation tooling at https://github.com/diuzhevVlad/MC-DeTra.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11717",
+          "CorpusId": 291905767
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11717, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "0f5d90ca4d6b23d502d5d4c361febd414e5e9fda",
+        "title": "MC-DeTra: Motion-Consistent Joint Object Detection and Socially-Aware Trajectory Forecasting in Bird's-Eye-View Images",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "MC-DeTra improves dynamic, socially-situated trajectory forecasting while preserving or improving detection accuracy; a gradient-based loss-calibration analysis exposes how the auxiliary objectives compete at the shared backbone, and the ablation identifies which signals contribute most."
+        },
+        "url": "https://www.semanticscholar.org/paper/0f5d90ca4d6b23d502d5d4c361febd414e5e9fda",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11744": {
+      "cached_at": "2026-09-12T04:55:36.426917+00:00",
+      "data": {
+        "abstract": "Prefix caching can reduce the time to first token (TTFT) of long-context LLM requests by reusing previously computed key-value (KV) states, but for short prefixes or fast GPUs, recomputation can be faster than loading from an external cache. We characterize this tradeoff in vLLM across GPU, CPU, and NVMe tiers using synthetic workloads, long-context benchmarks, production traces, and find that cache performance depends on transfer granularity, intermediate memory use, and when transfers enter the request schedule, not only on device bandwidth. These findings motivate py-kvcache, a vLLM KV Offload connector with asynchronous direct I/O, bounded shared staging, and scheduler-aware preloading, which starts disk reads while requests are still waiting, overlapping with compute. At 80k tokens, py-kvcache loading from disk is 2.0x faster than LMCache, with preloading contributing 1.34x. With GPU, CPU, and disk caching enabled, it is 1.23x faster than LMCache and within approximately 4% of the native vLLM KV Offload implementation. LongBench and SCBench show that these benefits extend to irregular prefix chains and multi-turn workloads. Bailian trace replays improve TTFT on a weaker GPU, but on an H100 the average request falls below the break-even point and GPU memory alone retains enough prefixes. External KV caching should therefore be treated as a setup specific admission decision. The py-kvcacheimplementation is available at: https://github.com/atlarge-research/py-kvcache.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11744",
+          "CorpusId": 291906029
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11744, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "145d66177bf795a0a835beab1a5cdbe450a90443",
+        "title": "Building py-kvcache: A Performance Characterization of External KV Caching for vLLM with NVMe SSDs",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "It is found that cache performance depends on transfer granularity, intermediate memory use, and when transfers enter the request schedule, not only on device bandwidth, not only on device bandwidth."
+        },
+        "url": "https://www.semanticscholar.org/paper/145d66177bf795a0a835beab1a5cdbe450a90443",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11864": {
+      "cached_at": "2026-09-12T04:55:47.711551+00:00",
+      "data": {
+        "abstract": "Speech large language models (SpeechLLMs) offer reduced latency and retain paralinguistic nuances that are typically lost in cascaded automatic speech recognition (ASR) and text-based LM architectures. However, they continue to lag behind text-only LLMs on complex reasoning tasks, while real-time spoken interaction imposes strict latency constraints. Although prior works employ Chain-of-Thought (CoT) and concurrent reasoning to enhance reasoning capabilities without inducing prohibitive delays, an inherent accuracy-latency trade-off persists. In this paper, we investigate whether a streaming SpeechLLM can dynamically revise its reasoning traces on the fly. We introduce RetroThinker, a multi-stage post-training framework that equips the Moshi model to self-verify and forward-correct CoT steps during inference. RetroThinker combines supervised fine-tuning (SFT) on curated retrospective thinking data with length-based direct preference optimization (DPO) to optimize retrospective during early reasoning (i.e., reasoning concurrently while the user speaks). Evaluated on the GSM8K benchmark, RetroThinker significantly improves the accuracy-latency trade-off over non-retrospective baselines, achieving an 11% absolute accuracy gain at a comparable latency.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11864",
+          "CorpusId": 291905943
+        },
+        "fieldsOfStudy": [
+          "Engineering",
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11864, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "f86e94b8e3ce035b9f4bdc9638695921fe6186a5",
+        "title": "RetroThinker: Enabling Retrospective Thinking in Speech LLMs",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": null
+        },
+        "url": "https://www.semanticscholar.org/paper/f86e94b8e3ce035b9f4bdc9638695921fe6186a5",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11867": {
+      "cached_at": "2026-09-12T04:54:43.370437+00:00",
+      "data": {
+        "abstract": "We introduce AdamX, a first-order optimizer that incorporates cosine similarity as an adaptive mechanism for controlling update magnitudes. The proposed method is scalable, model-agnostic, and straightforward to integrate into existing training pipelines. We further introduce a variance rectification scheme that promotes smoother optimization during the early stages of training. Overall, we provide empirical evidence that AdamX achieves competitive convergence rates across a range of benchmark datasets and architectures. Performance is evaluated in terms of the number of epochs required to reach predefined performance thresholds under a fixed hyperparameter budget. Code and Experiments available at: https://github.com/FranciscoCaldas/adamX.",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11867",
+          "CorpusId": 291905617
+        },
+        "fieldsOfStudy": [
+          "Computer Science",
+          "Mathematics"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11867, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "2c0c9ca147ffc8a3100ad85823ae060b15b77d27",
+        "title": "AdamX: Cosine similarity meets gradient descent",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "AdamX, a first-order optimizer that incorporates cosine similarity as an adaptive mechanism for controlling update magnitudes is introduced, which is scalable, model-agnostic, and straightforward to integrate into existing training pipelines."
+        },
+        "url": "https://www.semanticscholar.org/paper/2c0c9ca147ffc8a3100ad85823ae060b15b77d27",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11878": {
+      "cached_at": "2026-09-12T04:54:41.269897+00:00",
+      "data": {
+        "abstract": "Large language models generate fluent text that can contain unfaithful claims -- a phenomenon known as hallucination. We present a multi-signal detection pipeline combining fine-tuned DeBERTa-v3 classification, Monte Carlo (MC) Dropout uncertainty quantification, and temperature-scaled calibration for response-level hallucination detection. Evaluated on the HaluEval benchmark, our pipeline achieves F1=0.915 and AUROC=0.977 on general-domain tasks, with per-task F1 scores of 0.97 (QA), 0.96 (Summarization), and 0.82 (Dialogue). MC Dropout inference further improves accuracy to 93.2%. A context ablation study confirms the model performs genuine entailment reasoning rather than exploiting surface patterns, with summarization F1 dropping 24% when knowledge context is removed. Learning curve analysis reveals that 25% of training data captures 77% of full-data performance. Beyond detection, we apply Direct Preference Optimization (DPO) to a Qwen2.5-0.5B generator, reducing its hallucination rate from 85.5% to 37.7% (55.9% relative reduction) as measured by our detector. Cross-domain evaluation on the SciFact biomedical benchmark shows that general-domain training transfers poorly (F1=0.52), motivating domain-specific fine-tuning. PubMedBERT fine-tuned on SciFact achieves F1=0.63 and AUROC=0.81, demonstrating that domain-matched pre-training is the strongest adaptation strategy. Code and models are available at https://github.com/varunteja99/hallucination-detection-nlp",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11878",
+          "CorpusId": 291905787
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11878, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "418fa61dc7b91d83e2021e92a789e81236d7988f",
+        "title": "Domain-Specific Hallucination Detection in Large Language Models",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "A multi-signal detection pipeline combining fine-tuned DeBERTa-v3 classification, Monte Carlo Dropout uncertainty quantification, and temperature-scaled calibration for response-level hallucination detection is presented."
+        },
+        "url": "https://www.semanticscholar.org/paper/418fa61dc7b91d83e2021e92a789e81236d7988f",
+        "venue": "",
+        "year": 2026
+      }
+    },
+    "arxiv:2609.11900": {
+      "cached_at": "2026-09-12T04:55:25.188952+00:00",
+      "data": {
+        "abstract": "Spatial reasoning depends not only on metric properties such as distance, angle, and shape, but also on topological relations that remain invariant under continuous deformation. Cognitive science identifies these relations as foundational to spatial understanding, yet foundation-model evaluations largely focus on metric or viewpoint-dependent relations. We introduce MindTopo, a benchmark of topological intuition across five properties grounded in cognitive science and formal topology: continuity, separation, order, enclosure, and knots. MindTopo evaluates each property at two cognitive levels. Reasoning asks a model to identify topological relations or infer how they change. Planning instantiates a foundation model as a closed-loop agent whose policy selects environment actions. MindTopo contains 11,030 instances across 13 procedurally generated task types with controllable difficulty. We benchmark 14 MLLMs and study agent configurations augmented with image and video generation, including 3 video generative models in planning settings. Every MLLM performs better on reasoning than on planning, and the best-performing model remains far below observed human performance. On Qwen3-VL-2B-Instruct, supervised fine-tuning and reinforcement learning improve reasoning more than planning. Generated observations retain local cues and reach plausible endpoints, but audited rollouts do not reliably follow environment dynamics or preserve topology across transitions. Our website is at https://mind-topo.github.io/",
+        "authors": [],
+        "citationCount": 0,
+        "externalIds": {
+          "ArXiv": "2609.11900",
+          "CorpusId": 291906003
+        },
+        "fieldsOfStudy": [
+          "Computer Science"
+        ],
+        "influentialCitationCount": 0,
+        "openAccessPdf": {
+          "disclaimer": "Notice: Paper or abstract available at https://arxiv.org/abs/2609.11900, which is subject to the license by the author or copyright owner provided with this content. Please go to the source to verify the license and copyright information for your use.",
+          "license": null,
+          "status": null,
+          "url": ""
+        },
+        "paperId": "d31629b1414a8774b7128313f2e44729ec7e65f6",
+        "title": "MindTopo: Can Foundation Models Reason in Topological Space?",
+        "tldr": {
+          "model": "tldr@v2.0.0",
+          "text": "This work introduces MindTopo, a benchmark of topological intuition across five properties grounded in cognitive science and formal topology: continuity, separation, order, enclosure, and knots, which performs better on reasoning than on planning, and the best-performing model remains far below observed human performance."
+        },
+        "url": "https://www.semanticscholar.org/paper/d31629b1414a8774b7128313f2e44729ec7e65f6",
+        "venue": "",
+        "year": 2026
+      }
+    },
     "title:acesearcher bootstrapping reasoning and search for llms via reinforced self play": {
       "cached_at": "2026-06-29T05:15:21.571589+00:00",
       "data": {
